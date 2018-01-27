@@ -10,7 +10,7 @@
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  *
- * @see https://github.com/Woeler/eso-raid-planner
+ * @see https://github.com/ESORaidplanner/ESORaidplanner
  */
 
 namespace App\Telegram\Menu;
