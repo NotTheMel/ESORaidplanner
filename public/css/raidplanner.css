@@ -1,0 +1,100 @@
+.rp-main-background-0 {
+    background: url('../img/bg.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.rp-main-background-0 a {
+    color: purple;
+}
+
+.rp-main-background-0 a:hover {
+    color: mediumpurple;
+}
+
+.rp-main-background-1 {
+    background: url('../img/bg1.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.rp-main-background-1 a {
+    color: orange;
+}
+
+.rp-main-background-1 a:hover {
+    color: yellow;
+}
+
+.rp-main-background-2 {
+    background: url('../img/bg2.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+.rp-main-background-2 a {
+    color: red;
+}
+
+.rp-main-background-2 a:hover {
+    color: orangered;
+}
+
+.rp-main-background-3 {
+    background: url('../img/bg3.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.rp-main-background-3 a {
+    color: green;
+}
+
+.rp-main-background-3 a:hover {
+    color: greenyellow;
+}
+
+.rp-main-background-4 {
+    background: url('../img/bg4.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.rp-main-background-4 a {
+    color: blue;
+}
+
+.rp-main-background-4 a:hover {
+    color: dodgerblue;
+}
+
+.rp-main-background-5 {
+    background: url('../img/bg5.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.rp-main-background-5 a {
+    color: darkgreen;
+}
+
+.rp-main-background-5 a:hover {
+    color: forestgreen;
+}
+
+.dropdown-menu {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}

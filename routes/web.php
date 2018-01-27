@@ -1,0 +1,234 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    if(Auth::check()){
+        return view('dashboard');
+    }
+    return view('auth.login');
+});
+
+// Authentication Routes...
+Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
+Route::post('login', 'Auth\LoginController@login');
+Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+
+// Registration Routes...
+Route::get('register', 'UserController@showRegistrationForm')->name('register');
+Route::post('register', 'Auth\RegisterController@register');
+
+// Password Reset Routes...
+Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
+Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
+Route::post('password/reset', 'Auth\ResetPasswordController@reset');
+
+/*
+ *
+ * ROUTES FOR GENERAL
+ *
+ */
+
+Route::get('/changelog', function () {
+    return view('changelog');
+});
+
+Route::get('/faq', function () {
+    return view('faq');
+});
+
+Route::get('/about', function () {
+    return view('about');
+});
+
+Route::get('/termsofuse', function () {
+    return view('termsofuse');
+});
+
+
+/*
+ *
+ * ROUTES FOR EVENTS
+ *
+ */
+
+Route::group(['middleware' => 'auth'], function () {
+
+    /*
+     *
+     * ROUTES FOR EVENTS
+     *
+     */
+
+    Route::get('/events', 'EventsController@index')->name('events');
+
+    Route::get('/g/{slug}/event/{id}', 'EventsController@detail');
+
+    Route::post('/g/{slug}/sign/up/{id}', 'EventsController@signUpUser');
+
+    Route::post('/g/{slug}/sign/other/{id}', 'EventsController@signUpOther');
+
+    Route::post('/g/{slug}/sign/off/{id}', 'EventsController@signOffUser');
+
+    Route::post('/g/{slug}/sign/modify/{id}', 'EventsController@modifySignup');
+
+    Route::get('/g/{slug}/events/create', 'EventsController@createPage');
+
+    Route::post('/g/{slug}/events/create', 'EventsController@create');
+
+    Route::get('/g/{slug}/events/edit/{id}', 'EventsController@editPage');
+
+    Route::post('/g/{slug}/events/edit/{id}', 'EventsController@modifyEvent');
+
+    Route::get('/g/{slug}/events/delete/{id}', 'EventsController@deleteEvent');
+
+    Route::get('/g/{slug}/pastevents', 'EventsController@pastEvents');
+
+    Route::get('/g/{slug}/logs', 'GuildController@logs');
+
+    /*
+     *
+     * ROUTES FOR WEBHOOKS
+     *
+     */
+
+    Route::get('/hooks', 'HookController@hookList');
+
+    Route::get('/hooks/create/{type}', 'HookController@createView');
+
+    Route::post('/hooks/create/{type}', 'HookController@create');
+
+    Route::get('/hooks/modify/{type}/{id}', 'HookController@modifyView');
+
+    Route::post('/hooks/modify/{type}/{id}', 'HookController@modify');
+
+    Route::post('/hooks/delete/{id}', 'HookController@delete');
+
+    /*
+     *
+     * ROUTES FOR GUILDS
+     *
+     */
+
+    Route::get('/g/{slug}', 'GuildController@detail');
+
+    Route::get('/guild/create', function () {
+        return view('guild.create');
+    });
+
+    Route::get('/guilds', 'GuildController@listAll');
+
+    Route::post('/guild/create', 'GuildController@create');
+
+    Route::get('/guild/delete/{id}', 'GuildController@deleteConfirm');
+
+    Route::get('/guild/delete/{id}/confirm', 'GuildController@delete');
+
+    Route::post('/g/{slug}/member/request/{id}', 'GuildController@requestMembership');
+
+    Route::post('/g/{slug}/member/approve/{guild_id}/{user_id}', 'GuildController@approveMembership');
+
+    Route::get('/g/{slug}/member/remove/{guild_id}/{user_id}', 'GuildController@removeMembership');
+
+    Route::get('/g/{slug}/member/makeadmin/{user_id}', 'GuildController@makeAdmin');
+
+    Route::get('/g/{slug}/member/removeadmin/{user_id}', 'GuildController@removeAdmin');
+
+    Route::get('/g/{slug}/member/leave', 'GuildController@leaveGuild');
+
+    Route::get('/g/{slug}/settings', 'GuildController@settings');
+
+    Route::post('/g/{slug}/settings', 'GuildController@saveSettings');
+
+    Route::get('/g/{slug}/members', 'GuildController@members');
+
+
+
+    /*
+     *
+     * ROUTES FOR COMMENTS
+     *
+     */
+
+    Route::post('/g/{slug}/event/{event_id}/comment/create', 'CommentController@create');
+
+    Route::post('/g/{slug}/event/{event_id}/comment/modify/{comment_id}', 'CommentController@modify');
+
+    Route::get('/g/{slug}/event/{event_id}/comment/delete/{comment_id}', 'CommentController@delete');
+
+    /*
+     *
+     * ROUTES FOR Profile
+     *
+     */
+
+    Route::get('/profile/menu', 'UserController@menuProfilePage');
+
+    Route::get('/profile/characters', 'UserController@profileCharacters');
+
+    Route::get('/profile/membership', 'UserController@profileMembership');
+
+    Route::get('/profile/accountsettings', 'UserController@editProfilePage');
+
+    Route::post('/profile/accountsettings', 'UserController@editProfile');
+
+    Route::get('/profile/profilesettings', 'UserController@profileEdit');
+
+    Route::post('/profile/profilesettings', 'UserController@profileEditPost');
+
+    Route::get('/profile/edit/avatar', 'UserController@avatarEditPage');
+
+    Route::post('/profile/edit/avatar', 'UserController@editAvatar');
+
+    Route::post('/profile/edit/avatar/upload', 'UserController@uploadAvatar');
+
+    /*
+     *
+     * ROUTES FOR CHARACTERS
+     *
+     */
+
+    Route::post('/profile/character/create', 'CharacterController@create');
+
+    Route::post('/profile/character/modify/{id}', 'CharacterController@modify');
+
+    Route::post('/profile/character/delete/{id}', 'CharacterController@delete');
+
+    /*
+     *
+     * ROUTES FOR SIGNUPS
+     *
+     */
+
+    Route::get('/signup/{signup_id}/{status}', 'EventsController@setSignupStatus');
+
+    Route::get('/signup/delete/{slug}/{event_id}/{id}', 'EventsController@deleteSignup');
+
+    /*
+     *
+     * ROUTES FOR PAGES
+     *
+     */
+
+    Route::get('/dashboard', 'HomeController@dashboard');
+    Route::get('/home', 'HomeController@dashboard');
+
+    Route::get('/patreon/error', 'PatreonController@error');
+
+    Route::get('/patreon/success', 'PatreonController@success');
+
+    Route::get('/patreon/login', 'PatreonController@OAuth');
+
+    Route::get('profile/{user_id}', 'UserController@profile');
+
+});
