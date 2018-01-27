@@ -191,6 +191,7 @@ class ApiController extends Controller
 
     /**
      * @param Request $request
+     *
      * @return array|\Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
     public function getUserGuildsPending(Request $request)
