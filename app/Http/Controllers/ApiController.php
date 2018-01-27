@@ -191,6 +191,32 @@ class ApiController extends Controller
 
     /**
      * @param Request $request
+     * @return array|\Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function getUserGuildsPending(Request $request)
+    {
+        $user = $this->login($request);
+
+        if (false === $user) {
+            return response(null, 401);
+        }
+
+        $ids = DB::table('user_guilds')
+            ->where('user_id', '=', $user->id)
+            ->where('status', '=', 0)
+            ->get();
+
+        $guilds = [];
+
+        foreach ($ids as $id) {
+            $guilds[] = Guild::query()->find($id->guild_id);
+        }
+
+        return $guilds;
+    }
+
+    /**
+     * @param Request $request
      * @param int     $guild_id
      *
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response|void
@@ -332,7 +358,7 @@ class ApiController extends Controller
         }
 
         if (!$guild->isAdmin($user_id)) {
-            $guild->makeAdmin($user_id);
+            $guild->makeAdmin($user_id, $user->id);
 
             $u = User::query()->find($user_id);
 
@@ -363,7 +389,7 @@ class ApiController extends Controller
         }
 
         if ($guild->isAdmin($user_id)) {
-            $guild->removeAdmin($user_id);
+            $guild->removeAdmin($user_id, $user->id);
 
             $u = User::query()->find($user_id);
 

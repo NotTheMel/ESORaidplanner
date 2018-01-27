@@ -113,9 +113,9 @@ class Guild extends Model
     /**
      * @param int $user_id
      */
-    public function makeAdmin(int $user_id)
+    public function makeAdmin(int $user_id, int $admin_id = null)
     {
-        if (!$this->isOwner(Auth::id())) {
+        if (!$this->isOwner($admin_id ?? Auth::id())) {
             return;
         }
         $admins = json_decode($this->admins, true);

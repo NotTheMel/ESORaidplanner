@@ -36,6 +36,8 @@ Route::post('/user/create', 'ApiController@createUser');
 
 Route::post('/user/guilds', 'ApiController@getUserGuilds');
 
+Route::post('/user/guilds/pending', 'ApiController@getUserGuildsPending');
+
 Route::post('/user/events', 'ApiController@getUserEvents');
 
 Route::post('/user/signups', 'ApiController@getUserSignups');
