@@ -311,6 +311,68 @@ class ApiController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @param int     $guild_id
+     * @param int     $user_id
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function makeGuildAdmin(Request $request, int $guild_id, int $user_id)
+    {
+        $user = $this->login($request);
+
+        if (false === $user) {
+            return response(null, 401);
+        }
+
+        $guild = Guild::query()->find($guild_id);
+
+        if ($guild->owner_id !== $user->id) {
+            return response(null, 401);
+        }
+
+        if (!$guild->isAdmin($user_id)) {
+            $guild->makeAdmin($user_id);
+
+            $u = User::query()->find($user_id);
+
+            $log = new LogEntry();
+            $log->create($guild->id, $user->name.' promoted '.$u->name.' to admin.');
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @param int     $guild_id
+     * @param int     $user_id
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function removeGuildAdmin(Request $request, int $guild_id, int $user_id)
+    {
+        $user = $this->login($request);
+
+        if (false === $user) {
+            return response(null, 401);
+        }
+
+        $guild = Guild::query()->find($guild_id);
+
+        if ($guild->owner_id !== $user->id) {
+            return response(null, 401);
+        }
+
+        if ($guild->isAdmin($user_id)) {
+            $guild->removeAdmin($user_id);
+
+            $u = User::query()->find($user_id);
+
+            $log = new LogEntry();
+            $log->create($guild->id, $user->name.' demoted '.$u->name.' to member.');
+        }
+    }
+
+    /**
      * Get the signup of an event for the user (self only).
      *
      * @param Request $request

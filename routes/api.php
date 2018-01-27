@@ -58,6 +58,10 @@ Route::post('/guild/{guild_id}/approve/{user_id}', 'ApiController@approveGuildMe
 
 Route::post('/guild/{guild_id}/remove/{user_id}', 'ApiController@removeGuildMembership');
 
+Route::post('/guild/{guild_id}/promote/{user_id}', 'ApiController@makeGuildAdmin');
+
+Route::post('/guild/{guild_id}/demote/{user_id}', 'ApiController@removeGuildAdmin');
+
 Route::post('/event/{event_id}/signups', 'ApiController@getEventSignups');
 
 Route::post('/signup/create/{event_id}', 'ApiController@signUpUser');
