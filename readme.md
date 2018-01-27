@@ -1,4 +1,4 @@
-# ESO Raidplanner
+# ESO Raidplanner ![Travis](https://travis-ci.org/ESORaidplanner/ESORaidplanner.svg?branch=master)
 
 Welcome to the ESO Raidplanner Github Repository. This is the place where issue-tracking a code contribution takes place!
 
