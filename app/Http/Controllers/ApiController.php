@@ -385,7 +385,7 @@ class ApiController extends Controller
 
         $guild = Guild::query()->find($guild_id);
 
-        if ($guild->owner_id !== $user->id) {
+        if ($guild->owner_id !== $user->id || $guild->owner_id === $user_id) {
             return response(null, 401);
         }
 
