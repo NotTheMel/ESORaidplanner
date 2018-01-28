@@ -219,6 +219,11 @@
                             </a>
                         </li>
                         <li>
+                            <a href="https://github.com/ESORaidplanner/ESORaidplanner" target="_blank">
+                                Contribute
+                            </a>
+                        </li>
+                        <li>
                             <a href="/termsofuse">
                                 Terms of Use
                             </a>
