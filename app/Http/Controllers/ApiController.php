@@ -130,6 +130,47 @@ class ApiController extends Controller
     }
 
     /**
+     * @param Request $request
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function addOnesignalIdToUser(Request $request)
+    {
+        $user = $this->login($request);
+
+        if (false === $user) {
+            return response(null, 401);
+        }
+
+        $device_id    = $request->input('device');
+        $onesignal_id = $request->input('onesignal_id');
+
+        if (!empty($device_id) && !empty($onesignal_id)) {
+            $user->addOnesignalId($device_id, $onesignal_id);
+        }
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function removeOnesignalIdFromUser(Request $request)
+    {
+        $user = $this->login($request);
+
+        if (false === $user) {
+            return response(null, 401);
+        }
+
+        $device_id = $request->input('device');
+
+        if (!empty($device_id)) {
+            $user->removeOnesignalId($device_id);
+        }
+    }
+
+    /**
      * Get a guild, but only if the user is a member.
      *
      * @param Request $request

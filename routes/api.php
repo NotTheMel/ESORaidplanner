@@ -46,6 +46,10 @@ Route::post('/user/{user_id}', 'ApiController@getUserInfo');
 
 Route::post('/user/events/signedup', 'ApiController@getUserEventsSignedUp');
 
+Route::post('/user/onesignal/add', 'ApiController@addOnesignalIdToUser');
+
+Route::post('/user/onesignal/remove', 'ApiController@removeOnesignalIdFromUser');
+
 Route::post('/guild/{guild_id}/events', 'ApiController@getGuildEvents');
 
 Route::post('/guild/{guild_id}/members', 'ApiController@getGuildMembers');

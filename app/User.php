@@ -193,4 +193,31 @@ class User extends Authenticatable
 
         return $badges;
     }
+
+    /**
+     * @param $device_id
+     * @param string $onesignal_id
+     */
+    public function addOnesignalId($device_id, string $onesignal_id)
+    {
+        $ids = json_decode($this->onsesignal_id, true) ?? [];
+
+        $ids[$device_id] = $onesignal_id;
+
+        $this->onesignal_id = json_encode($ids);
+
+        $this->save();
+    }
+
+    /**
+     * @param $device_id
+     */
+    public function removeOnesignalId($device_id)
+    {
+        $ids = json_decode($this->onsesignal_id, true);
+
+        $this->onesignal_id = json_encode(array_except($ids, $device_id));
+
+        $this->save();
+    }
 }
