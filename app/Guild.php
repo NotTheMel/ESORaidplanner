@@ -126,7 +126,7 @@ class Guild extends Model
             ->where('id', '=', $this->id)
             ->update(['admins' => json_encode($admins)]);
 
-        $user = User::query()->find($user_id);
+        $user  = User::query()->find($user_id);
         $admin = User::query()->find($admin_id ?? Auth::id());
 
         $log = new LogEntry();
@@ -150,7 +150,7 @@ class Guild extends Model
                 ->where('id', '=', $this->id)
                 ->update(['admins' => json_encode($arr)]);
 
-            $user = User::query()->find($user_id);
+            $user  = User::query()->find($user_id);
             $admin = User::query()->find($admin_id ?? Auth::id());
 
             $log = new LogEntry();

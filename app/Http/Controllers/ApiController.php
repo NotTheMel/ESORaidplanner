@@ -310,7 +310,7 @@ class ApiController extends Controller
             return response(null, 401);
         }
 
-        if($guild->isAdmin($user->id)) {
+        if ($guild->isAdmin($user->id)) {
             $guild->removeAdmin($user->id, $user->id);
         }
 
