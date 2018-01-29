@@ -310,7 +310,9 @@ class ApiController extends Controller
             return response(null, 401);
         }
 
-        $guild->removeAdmin($user->id);
+        if($guild->isAdmin($user->id)) {
+            $guild->removeAdmin($user->id, $user->id);
+        }
 
         DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $guild->id)->delete();
 

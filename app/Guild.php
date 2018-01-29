@@ -127,9 +127,10 @@ class Guild extends Model
             ->update(['admins' => json_encode($admins)]);
 
         $user = User::query()->find($user_id);
+        $admin = User::query()->find($admin_id ?? Auth::id());
 
         $log = new LogEntry();
-        $log->create($this->id, Auth::user()->name.' promoted '.$user->name.' to admin.');
+        $log->create($this->id, $admin->name.' promoted '.$user->name.' to admin.');
     }
 
     /**
@@ -150,9 +151,10 @@ class Guild extends Model
                 ->update(['admins' => json_encode($arr)]);
 
             $user = User::query()->find($user_id);
+            $admin = User::query()->find($admin_id ?? Auth::id());
 
             $log = new LogEntry();
-            $log->create($this->id, Auth::user()->name.' demoted '.$user->name.' to member.');
+            $log->create($this->id, $admin->name.' demoted '.$user->name.' to member.');
         }
     }
 
