@@ -16,6 +16,15 @@
                                     <a href="{{ '/g/' . $guild->slug . '/events/edit/' . $event->id }}">
                                         <button type="button" class="btn">Edit event</button>
                                     </a>
+                                    @if($event->locked === 1)
+                                        <a href="{{ '/g/' . $guild->slug . '/events/lock/' . $event->id . '/0' }}">
+                                            <button type="button" class="btn btn-warning">Unlock event</button>
+                                        </a>
+                                    @else
+                                        <a href="{{ '/g/' . $guild->slug . '/events/lock/' . $event->id . '/1' }}">
+                                            <button type="button" class="btn btn-warning">Lock event</button>
+                                        </a>
+                                    @endif
                                     <a href="{{ '/g/' . $guild->slug . '/events/delete/' . $event->id }}">
                                         <button type="button" class="btn btn-danger">Delete event</button>
                                     </a>
@@ -27,28 +36,56 @@
                             <b>Starts:</b> {{ $event->getNiceDate() }}<br>
                             <b>Total players signed up:</b> {{ $event->getTotalSignups() }}<br>
 
-                            @if ($event->userIsSignedUp())
-                                You are signed up for this event.<br>
+                            @if($event->locked === 0)
+                                @if ($event->userIsSignedUp())
+                                    You are signed up for this event.<br>
 
-                                @if (count(Auth::user()->getCharacters(true)) === 0)
-                                    <br>You do not have any character presets. Did you know you can create character
-                                    presets in your <a href="/profile/characters">user profile</a> and use these to sign
-                                    up
-                                    faster?<br><br>
-                                @else
-                                    <br><br><b>Use one of your presets to sign up</b><br>
+                                    @if (count(Auth::user()->getCharacters(true)) === 0)
+                                        <br>You do not have any character presets. Did you know you can create character
+                                        presets in your <a href="/profile/characters">user profile</a> and use these to
+                                        sign
+                                        up
+                                        faster?<br><br>
+                                    @else
+                                        <br><br><b>Use one of your presets to sign up</b><br>
+                                        {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/modify/'.$event->id)) }}
+                                        {!! Form::open([]) !!}
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                Character preset
+                                                @if (empty($event->getUserSignup('character_id')))
+                                                    {!! Form::select('character', ['0' => 'You did not select a preset'] + Auth::user()->getCharacters(true), '0', array('class' => 'form-control')) !!}
+                                                    <br>
+                                                @else
+                                                    {!! Form::select('character', Auth::user()->getCharacters(true), $event->getUserSignup('character_id'), array('class' => 'form-control')) !!}
+                                                    <br>
+                                                @endif
+                                            </div>
+                                            <div class="col-md-2">
+                                                <br>{!! Form::submit('Save changes', ['class' => 'btn']) !!}
+                                                <br>
+                                            </div>
+                                        </div>
+
+                                        {!! Form::close() !!}
+                                        {{ Form::close() }}
+                                        <b>Or sign up using a custom setup</b><br>
+                                    @endif
+
                                     {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/modify/'.$event->id)) }}
                                     {!! Form::open([]) !!}
                                     <div class="row">
-                                        <div class="col-md-10">
-                                            Character preset
-                                            @if (empty($event->getUserSignup('character_id')))
-                                                {!! Form::select('character', ['0' => 'You did not select a preset'] + Auth::user()->getCharacters(true), '0', array('class' => 'form-control')) !!}
-                                                <br>
-                                            @else
-                                                {!! Form::select('character', Auth::user()->getCharacters(true), $event->getUserSignup('character_id'), array('class' => 'form-control')) !!}
-                                                <br>
-                                            @endif
+                                        <div class="col-md-3">
+                                            Class
+                                            {!! Form::select('class', array('1' => 'Dragonknight', '2' => 'Sorcerer', '3' => 'Nightblade', '4' => 'Warden', '6' => 'Templar'), $event->getUserSignup('class_id'), array('class' => 'form-control')) !!}
+                                        </div>
+                                        <div class="col-md-3">
+                                            Role
+                                            {!! Form::select('role', array('1' => 'Tank', '2' => 'Healer', '3' => 'Damage Dealer (Magicka)', '4' => 'Damage Dealer (Stamina)', '5' => 'Other'), $event->getUserSignup('role_id'), array('class' => 'form-control')) !!}
+                                        </div>
+                                        <div class="col-md-4">
+                                            Supportive sets<br>
+                                            {!! Form::select('sets[]', $sets, explode(', ', $event->getUserSignup('sets')), array('class' => 'chosen-select', 'multiple')) !!}
                                         </div>
                                         <div class="col-md-2">
                                             <br>{!! Form::submit('Save changes', ['class' => 'btn']) !!}
@@ -56,89 +93,73 @@
                                         </div>
                                     </div>
 
-                                    {!! Form::close() !!}
-                                    {{ Form::close() }}
-                                    <b>Or sign up using a custom setup</b><br>
-                                @endif
-
-                                {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/modify/'.$event->id)) }}
-                                {!! Form::open([]) !!}
-                                <div class="row">
                                     <div class="col-md-3">
-                                        Class
-                                        {!! Form::select('class', array('1' => 'Dragonknight', '2' => 'Sorcerer', '3' => 'Nightblade', '4' => 'Warden', '6' => 'Templar'), $event->getUserSignup('class_id'), array('class' => 'form-control')) !!}
-                                    </div>
-                                    <div class="col-md-3">
-                                        Role
-                                        {!! Form::select('role', array('1' => 'Tank', '2' => 'Healer', '3' => 'Damage Dealer (Magicka)', '4' => 'Damage Dealer (Stamina)', '5' => 'Other'), $event->getUserSignup('role_id'), array('class' => 'form-control')) !!}
-                                    </div>
-                                    <div class="col-md-4">
-                                        Supportive sets<br>
-                                        {!! Form::select('sets[]', $sets, explode(', ', $event->getUserSignup('sets')), array('class' => 'chosen-select', 'multiple')) !!}
-                                    </div>
-                                    <div class="col-md-2">
-                                        <br>{!! Form::submit('Save changes', ['class' => 'btn']) !!}
-                                        <br>
-                                    </div>
-                                </div>
+                                        {!! Form::close() !!}
+                                        {{ Form::close() }}
+                                        {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/off/'.$event->id)) }}
+                                        {!! Form::open([]) !!}
+                                        {!! Form::submit('Sign off', ['class' => 'btn btn-danger']) !!}<br>
 
-                                <div class="col-md-3">
-                                    {!! Form::close() !!}
-                                    {{ Form::close() }}
-                                    {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/off/'.$event->id)) }}
-                                    {!! Form::open([]) !!}
-                                    {!! Form::submit('Sign off', ['class' => 'btn btn-danger']) !!}<br>
-
-                                    {!! Form::close() !!}
-                                    {{ Form::close() }}
-                                </div>
-                            @else
-                                @if (count(Auth::user()->getCharacters(true)) === 0)
-                                    <br>You do not have any character presets. Did you know you can create character
-                                    presets in your <a href="/profile/edit">user profile</a> and use these to sign up
-                                    faster?<br><br>
+                                        {!! Form::close() !!}
+                                        {{ Form::close() }}
+                                    </div>
                                 @else
-                                    <br><br><b>Use one of your presets to sign up</b><br>
+                                    @if (count(Auth::user()->getCharacters(true)) === 0)
+                                        <br>You do not have any character presets. Did you know you can create character
+                                        presets in your <a href="/profile/edit">user profile</a> and use these to sign
+                                        up
+                                        faster?<br><br>
+                                    @else
+                                        <br><br><b>Use one of your presets to sign up</b><br>
+                                        {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/up/'.$event->id)) }}
+                                        {!! Form::open([]) !!}
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                Character preset
+                                                {!! Form::select('character', Auth::user()->getCharacters(true), null, array('class' => 'form-control')) !!}
+                                                <br>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <br>{!! Form::submit('Sign up', ['class' => 'btn']) !!}
+                                                <br>
+                                            </div>
+                                        </div>
+
+                                        {!! Form::close() !!}
+                                        {{ Form::close() }}
+                                        <b>Or sign up using a custom setup</b><br>
+                                    @endif
                                     {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/up/'.$event->id)) }}
                                     {!! Form::open([]) !!}
                                     <div class="row">
-                                        <div class="col-md-10">
-                                            Character preset
-                                            {!! Form::select('character', Auth::user()->getCharacters(true), null, array('class' => 'form-control')) !!}
-                                            <br>
+                                        <div class="col-md-3">
+                                            Class
+                                            {!! Form::select('class', array('1' => 'Dragonknight', '2' => 'Sorcerer', '3' => 'Nightblade', '4' => 'Warden', '6' => 'Templar'), null, array('class' => 'form-control')) !!}
+                                        </div>
+                                        <div class="col-md-3">
+                                            Role
+                                            {!! Form::select('role', array('1' => 'Tank', '2' => 'Healer', '3' => 'Damage Dealer (Magicka)', '4' => 'Damage Dealer (Stamina)', '5' => 'Other'), null, array('class' => 'form-control')) !!}
+                                        </div>
+                                        <div class="col-md-4">
+                                            Supportive sets<br>
+                                            {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!}
                                         </div>
                                         <div class="col-md-2">
-                                            <br>{!! Form::submit('Sign up', ['class' => 'btn']) !!}
-                                            <br>
+                                            <br>{!! Form::submit('Sign up', ['class' => 'btn']) !!}<br>
                                         </div>
                                     </div>
 
                                     {!! Form::close() !!}
                                     {{ Form::close() }}
-                                    <b>Or sign up using a custom setup</b><br>
                                 @endif
-                                {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/up/'.$event->id)) }}
-                                {!! Form::open([]) !!}
+                            @else
                                 <div class="row">
-                                    <div class="col-md-3">
-                                        Class
-                                        {!! Form::select('class', array('1' => 'Dragonknight', '2' => 'Sorcerer', '3' => 'Nightblade', '4' => 'Warden', '6' => 'Templar'), null, array('class' => 'form-control')) !!}
+                                    <div class="col-md-12">
+                                    <div class="alert alert-warning" role="alert">
+                                        This event has been locked by an administrator of {{ $guild->name }}. Signing up, editing signups or signing off is not possible until an administrator unlocks this event.
                                     </div>
-                                    <div class="col-md-3">
-                                        Role
-                                        {!! Form::select('role', array('1' => 'Tank', '2' => 'Healer', '3' => 'Damage Dealer (Magicka)', '4' => 'Damage Dealer (Stamina)', '5' => 'Other'), null, array('class' => 'form-control')) !!}
-                                    </div>
-                                    <div class="col-md-4">
-                                        Supportive sets<br>
-                                        {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!}
-                                    </div>
-                                    <div class="col-md-2">
-                                        <br>{!! Form::submit('Sign up', ['class' => 'btn']) !!}<br>
                                     </div>
                                 </div>
-
-                                {!! Form::close() !!}
-                                {{ Form::close() }}
                             @endif
                         </div>
                         <div class="content table-responsive table-full-width" style="z-index: 9999">

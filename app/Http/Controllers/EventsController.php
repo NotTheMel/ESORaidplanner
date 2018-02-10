@@ -183,13 +183,13 @@ class EventsController extends Controller
      */
     public function signUpUser(string $slug, int $id)
     {
-        if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id)) {
+        $event = Event::query()->find($id);
+
+        if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id) || 1 === $event->locked) {
             return redirect('g/'.$slug);
         }
 
         Signup::query()->where('event_id', '=', $id)->where('user_id', '=', Auth::id())->delete();
-
-        $event = Event::query()->find($id);
 
         $sign           = new Signup();
         $sign->user_id  = Auth::id();
@@ -281,13 +281,15 @@ class EventsController extends Controller
      */
     public function modifySignUp(string $slug, int $id)
     {
-        if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id)) {
-            return redirect('g/'.$slug);
-        }
-
         $sign = Signup::query()->where('event_id', '=', $id)
             ->where('user_id', '=', Auth::id())
             ->first();
+
+        $event = Event::query()->find($sign->event_id);
+
+        if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id) || 1 === $event->locked) {
+            return redirect('g/'.$slug);
+        }
 
         if (!empty(Input::get('character'))) {
             if (0 == Input::get('character')) {
@@ -336,13 +338,13 @@ class EventsController extends Controller
             Signup::query()
                 ->where('id', '=', $id)
                 ->delete();
+
+            $event = Event::query()->find($event_id);
+            $user  = User::query()->find($signup->user_id);
+
+            $log = new LogEntry();
+            $log->create($this->getGuildId($slug), Auth::user()->name.' signed off '.$user->name.' for <a href="/g/'.$slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
         }
-
-        $event = Event::query()->find($event_id);
-        $user  = User::query()->find($signup->user_id);
-
-        $log = new LogEntry();
-        $log->create($this->getGuildId($slug), Auth::user()->name.' signed off '.$user->name.' for <a href="/g/'.$slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
 
         return redirect('/g/'.$slug.'/event/'.$event_id);
     }
@@ -355,13 +357,13 @@ class EventsController extends Controller
      */
     public function signOffUser(string $slug, int $id)
     {
-        if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id)) {
+        $event = Event::query()->find($id);
+
+        if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id) || 1 === $event->locked) {
             return redirect('g/'.$slug);
         }
 
         Signup::query()->where('event_id', '=', $id)->where('user_id', '=', Auth::id())->delete();
-
-        $event = Event::query()->find($id);
 
         $log = new LogEntry();
         $log->create($this->getGuildId($slug), Auth::user()->name.' signed off for <a href="/g/'.$slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
@@ -530,6 +532,21 @@ class EventsController extends Controller
             ->get();
 
         return view('event.events', compact('events', 'guild'));
+    }
+
+    public function changeLockStatus(string $slug, int $event_id, int $lockstatus)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        if (!$guild->isAdmin(Auth::id())) {
+            return redirect('/g/'.$slug.'/event/'.$event_id);
+        }
+
+        $event         = Event::query()->find($event_id);
+        $event->locked = $lockstatus;
+        $event->save();
+
+        return redirect('/g/'.$slug.'/event/'.$event_id);
     }
 
     private function eventBelongsToGuild(string $slug, int $event_id): bool

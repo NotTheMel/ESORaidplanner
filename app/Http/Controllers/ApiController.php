@@ -806,7 +806,7 @@ class ApiController extends Controller
 
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isMember($user->id)) {
+        if (!$guild->isMember($user->id) || 1 === $event->locked) {
             return response(null, 401);
         }
 
@@ -864,7 +864,7 @@ class ApiController extends Controller
 
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isMember($user->id)) {
+        if (!$guild->isMember($user->id) || 1 === $event->locked) {
             return response(null, 401);
         }
 
@@ -915,7 +915,7 @@ class ApiController extends Controller
 
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isMember($user->id)) {
+        if (!$guild->isMember($user->id) || 1 === $event->locked) {
             return response(null, 401);
         }
 
