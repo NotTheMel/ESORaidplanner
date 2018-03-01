@@ -410,7 +410,9 @@ class EventsController extends Controller
         $hooks = Hook::query()->where('call_type', '=', 1)->where('guild_id', '=', $guild->id)->get();
 
         foreach ($hooks as $hook) {
-            $hook->call($event);
+            if ($hook->matchesEventTags($event)) {
+                $hook->call($event);
+            }
         }
 
         return redirect('g/'.$slug.'/event/'.$event->id);
