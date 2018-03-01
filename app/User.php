@@ -220,4 +220,27 @@ class User extends Authenticatable
 
         $this->save();
     }
+
+    /**
+     * @return array
+     */
+    public function getSignups(): array
+    {
+        $events = $this->getEvents();
+
+        if (0 === count($events)) {
+            return [];
+        }
+
+        $signups = [];
+
+        foreach ($events as $event) {
+            $signups[] = Signup::query()
+                ->where('user_id', '=', $this->id)
+                ->where('event_id', '=', $event->id)
+                ->first();
+        }
+
+        return $signups;
+    }
 }
