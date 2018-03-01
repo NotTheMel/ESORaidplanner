@@ -1,9 +1,16 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: woeler
- * Date: 02.03.18
- * Time: 00:10.
+ * This file is part of the ESO Raidplanner project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 3
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ *
+ * @see https://github.com/ESORaidplanner/ESORaidplanner
  */
 
 namespace App\Singleton;
