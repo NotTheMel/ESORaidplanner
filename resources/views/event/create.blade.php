@@ -68,6 +68,8 @@
                                     </div>
                                 </div>
                             @endif
+                            Event tags (separate each tag with a comma, using tags will make sure this event will onlt trigger notifications that have a matching tag):
+                            {!! Form::text('tags', '', ['class' => 'form-control']) !!}<br><br>
                             Description:{!! Form::textarea('description', '', array('class' => 'form-control')) !!}<br>
 
                             {!! Form::submit('Create Event', ['class' => 'btn']) !!}<br>

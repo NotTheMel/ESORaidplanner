@@ -37,6 +37,7 @@ class HookController extends Controller
         foreach ($guild_ids as $guild_id) {
             $guild = Guild::query()->where('id', '=', $guild_id->guild_id)->first();
 
+            /** @var Guild $guild */
             if ($guild->isAdmin(Auth::id())) {
                 $guilds[] = $guild->id;
             }
@@ -127,6 +128,7 @@ class HookController extends Controller
         $data['type']       = $type;
         $data['active']     = true;
         $data['created_at'] = date('Y-m-d H:i:s');
+        $data['tags']       = Input::get('tags');
 
         if ('0' === Input::get('owner')) {
             $data['user_id'] = Auth::id();
@@ -180,6 +182,7 @@ class HookController extends Controller
         $data['type']       = $type;
         $data['active']     = true;
         $data['updated_at'] = date('Y-m-d H:i:s');
+        $data['tags']       = Input::get('tags');
 
         Hook::query()->where('id', '=', $id)->update($data);
 

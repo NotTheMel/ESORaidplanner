@@ -132,20 +132,19 @@
                                     {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/up/'.$event->id)) }}
                                     {!! Form::open([]) !!}
                                     <div class="row">
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
                                             Class
                                             {!! Form::select('class', array('1' => 'Dragonknight', '2' => 'Sorcerer', '3' => 'Nightblade', '4' => 'Warden', '6' => 'Templar'), null, array('class' => 'form-control')) !!}
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
                                             Role
                                             {!! Form::select('role', array('1' => 'Tank', '2' => 'Healer', '3' => 'Damage Dealer (Magicka)', '4' => 'Damage Dealer (Stamina)', '5' => 'Other'), null, array('class' => 'form-control')) !!}
                                         </div>
-                                        <div class="col-md-4">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
                                             Supportive sets<br>
-                                            {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!}
-                                        </div>
-                                        <div class="col-md-2">
-                                            <br>{!! Form::submit('Sign up', ['class' => 'btn']) !!}<br>
+                                            {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!} &nbsp; {!! Form::submit('Sign up', ['class' => 'btn']) !!}
                                         </div>
                                     </div>
 

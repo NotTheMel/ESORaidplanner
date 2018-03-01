@@ -147,4 +147,32 @@ class Hook extends Model
 
         return false;
     }
+
+    /**
+     * @param Event $event
+     * @return bool
+     */
+    public function matchesEventTags(Event $event): bool
+    {
+        if (empty($this->tags)) {
+            return true;
+        }
+
+        if (empty($event->tags)) {
+            return false;
+        }
+
+        $event_tags = explode(',', $event->tags);
+        $hook_tags = explode(',', $this->tags);
+
+        foreach ($event_tags as $event_tag) {
+            foreach ($hook_tags as $hook_tag) {
+                if (trim($event_tag) === trim($hook_tag)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

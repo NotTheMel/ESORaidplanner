@@ -70,9 +70,13 @@ class HooksCall extends Command
 
                         if ($now->getTimestamp() > ($start_time->getTimestamp() - $hook->call_time_diff)) {
                             if (0 === $hook->if_less_signups || empty($hook->if_less_signups)) {
-                                $hook->call($event);
+                                if ($hook->matchesEventTags($event)) {
+                                    $hook->call($event);
+                                }
                             } elseif ($hook->if_less_signups > $event->getTotalSignups()) {
-                                $hook->call($event);
+                                if ($hook->matchesEventTags($event)) {
+                                    $hook->call($event);
+                                }
                             }
                         }
                     }

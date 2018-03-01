@@ -39,7 +39,9 @@
                             Only send this message if the event has less signups than (leave blank or 0 to always send
                             the message):
                             {!! Form::number('if_less_signups', $hook->if_less_signups, array('class' => 'form-control')) !!}
-                            <br><br>
+                            <br>
+                            Notification tags (separate each tag with a comma, using tags will make sure this notification is only sent for events that contain a matching tag):
+                            {!! Form::text('tags', $hook->tags, ['class' => 'form-control']) !!}<br><br>
                             Message to be
                             sent:{!! Form::textarea('message', $hook->message, ['class' => 'form-control', 'required']) !!}
                             <br>
