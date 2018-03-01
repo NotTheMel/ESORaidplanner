@@ -61,7 +61,7 @@ class User extends Authenticatable
                 ->where('id', '=', $guild_id->guild_id)
                 ->first();
 
-            array_push($guilds, $guild);
+            $guilds[] = $guild;
         }
 
         return $guilds;
@@ -87,6 +87,24 @@ class User extends Authenticatable
         });
 
         return $events;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEventsSignedUp(): array
+    {
+        $events = $this->getEvents();
+
+        $e = [];
+
+        foreach ($events as $event) {
+            if ($event->userIsSignedUp($this->id)) {
+                $e[] = $event;
+            }
+        }
+
+        return $e;
     }
 
     /**
