@@ -150,6 +150,7 @@ class Hook extends Model
 
     /**
      * @param Event $event
+     *
      * @return bool
      */
     public function matchesEventTags(Event $event): bool
@@ -162,8 +163,16 @@ class Hook extends Model
             return false;
         }
 
-        $event_tags = explode(',', $event->tags);
-        $hook_tags = explode(',', $this->tags);
+        if (false !== strpos($event->tags, ',')) {
+            $event_tags = explode(',', $event->tags);
+        } else {
+            $event_tags = [$event->tags];
+        }
+        if (false !== strpos($this->tags, ',')) {
+            $hook_tags = explode(',', $this->tags);
+        } else {
+            $hook_tags = [$this->tags];
+        }
 
         foreach ($event_tags as $event_tag) {
             foreach ($hook_tags as $hook_tag) {

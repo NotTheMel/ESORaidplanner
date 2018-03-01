@@ -400,7 +400,7 @@ class EventsController extends Controller
         $event->start_date  = $date->format('Y-m-d H:i:s');
         $event->guild_id    = $guild->id;
         $event->description = Input::get('description') ?? '';
-        $event->tags = Input::get('tags') ?? '';
+        $event->tags        = Input::get('tags') ?? '';
 
         $event->save();
 
@@ -445,8 +445,7 @@ class EventsController extends Controller
         $event->type        = Input::get('type');
         $event->start_date  = $date->format('Y-m-d H:i:s');
         $event->description = Input::get('description') ?? '';
-        $event->tags = Input::get('tags') ?? '';
-
+        $event->tags        = Input::get('tags') ?? '';
 
         $event->save();
 
