@@ -17,7 +17,6 @@ namespace App;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
@@ -115,7 +114,7 @@ class User extends Authenticatable
     public function getCharacters(bool $forsignup = false)
     {
         $characters = Character::query()
-            ->where('user_id', '=', Auth::id())
+            ->where('user_id', '=', $this->id)
             ->get();
 
         if ($forsignup) {
