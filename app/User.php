@@ -61,7 +61,7 @@ class User extends Authenticatable
                 ->where('id', '=', $guild_id->guild_id)
                 ->first();
 
-            array_push($guilds, $guild);
+            $guilds[] = $guild;
         }
 
         return $guilds;
@@ -87,6 +87,24 @@ class User extends Authenticatable
         });
 
         return $events;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEventsSignedUp(): array
+    {
+        $events = $this->getEvents();
+
+        $e = [];
+
+        foreach ($events as $event) {
+            if ($event->userIsSignedUp($this->id)) {
+                $e[] = $event;
+            }
+        }
+
+        return $e;
     }
 
     /**
@@ -219,5 +237,28 @@ class User extends Authenticatable
         $this->onesignal_id = json_encode(array_except($ids, $device_id));
 
         $this->save();
+    }
+
+    /**
+     * @return array
+     */
+    public function getSignups(): array
+    {
+        $events = $this->getEvents();
+
+        if (0 === count($events)) {
+            return [];
+        }
+
+        $signups = [];
+
+        foreach ($events as $event) {
+            $signups[] = Signup::query()
+                ->where('user_id', '=', $this->id)
+                ->where('event_id', '=', $event->id)
+                ->first();
+        }
+
+        return $signups;
     }
 }
