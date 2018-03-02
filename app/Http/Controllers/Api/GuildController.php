@@ -90,7 +90,7 @@ class GuildController extends ApiController
             ->count();
 
         if ($count > 0) {
-            return;
+            return response(null, 200);
         }
 
         DB::table('user_guilds')->insert([
