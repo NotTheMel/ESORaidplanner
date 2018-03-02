@@ -17,31 +17,31 @@ Route::post('/telegram', 'TelegramController@exec');
 
 Route::post('/checklogin', 'Api\ApiController@checkLogin');
 
-Route::post('/user', 'ApiController@getUser');
+Route::post('/user', 'Api\UserController@get');
 
 Route::post('/sets', 'Api\SetController@all');
 
-Route::post('/sets/version', 'ApiController@getSetsVersion');
+Route::post('/sets/version', 'Api\SetController@getVersion');
 
-Route::post('/guilds', 'ApiController@getGuilds');
+Route::post('/guilds', 'Api\GuildController@all');
 
-Route::post('/timezones', 'ApiController@getTimezones');
+Route::post('/timezones', 'Api\TimeZoneController@all');
 
-Route::post('/characters', 'ApiController@getCharacters');
+Route::post('/characters', 'Api\CharacterController@all');
 
 Route::post('/guild/{guild_id}', 'Api\GuildController@get');
 
-Route::post('/user/create', 'ApiController@createUser');
+Route::post('/user/create', 'Api\UserController@create');
 
-Route::post('/user/guilds', 'ApiController@getUserGuilds');
+Route::post('/user/guilds', 'Api\UserController@getGuilds');
 
-Route::post('/user/guilds/pending', 'ApiController@getUserGuildsPending');
+Route::post('/user/guilds/pending', 'Api\UserController@getGuildsPending');
 
-Route::post('/user/events', 'ApiController@getUserEvents');
+Route::post('/user/events', 'Api\UserController@getEvents');
 
-Route::post('/user/signups', 'ApiController@getUserSignups');
+Route::post('/user/signups', 'Api\UserController@getSignups');
 
-Route::post('/user/{user_id}', 'ApiController@getUserInfo');
+Route::post('/user/{user_id}', 'Api\UserController@getInfo');
 
 Route::post('/user/events/signedup', 'ApiController@getUserEventsSignedUp');
 
