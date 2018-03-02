@@ -43,57 +43,57 @@ Route::post('/user/signups', 'Api\UserController@getSignups');
 
 Route::post('/user/{user_id}', 'Api\UserController@getInfo');
 
-Route::post('/user/events/signedup', 'ApiController@getUserEventsSignedUp');
+Route::post('/user/events/signedup', 'Api\UserController@getEventsSignedUp');
 
-Route::post('/user/onesignal/add', 'ApiController@addOnesignalIdToUser');
+Route::post('/user/onesignal/add', 'Api\UserController@setOnesignal');
 
-Route::post('/user/onesignal/remove', 'ApiController@removeOnesignalIdFromUser');
+Route::post('/user/onesignal/remove', 'Api\UserController@deleteOnesignal');
 
-Route::post('/guild/{guild_id}/events', 'ApiController@getGuildEvents');
+Route::post('/guild/{guild_id}/events', 'Api\GuildController@getEvents');
 
-Route::post('/guild/{guild_id}/members', 'ApiController@getGuildMembers');
+Route::post('/guild/{guild_id}/members', 'Api\GuildController@getMembers');
 
-Route::post('/guild/{guild_id}/members/pending', 'ApiController@getGuildMembersPending');
+Route::post('/guild/{guild_id}/members/pending', 'Api\GuildController@getMembersPending');
 
-Route::post('/guild/{guild_id}/requestmembership', 'ApiController@requestGuildMembership');
+Route::post('/guild/{guild_id}/requestmembership', 'Api\GuildController@requestMembership');
 
-Route::post('/guild/{guild_id}/leave', 'ApiController@leaveGuild');
+Route::post('/guild/{guild_id}/leave', 'Api\GuildController@leave');
 
-Route::post('/guild/{guild_id}/approve/{user_id}', 'ApiController@approveGuildMembership');
+Route::post('/guild/{guild_id}/approve/{user_id}', 'Api\GuildController@approveMembership');
 
-Route::post('/guild/{guild_id}/remove/{user_id}', 'ApiController@removeGuildMembership');
+Route::post('/guild/{guild_id}/remove/{user_id}', 'Api\GuildController@removeMembership');
 
-Route::post('/guild/{guild_id}/promote/{user_id}', 'ApiController@makeGuildAdmin');
+Route::post('/guild/{guild_id}/promote/{user_id}', 'Api\GuildController@makeAdmin');
 
-Route::post('/guild/{guild_id}/demote/{user_id}', 'ApiController@removeGuildAdmin');
+Route::post('/guild/{guild_id}/demote/{user_id}', 'Api\GuildController@removeAdmin');
 
-Route::post('/event/{event_id}/signups', 'ApiController@getEventSignups');
+Route::post('/event/{event_id}/signups', 'Api\EventController@allSignups');
 
-Route::post('/signup/create/{event_id}', 'ApiController@signUpUser');
+Route::post('/signup/create/{event_id}', 'Api\EventController@createSignup');
 
-Route::post('/signup/modify/{event_id}', 'ApiController@editSignup');
+Route::post('/signup/modify/{event_id}', 'Api\EventController@editSignup');
 
-Route::post('/signup/delete/{event_id}', 'ApiController@signOffUser');
+Route::post('/signup/delete/{event_id}', 'Api\EventController@deleteSignup');
 
-Route::post('/signup/get/{event_id}', 'ApiController@getSignup');
+Route::post('/signup/get/{event_id}', 'Api\EventController@getSignup');
 
-Route::post('/signup/confirm/{signup_id}', 'ApiController@confirmSignup');
+Route::post('/signup/confirm/{signup_id}', 'Api\EventController@confirmSignup');
 
-Route::post('/signup/backup/{signup_id}', 'ApiController@backupSignup');
+Route::post('/signup/backup/{signup_id}', 'Api\EventController@backupSignup');
 
-Route::post('/signup/remove/{signup_id}', 'ApiController@removeSignup');
+Route::post('/signup/remove/{signup_id}', 'Api\EventController@deleteSignupOther');
 
-Route::post('/character/create', 'ApiController@createCharacter');
+Route::post('/character/create', 'Api\CharacterController@create');
 
-Route::post('/character/modify/{character_id}', 'ApiController@modifyCharacter');
+Route::post('/character/modify/{character_id}', 'Api\CharacterController@edit');
 
-Route::post('/character/delete/{character_id}', 'ApiController@deleteCharacter');
+Route::post('/character/delete/{character_id}', 'Api\CharacterController@delete');
 
-Route::post('/event/create', 'ApiController@createEvent');
+Route::post('/event/create', 'Api\EventController@create');
 
-Route::post('/event/modify/{event_id}', 'ApiController@modifyEvent');
+Route::post('/event/modify/{event_id}', 'Api\EventController@edit');
 
-Route::post('/event/delete/{event_id}', 'ApiController@deleteEvent');
+Route::post('/event/delete/{event_id}', 'Api\EventController@delete');
 
 
 
