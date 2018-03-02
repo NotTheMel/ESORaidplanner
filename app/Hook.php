@@ -20,6 +20,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Hook extends Model
 {
+    const TYPE_DISCORD  = 1;
+    const TYPE_TELEGRAM = 2;
+    const TYPE_SLACK    = 3;
+
     /**
      * @param Event $event
      */
@@ -28,7 +32,7 @@ class Hook extends Model
         $message = $this->makeMessage($this->message, $event);
 
         // DISCORD
-        if (1 === $this->type) {
+        if (self::TYPE_DISCORD === $this->type) {
             $ch = curl_init($this->url);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['content' => $message, 'username' => 'ESO Raidplanner']));
@@ -41,7 +45,7 @@ class Hook extends Model
             }
 
             // TELEGRAM
-        } elseif (2 === $this->type) {
+        } elseif (self::TYPE_TELEGRAM === $this->type) {
             $params = [
                 'chat_id' => $this->chat_id,
                 'text'    => $message,
@@ -60,7 +64,7 @@ class Hook extends Model
             }
 
             // SLACK
-        } elseif (3 === $this->type) {
+        } elseif (self::TYPE_SLACK === $this->type) {
             $params = 'payload='.json_encode(['text' => $message]);
 
             $ch = curl_init($this->url);
@@ -70,7 +74,7 @@ class Hook extends Model
             $result = curl_exec($ch);
             curl_close($ch);
 
-            if (1 !== $hook->call_type && false !== $result) {
+            if (false !== $result) {
                 $this->wasCalled($event);
             }
         }

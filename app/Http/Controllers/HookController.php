@@ -17,6 +17,7 @@ namespace App\Http\Controllers;
 
 use App\Guild;
 use App\Hook;
+use App\Singleton\HookTypes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +36,8 @@ class HookController extends Controller
         $guilds[] = 0;
 
         foreach ($guild_ids as $guild_id) {
-            $guild = Guild::query()->where('id', '=', $guild_id->guild_id)->first();
+            /** @var Guild $guild */
+            $guild = Guild::query()->find($guild_id->guild_id);
 
             /** @var Guild $guild */
             if ($guild->isAdmin(Auth::id())) {
@@ -60,9 +62,7 @@ class HookController extends Controller
             return redirect('/hooks');
         }
 
-        $hook = Hook::query()->where('id', '=', $id)->limit(1)->get();
-
-        $hook = $hook->first();
+        $hook = Hook::query()->find($id);
 
         return view('hook.hookdetail', compact('hook'));
     }
@@ -79,6 +79,7 @@ class HookController extends Controller
         $guilds    = [];
         $guilds[0] = 'Me as an individual';
 
+        /** @var Guild $guild */
         foreach ($guilds_user as $key => $guild) {
             if ($guild->isAdmin(Auth::id())) {
                 $guilds[$guild->id] = $guild->name;
@@ -95,53 +96,46 @@ class HookController extends Controller
      */
     public function create(Request $request, int $type)
     {
-        $data = [];
-
-        if (1 === $type) {
+        if (Hook::TYPE_DISCORD === $type) {
             $request->validate([
                'url' => new \App\Rules\DiscordHook(),
             ]);
-        } elseif (3 === $type) {
+        } elseif (Hook::TYPE_SLACK === $type) {
             $request->validate([
                 'url' => new \App\Rules\SlackHook(),
             ]);
         }
 
-        if (1 === $type || 3 === $type) {
-            $data['url'] = Input::get('url');
-        } elseif (2 === $type) {
-            $data['token']   = env('TELEGRAM_TOKEN_NOTIFICATIONS');
-            $data['chat_id'] = Input::get('chat_id');
-        } else {
-            redirect('/hooks');
+        $hook      = new Hook();
+        $hook->url = Input::get('url') ?? null;
+        if (Hook::TYPE_TELEGRAM === $type) {
+            $hook->token = env('TELEGRAM_TOKEN_NOTIFICATIONS');
         }
-
-        $data['name'] = Input::get('name');
-        if (2 == Input::get('call_type')) {
-            $data['call_time_diff'] = Input::get('call_time_diff') * 60;
+        $hook->chat_id   = Input::get('chat_id') ?? null;
+        $hook->name      = Input::get('name');
+        $hook->call_type = Input::get('call_type');
+        if (HookTypes::ON_TIME === (int) $hook->call_type) {
+            $hook->call_time_diff = (int) Input::get('call_time_diff') * 60;
         }
-        if (!empty(Input::get('if_less_signups')) && 0 !== Input::get('if_less_signups')) {
-            $data['if_less_signups'] = Input::get('if_less_signups');
-        }
-        $data['call_type']  = Input::get('call_type');
-        $data['message']    = Input::get('message');
-        $data['type']       = $type;
-        $data['active']     = true;
-        $data['created_at'] = date('Y-m-d H:i:s');
-        $data['tags']       = Input::get('tags');
+        $hook->if_less_signups = Input::get('if_less_signups') ?? null;
+        $hook->type            = $type;
+        $hook->active          = true;
+        $hook->tags            = Input::get('tags') ?? null;
+        $hook->message         = Input::get('message');
 
         if ('0' === Input::get('owner')) {
-            $data['user_id'] = Auth::id();
+            $hook->user_id = Auth::id();
         } else {
-            $data['guild_id'] = Input::get('owner');
-            $guild            = Guild::query()->where('id', '=', $data['guild_id'])->first();
+            $hook->guild_id = Input::get('owner');
+            /** @var Guild $guild */
+            $guild            = Guild::query()->find($hook->guild_id);
 
             if (!$guild->isAdmin(Auth::id())) {
                 return redirect('/hooks');
             }
         }
 
-        Hook::query()->insert($data);
+        $hook->save();
 
         return redirect('/hooks');
     }
@@ -152,39 +146,38 @@ class HookController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function modify(int $type, int $id)
+    public function modify(Request $request, int $type, int $id)
     {
         if (!$this->isAdmin($id)) {
             return redirect('/hooks');
         }
 
-        $data = [];
-
-        if (1 === $type || 3 === $type) {
-            $data['url'] = Input::get('url');
-        } elseif (2 === $type) {
-            $data['chat_id'] = Input::get('chat_id');
-        } else {
-            redirect('/hooks');
+        if (Hook::TYPE_DISCORD === $type) {
+            $request->validate([
+                'url' => new \App\Rules\DiscordHook(),
+            ]);
+        } elseif (Hook::TYPE_SLACK === $type) {
+            $request->validate([
+                'url' => new \App\Rules\SlackHook(),
+            ]);
         }
 
-        if (!empty(Input::get('if_less_signups')) && 0 !== Input::get('if_less_signups')) {
-            $data['if_less_signups'] = Input::get('if_less_signups');
-        } else {
-            $data['if_less_signups'] = 0;
+        $hook      = Hook::query()->find($id);
+        $hook->url = Input::get('url') ?? null;
+        if (Hook::TYPE_TELEGRAM === $type) {
+            $hook->token = $hook->token ?? env('TELEGRAM_TOKEN_NOTIFICATIONS');
         }
-
-        $data['name'] = Input::get('name');
-        if (!empty(Input::get('call_time_diff'))) {
-            $data['call_time_diff'] = (int) Input::get('call_time_diff') * 60;
+        $hook->chat_id   = Input::get('chat_id') ?? null;
+        $hook->name      = Input::get('name');
+        if (HookTypes::ON_TIME === $hook->call_type) {
+            $hook->call_time_diff = Input::get('call_time_diff') * 60;
         }
-        $data['message']    = Input::get('message');
-        $data['type']       = $type;
-        $data['active']     = true;
-        $data['updated_at'] = date('Y-m-d H:i:s');
-        $data['tags']       = Input::get('tags');
+        $hook->if_less_signups = Input::get('if_less_signups') ?? null;
+        $hook->type            = $type;
+        $hook->active          = true;
+        $hook->tags            = Input::get('tags') ?? null;
 
-        Hook::query()->where('id', '=', $id)->update($data);
+        $hook->save();
 
         return redirect('/hooks');
     }
@@ -196,9 +189,10 @@ class HookController extends Controller
      */
     public function delete(int $id)
     {
-        $hook = Hook::query()->where('id', '=', $id)->limit(1)->get();
+        /** @var Hook $hook */
+        $hook = Hook::query()->find($id);
 
-        if ($hook[0]->isOwner(Auth::id())) {
+        if ($hook->isOwner(Auth::id())) {
             Hook::query()->where('id', '=', $id)->delete();
         }
 
