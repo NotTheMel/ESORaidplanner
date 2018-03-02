@@ -42,7 +42,7 @@ class SetController extends ApiController
     /**
      * @return JsonResponse
      */
-    public function getSetsVersion(): JsonResponse
+    public function getVersion(): JsonResponse
     {
         return response(Set::query()->orderBy('version', 'desc')->first()->version, 200);
     }

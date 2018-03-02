@@ -17,6 +17,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -42,5 +43,29 @@ class ApiController extends Controller
         }
 
         return false;
+    }
+
+    /**
+     * Simple true/false login check.
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function checkLogin(Request $request): JsonResponse
+    {
+        $user = $this->login($request);
+
+        if (false === $user) {
+            return response(null, 401);
+        }
+
+        $u = [];
+
+        $u['name']   = $user->name;
+        $u['email']  = $user->email;
+        $u['layout'] = $user->layout;
+
+        return response($u, 200);
     }
 }

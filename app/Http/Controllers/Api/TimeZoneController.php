@@ -25,7 +25,7 @@ class TimeZoneController extends ApiController
      *
      * @return JsonResponse
      */
-    public function getTimezones(): JsonResponse
+    public function all(): JsonResponse
     {
         return response(TimeZones::list(), 200);
     }
