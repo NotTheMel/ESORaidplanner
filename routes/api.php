@@ -15,12 +15,7 @@ use Illuminate\Http\Request;
 
 Route::post('/telegram', 'TelegramController@exec');
 
-
-<<<<<<< HEAD
-Route::post('/checklogin', 'Api\Controller@checkLogin');
-=======
 Route::post('/checklogin', 'Api/ApiController@checkLogin');
->>>>>>> bfcc6888fe54eaf65211847919a28773556a84c3
 
 Route::post('/user', 'ApiController@getUser');
 
