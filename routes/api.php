@@ -19,7 +19,7 @@ Route::post('/checklogin', 'Api\ApiController@checkLogin');
 
 Route::post('/user', 'ApiController@getUser');
 
-Route::post('/sets', 'ApiController@getSets');
+Route::post('/sets', 'Api\SetController@all');
 
 Route::post('/sets/version', 'ApiController@getSetsVersion');
 
