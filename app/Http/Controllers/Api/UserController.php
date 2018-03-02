@@ -22,8 +22,8 @@ use App\Singleton\TimeZones;
 use App\User;
 use DateTime;
 use DateTimeZone;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class UserController extends ApiController
@@ -33,17 +33,17 @@ class UserController extends ApiController
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function get(Request $request): JsonResponse
+    public function get(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        return response($user, 200);
+        return response($user, Response::HTTP_OK);
     }
 
     /**
@@ -52,14 +52,14 @@ class UserController extends ApiController
      * @param Request $request
      * @param int     $user_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function getInfo(Request $request, int $user_id): JsonResponse
+    public function getInfo(Request $request, int $user_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $u = DB::table('users')
@@ -72,15 +72,15 @@ class UserController extends ApiController
         $u1->name   = $u->name;
         $u1->id     = $u->id;
 
-        return response($u1, 200);
+        return response($u1, Response::HTTP_OK);
     }
 
     /**
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function create(Request $request): JsonResponse
+    public function create(Request $request): Response
     {
         if ($request->input('password') !== $request->input('password_repeat')) {
             return response('Passwords do not match.', 400);
@@ -104,20 +104,20 @@ class UserController extends ApiController
 
         $user->save();
 
-        return response(User::query()->where('email', '=', $request->input('email'))->first(), 200);
+        return response(User::query()->where('email', '=', $request->input('email'))->first(), Response::HTTP_OK);
     }
 
     /**
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function setOnesignal(Request $request): JsonResponse
+    public function setOnesignal(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $device_id    = $request->input('device');
@@ -126,7 +126,7 @@ class UserController extends ApiController
         if (!empty($device_id) && !empty($onesignal_id)) {
             $user->addOnesignalId($device_id, $onesignal_id);
 
-            return response(null, 200);
+            return response(null, Response::HTTP_OK);
         }
 
         return response(null, 400);
@@ -135,14 +135,14 @@ class UserController extends ApiController
     /**
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function deleteOnesignal(Request $request): JsonResponse
+    public function deleteOnesignal(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $device_id = $request->input('device');
@@ -150,7 +150,7 @@ class UserController extends ApiController
         if (!empty($device_id)) {
             $user->removeOnesignalId($device_id);
 
-            return response(null, 200);
+            return response(null, Response::HTTP_OK);
         }
 
         return response(null, 400);
@@ -161,14 +161,14 @@ class UserController extends ApiController
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function getGuilds(Request $request): JsonResponse
+    public function getGuilds(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $ids = DB::table('user_guilds')
@@ -188,20 +188,20 @@ class UserController extends ApiController
             $guilds[] = $guild;
         }
 
-        return response($guilds, 200);
+        return response($guilds, Response::HTTP_OK);
     }
 
     /**
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function getGuildsPending(Request $request): JsonResponse
+    public function getGuildsPending(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $ids = DB::table('user_guilds')
@@ -215,7 +215,7 @@ class UserController extends ApiController
             $guilds[] = Guild::query()->find($id->guild_id);
         }
 
-        return response($guilds, 200);
+        return response($guilds, Response::HTTP_OK);
     }
 
     /**
@@ -223,14 +223,14 @@ class UserController extends ApiController
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function getEvents(Request $request): JsonResponse
+    public function getEvents(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $events = [];
@@ -249,7 +249,7 @@ class UserController extends ApiController
             }
         }
 
-        return response($events, 200);
+        return response($events, Response::HTTP_OK);
     }
 
     /**
@@ -257,20 +257,20 @@ class UserController extends ApiController
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function getEventsSignedUp(Request $request): JsonResponse
+    public function getEventsSignedUp(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         /** @var array $events */
         $events = $user->getEventsSignedUp();
 
-        return response($events, 200);
+        return response($events, Response::HTTP_OK);
     }
 
     /**
@@ -278,20 +278,20 @@ class UserController extends ApiController
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function getSignups(Request $request): JsonResponse
+    public function getSignups(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $events = $user->getEventsSignedUp();
 
         if (0 === count($events)) {
-            return response([], 200);
+            return response([], Response::HTTP_OK);
         }
 
         $signups = [];
@@ -303,6 +303,6 @@ class UserController extends ApiController
                 ->first();
         }
 
-        return response($signups, 200);
+        return response($signups, Response::HTTP_OK);
     }
 }

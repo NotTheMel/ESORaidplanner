@@ -24,8 +24,8 @@ use App\Signup;
 use App\User;
 use DateTime;
 use DateTimeZone;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class EventController extends ApiController
 {
@@ -34,21 +34,21 @@ class EventController extends ApiController
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function create(Request $request): JsonResponse
+    public function create(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         /** @var Guild $guild */
         $guild = Guild::query()->find($request->input('guild_id'));
 
         if (!$guild->isAdmin($user->id)) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $event              = new Event();
@@ -75,7 +75,7 @@ class EventController extends ApiController
             }
         }
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 
     /**
@@ -84,14 +84,14 @@ class EventController extends ApiController
      * @param Request $request
      * @param int     $event_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function edit(Request $request, int $event_id): JsonResponse
+    public function edit(Request $request, int $event_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $event = Event::query()->find($event_id);
@@ -100,7 +100,7 @@ class EventController extends ApiController
         $guild = Guild::query()->find($event->guild_id);
 
         if (!$guild->isAdmin($user->id)) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $event->name        = $request->input('name') ?? $event->name;
@@ -116,7 +116,7 @@ class EventController extends ApiController
 
         $event->save();
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 
     /**
@@ -125,14 +125,14 @@ class EventController extends ApiController
      * @param Request $request
      * @param int     $event_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function delete(Request $request, int $event_id): JsonResponse
+    public function delete(Request $request, int $event_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $event = Event::query()->find($event_id);
@@ -141,7 +141,7 @@ class EventController extends ApiController
         $guild = Guild::query()->find($event->guild_id);
 
         if (!$guild->isAdmin($user->id)) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         Signup::query()->where('event_id', '=', $event->id)->delete();
@@ -151,7 +151,7 @@ class EventController extends ApiController
 
         $event->delete();
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 
     /**
@@ -160,17 +160,17 @@ class EventController extends ApiController
      * @param Request $request
      * @param int     $event_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function allSignups(Request $request, int $event_id): JsonResponse
+    public function allSignups(Request $request, int $event_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        return response(Signup::query()->where('event_id', '=', $event_id)->orderBy('created_at')->get() ?? [], 200);
+        return response(Signup::query()->where('event_id', '=', $event_id)->orderBy('created_at')->get() ?? [], Response::HTTP_OK);
     }
 
     /**
@@ -179,20 +179,20 @@ class EventController extends ApiController
      * @param Request $request
      * @param int     $event_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function getSignup(Request $request, int $event_id): JsonResponse
+    public function getSignup(Request $request, int $event_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         return response(Signup::query()
                 ->where('event_id', '=', $event_id)
                 ->where('user_id', '=', $user->id)
-                ->first() ?? [], 200);
+                ->first() ?? [], Response::HTTP_OK);
     }
 
     /**
@@ -201,14 +201,14 @@ class EventController extends ApiController
      * @param Request $request
      * @param int     $event_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function createSignup(Request $request, int $event_id): JsonResponse
+    public function createSignup(Request $request, int $event_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $event = Event::query()->find($event_id);
@@ -217,7 +217,7 @@ class EventController extends ApiController
         $guild = Guild::query()->find($event->guild_id);
 
         if (!$guild->isMember($user->id) || 1 === $event->locked) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $signup           = new Signup();
@@ -253,7 +253,7 @@ class EventController extends ApiController
         $log = new LogEntry();
         $log->create($guild->id, $user->name.' signed up for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>. (Via App)');
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 
     /**
@@ -262,14 +262,14 @@ class EventController extends ApiController
      * @param Request $request
      * @param int     $event_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function editSignup(Request $request, int $event_id): JsonResponse
+    public function editSignup(Request $request, int $event_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $event = Event::query()->find($event_id);
@@ -278,7 +278,7 @@ class EventController extends ApiController
         $guild = Guild::query()->find($event->guild_id);
 
         if (!$guild->isMember($user->id) || 1 === $event->locked) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $signup = Signup::query()->where('user_id', '=', $user->id)->where('event_id', '=', $event_id)->first();
@@ -308,7 +308,7 @@ class EventController extends ApiController
 
         $signup->save();
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 
     /**
@@ -317,13 +317,13 @@ class EventController extends ApiController
      * @param Request $request
      * @param int     $event_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function deleteSignup(Request $request, int $event_id): JsonResponse
+    public function deleteSignup(Request $request, int $event_id): Response
     {
         $user = $this->login($request);
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $event = Event::query()->find($event_id);
@@ -332,7 +332,7 @@ class EventController extends ApiController
         $guild = Guild::query()->find($event->guild_id);
 
         if (1 === $event->locked || !$guild->isMember($user->id)) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         Signup::query()->where('event_id', '=', $event_id)->where('user_id', '=', $user->id)->delete();
@@ -340,7 +340,7 @@ class EventController extends ApiController
         $log = new LogEntry();
         $log->create($guild->id, $user->name.' signed off for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>. (Via App)');
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 
     /**
@@ -349,14 +349,14 @@ class EventController extends ApiController
      * @param Request $request
      * @param int     $signup_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function confirmSignup(Request $request, int $signup_id): JsonResponse
+    public function confirmSignup(Request $request, int $signup_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $signup = Signup::query()->find($signup_id);
@@ -367,13 +367,13 @@ class EventController extends ApiController
         $guild = Guild::query()->find($event->guild_id);
 
         if (!$guild->isAdmin($user->id)) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $signup->status = 1;
         $signup->save();
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 
     /**
@@ -382,14 +382,14 @@ class EventController extends ApiController
      * @param Request $request
      * @param int     $signup_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function backupSignup(Request $request, int $signup_id): JsonResponse
+    public function backupSignup(Request $request, int $signup_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $signup = Signup::query()->find($signup_id);
@@ -400,13 +400,13 @@ class EventController extends ApiController
         $guild = Guild::query()->find($event->guild_id);
 
         if (!$guild->isAdmin($user->id)) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $signup->status = 2;
         $signup->save();
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 
     /**
@@ -415,14 +415,14 @@ class EventController extends ApiController
      * @param Request $request
      * @param int     $signup_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function deleteSignupOther(Request $request, int $signup_id): JsonResponse
+    public function deleteSignupOther(Request $request, int $signup_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $signup = Signup::query()->find($signup_id);
@@ -435,7 +435,7 @@ class EventController extends ApiController
         $guild = Guild::query()->find($event->guild_id);
 
         if (!$guild->isAdmin($user->id)) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $signup->delete();
@@ -443,6 +443,6 @@ class EventController extends ApiController
         $log = new LogEntry();
         $log->create($guild->id, $user->name.' signed off '.$u2->name.' for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>. (Via App)');
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 }

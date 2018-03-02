@@ -17,7 +17,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -58,7 +57,7 @@ class ApiController extends Controller
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $u = [];
@@ -67,6 +66,6 @@ class ApiController extends Controller
         $u['email']  = $user->email;
         $u['layout'] = $user->layout;
 
-        return response($u, 200);
+        return response($u, Response::HTTP_OK);
     }
 }

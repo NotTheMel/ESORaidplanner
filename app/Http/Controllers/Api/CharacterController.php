@@ -19,8 +19,8 @@ use App\Character;
 use App\Event;
 use App\Signup;
 use DateTime;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CharacterController extends ApiController
 {
@@ -29,17 +29,17 @@ class CharacterController extends ApiController
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function all(Request $request): JsonResponse
+    public function all(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        return response(Character::query()->where('user_id', '=', $user->id)->orderBy('name')->get() ?? [], 200);
+        return response(Character::query()->where('user_id', '=', $user->id)->orderBy('name')->get() ?? [], Response::HTTP_OK);
     }
 
     /**
@@ -47,14 +47,14 @@ class CharacterController extends ApiController
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function create(Request $request): JsonResponse
+    public function create(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $character          = new Character();
@@ -72,7 +72,7 @@ class CharacterController extends ApiController
 
         $character->save();
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 
     /**
@@ -81,20 +81,20 @@ class CharacterController extends ApiController
      * @param Request $request
      * @param int     $character_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function edit(Request $request, int $character_id): JsonResponse
+    public function edit(Request $request, int $character_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $character = Character::query()->find($character_id);
 
         if ($character->user_id !== $user->id) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $character->name    = $request->input('name') ?? $character->name;
@@ -123,7 +123,7 @@ class CharacterController extends ApiController
             }
         }
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 
     /**
@@ -132,20 +132,20 @@ class CharacterController extends ApiController
      * @param Request $request
      * @param int     $character_id
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function delete(Request $request, int $character_id): JsonResponse
+    public function delete(Request $request, int $character_id): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $character = Character::query()->find($character_id);
 
         if ($character->user_id !== $user->id) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
         $signups = $user->getSignups();
@@ -160,6 +160,6 @@ class CharacterController extends ApiController
 
         $character->delete();
 
-        return response(null, 200);
+        return response(null, Response::HTTP_OK);
     }
 }

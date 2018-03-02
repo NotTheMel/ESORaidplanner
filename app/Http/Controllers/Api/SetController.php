@@ -16,8 +16,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Set;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class SetController extends ApiController
 {
@@ -26,24 +26,24 @@ class SetController extends ApiController
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function all(Request $request): JsonResponse
+    public function all(Request $request): Response
     {
         $user = $this->login($request);
 
         if (false === $user) {
-            return response(null, 401);
+            return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        return response(Set::query()->orderBy('name')->get(), 200);
+        return response(Set::query()->orderBy('name')->get(), Response::HTTP_OK);
     }
 
     /**
-     * @return JsonResponse
+     * @return Response
      */
-    public function getVersion(): JsonResponse
+    public function getVersion(): Response
     {
-        return response(Set::query()->orderBy('version', 'desc')->first()->version, 200);
+        return response(Set::query()->orderBy('version', 'desc')->first()->version, Response::HTTP_OK);
     }
 }

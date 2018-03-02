@@ -16,17 +16,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Singleton\TimeZones;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class TimeZoneController extends ApiController
 {
     /**
      * Return list of supported timezones.
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function all(): JsonResponse
+    public function all(): Response
     {
-        return response(TimeZones::list(), 200);
+        return response(TimeZones::list(), Response::HTTP_OK);
     }
 }
