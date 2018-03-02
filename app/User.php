@@ -49,7 +49,7 @@ class User extends Authenticatable
     public function getGuilds(): array
     {
         $guild_ids = DB::table('user_guilds')
-            ->where('user_id', '=', Auth::id())
+            ->where('user_id', '=', $this->id)
             ->where('status', '>=', 1)
             ->orderBy('guild_id', 'asc')
             ->get();
