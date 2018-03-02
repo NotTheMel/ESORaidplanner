@@ -129,9 +129,7 @@ class Event extends Model
      */
     public function getGuild(): Guild
     {
-        return Guild::query()
-            ->where('id', '=', $this->guild_id)
-            ->first();
+        return Guild::query()->find($this->guild_id);
     }
 
     /**
@@ -141,6 +139,23 @@ class Event extends Model
     {
         return DB::table('signups')
             ->where('event_id', $this->id);
+    }
+
+    public function getSignupsByRole(int $role_id): array
+    {
+        return Signup::query()
+            ->where('event_id', '=', $this->id)
+            ->where('role_id', '=', $role_id)
+            ->orderBy('created_at', 'asc')
+            ->get()->all() ?? [];
+    }
+
+    public function getComments(): array
+    {
+        return Comment::query()
+            ->where('event_id', '=', $this->id)
+            ->orderBy('created_at', 'desc')
+            ->get()->all() ?? [];
     }
 
     /**
@@ -157,5 +172,94 @@ class Event extends Model
         }
 
         return $arr;
+    }
+
+    /**
+     * @param User           $user
+     * @param int|null       $role_id
+     * @param int|null       $class_id
+     * @param array          $sets
+     * @param Character|null $character
+     */
+    public function signup(User $user, int $role_id = null, int $class_id = null, array $sets = [], Character $character = null)
+    {
+        Signup::query()->where('event_id', '=', $this->id)
+            ->where('user_id', '=', $user->id)
+            ->delete();
+
+        $sign           = new Signup();
+        $sign->user_id  = $user->id;
+        $sign->event_id = $this->id;
+
+        if (null !== $character) {
+            $sign->class_id     = $character->class;
+            $sign->role_id      = $character->role;
+            $sign->sets         = $character->sets;
+            $sign->character_id = $character->id;
+        } else {
+            $sign->class_id = $class_id;
+            $sign->role_id  = $role_id;
+
+            if (count($sets) > 0) {
+                $sign->sets = implode(', ', $sets);
+            }
+        }
+
+        $sign->save();
+
+        $log = new LogEntry();
+        $log->create($this->guild_id, $user->name.' signed up for <a href="/g/'.$this->getGuildSlug().'/event/'.$this->id.'">'.$this->name.'</a>.');
+    }
+
+    /**
+     * @param User $user
+     */
+    public function signoff(User $user)
+    {
+        Signup::query()->where('event_id', '=', $this->id)
+            ->where('user_id', '=', $user->id)
+            ->delete();
+
+        $log = new LogEntry();
+        $log->create($this->guild_id, $user->name.' signed off for <a href="/g/'.$this->getGuildSlug().'/event/'.$this->id.'">'.$this->name.'</a>.');
+    }
+
+    /**
+     * @param User           $user
+     * @param int|null       $role_id
+     * @param int|null       $class_id
+     * @param array          $sets
+     * @param Character|null $character
+     */
+    public function editSignup(User $user, int $role_id = null, int $class_id = null, array $sets = [], Character $character = null)
+    {
+        $sign = Signup::query()->where('event_id', '=', $this->id)
+            ->where('user_id', '=', $user->id)
+            ->first();
+
+        if (null !== $character) {
+            $sign->class_id     = $character->class;
+            $sign->role_id      = $character->role;
+            $sign->sets         = $character->sets;
+            $sign->character_id = $character->id;
+        } else {
+            $sign->class_id = $class_id;
+            $sign->role_id  = $role_id;
+
+            if (count($sets) > 0) {
+                $sign->sets = implode(', ', $sets);
+            }
+            $sign->character_id = null;
+        }
+
+        $sign->save();
+    }
+
+    /**
+     * @return string
+     */
+    private function getGuildSlug(): string
+    {
+        return Guild::query()->find($this->guild_id)->slug;
     }
 }

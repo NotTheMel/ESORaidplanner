@@ -19,4 +19,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Set extends Model
 {
+    public static function Array(string $sets): array
+    {
+        if (false !== strpos($sets, ', ')) {
+            return explode(', ', $sets);
+        }
+
+        return [$sets];
+    }
 }

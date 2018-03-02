@@ -15,15 +15,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Badge;
 use App\Character;
-use App\Comment;
 use App\Event;
 use App\Guild;
 use App\Hook;
 use App\LogEntry;
 use App\Set;
 use App\Signup;
+use App\Singleton\RoleTypes;
 use App\User;
 use DateTime;
 use DateTimeZone;
@@ -66,69 +65,40 @@ class EventsController extends Controller
      */
     public function detail(string $slug, int $id)
     {
-        $event = Event::query()
-            ->where('id', '=', $id)
-            ->first();
+        /** @var Event $event */
+        $event = Event::query()->find($id);
 
-        if (!$this->eventBelongsToGuild($slug, $id)) {
-            return redirect('g/'.$slug);
-        }
-
+        /** @var Guild $guild */
         $guild = Guild::query()
             ->where('slug', '=', $slug)
             ->first();
 
-        $tanks = Signup::query()
-            ->where('event_id', '=', $id)
-            ->where('role_id', '=', 1)
-            ->orderBy('created_at', 'asc')
-            ->get();
+        if ($guild->id !== $event->guild_id) {
+            return redirect('g/'.$slug);
+        }
 
-        $healers = Signup::query()
-            ->where('event_id', '=', $id)
-            ->where('role_id', '=', 2)
-            ->orderBy('created_at', 'asc')
-            ->get();
+        $tanks = $event->getSignupsByRole(RoleTypes::ROLE_TANK);
 
-        $magickas = Signup::query()
-            ->where('event_id', '=', $id)
-            ->where('role_id', '=', 3)
-            ->orderBy('created_at', 'asc')
-            ->get();
+        $healers = $event->getSignupsByRole(RoleTypes::ROLE_HEALER);
 
-        $staminas = Signup::query()
-            ->where('event_id', '=', $id)
-            ->where('role_id', '=', 4)
-            ->orderBy('created_at', 'asc')
-            ->get();
+        $magickas = $event->getSignupsByRole(RoleTypes::ROLE_MAGICKA_DD);
 
-        $others = Signup::query()
-            ->where('event_id', '=', $id)
-            ->where('role_id', '=', 5)
-            ->orderBy('created_at', 'asc')
-            ->get();
+        $staminas = $event->getSignupsByRole(RoleTypes::ROLE_STAMINA_DD);
 
-        $comments = Comment::query()
-            ->where('event_id', '=', $event->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $others = $event->getSignupsByRole(RoleTypes::ROLE_OTHER);
+
+        $comments = $event->getComments();
 
         $sets_q = Set::query()
             ->orderBy('name', 'asc')
             ->get();
 
-        $mem = DB::table('user_guilds')
-            ->join('users', 'user_guilds.user_id', '=', 'users.id')
-            ->where('user_guilds.guild_id', '=', $guild->id)
-            ->where('user_guilds.status', '>=', 1)
-            ->whereNotIn('user_id', $event->getSignUpIds())
-            ->where('users.id', '<>', Auth::id())
-            ->orderBy('users.name')->get();
+        $mem = $guild->getMembers();
 
         $members = [];
 
         foreach ($mem as $member) {
-            $members[$member->user_id] = $member->name;
+            $members[$member->id] = $member->name;
         }
 
         $sets = [];
@@ -184,51 +154,18 @@ class EventsController extends Controller
      */
     public function signUpUser(string $slug, int $id)
     {
+        /** @var Event $event */
         $event = Event::query()->find($id);
 
         if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id) || 1 === $event->locked) {
             return redirect('g/'.$slug);
         }
 
-        Signup::query()->where('event_id', '=', $id)->where('user_id', '=', Auth::id())->delete();
-
-        $sign           = new Signup();
-        $sign->user_id  = Auth::id();
-        $sign->event_id = $id;
-
         if (!empty(Input::get('character'))) {
-            if (0 == Input::get('character')) {
-                return redirect('g/'.$slug.'/event/'.$id);
-            }
-
-            $character = Character::query()
-                ->find(Input::get('character'));
-            $sign->class_id     = $character->class;
-            $sign->role_id      = $character->role;
-            $sign->sets         = $character->sets;
-            $sign->character_id = $character->id;
+            $character = Character::query()->find(Input::get('character'));
+            $event->signup(Auth::user(), null, null, [], $character);
         } else {
-            $sign->class_id = Input::get('class');
-            $sign->role_id  = Input::get('role');
-
-            if (!empty(Input::get('sets'))) {
-                $sign->sets = implode(', ', Input::get('sets'));
-            }
-        }
-
-        $sign->save();
-
-        $log = new LogEntry();
-        $log->create($this->getGuildId($slug), Auth::user()->name.' signed up for <a href="/g/'.$slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
-
-        if (1 == $sign->role_id) {
-            Badge::earn(3);
-        } elseif (2 == $sign->role_id) {
-            Badge::earn(4);
-        } elseif (3 == $sign->role_id) {
-            Badge::earn(2);
-        } elseif (4 == $sign->role_id) {
-            Badge::earn(1);
+            $event->signup(Auth::user(), Input::get('role'), Input::get('class'), Set::Array(Input::get('sets') ?? ''));
         }
 
         return redirect('g/'.$slug.'/event/'.$id);
@@ -282,40 +219,19 @@ class EventsController extends Controller
      */
     public function modifySignUp(string $slug, int $id)
     {
-        $sign = Signup::query()->where('event_id', '=', $id)
-            ->where('user_id', '=', Auth::id())
-            ->first();
-
-        $event = Event::query()->find($sign->event_id);
+        /** @var Event $event */
+        $event = Event::query()->find($id);
 
         if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id) || 1 === $event->locked) {
             return redirect('g/'.$slug);
         }
 
         if (!empty(Input::get('character'))) {
-            if (0 == Input::get('character')) {
-                return redirect('g/'.$slug.'/event/'.$id);
-            }
-
-            $character = Character::query()
-                ->find(Input::get('character'));
-            $sign->class_id     = $character->class;
-            $sign->role_id      = $character->role;
-            $sign->sets         = $character->sets;
-            $sign->character_id = $character->id;
+            $character = Character::query()->find(Input::get('character'));
+            $event->editSignup(Auth::user(), null, null, [], $character);
         } else {
-            $sign->class_id = Input::get('class');
-            $sign->role_id  = Input::get('role');
-
-            if (!empty(Input::get('sets'))) {
-                $sign->sets = implode(', ', Input::get('sets'));
-            } else {
-                $sign->sets = '';
-            }
-            $sign->character_id = null;
+            $event->editSignup(Auth::user(), Input::get('role'), Input::get('class'), Set::Array(Input::get('sets') ?? ''));
         }
-
-        $sign->save();
 
         return redirect('g/'.$slug.'/event/'.$id);
     }
@@ -358,16 +274,14 @@ class EventsController extends Controller
      */
     public function signOffUser(string $slug, int $id)
     {
+        /** @var Event $event */
         $event = Event::query()->find($id);
 
         if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id) || 1 === $event->locked) {
             return redirect('g/'.$slug);
         }
 
-        Signup::query()->where('event_id', '=', $id)->where('user_id', '=', Auth::id())->delete();
-
-        $log = new LogEntry();
-        $log->create($this->getGuildId($slug), Auth::user()->name.' signed off for <a href="/g/'.$slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
+        $event->signoff(Auth::user());
 
         return redirect('g/'.$slug.'/event/'.$id);
     }
