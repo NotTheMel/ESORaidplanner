@@ -17,7 +17,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Event;
 use App\Guild;
-use App\LogEntry;
 use App\User;
 use DateTime;
 use DateTimeZone;
@@ -61,13 +60,14 @@ class GuildController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $count = DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $guild_id)->count();
+        /** @var Guild $guild */
+        $guild = Guild::query()->find($guild_id);
 
-        if (0 === $count) {
+        if (!$guild->isMember($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        return response(Guild::query()->find($guild_id), Response::HTTP_OK);
+        return response($guild, Response::HTTP_OK);
     }
 
     /**
@@ -84,23 +84,10 @@ class GuildController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $count = DB::table('user_guilds')
-            ->where('user_id', '=', $user->id)
-            ->where('guild_id', '=', $guild_id)
-            ->count();
+        /** @var Guild $guild */
+        $guild = Guild::query()->find($guild_id);
 
-        if ($count > 0) {
-            return response(null, 200);
-        }
-
-        DB::table('user_guilds')->insert([
-            'user_id'  => $user->id,
-            'guild_id' => $guild_id,
-            'status'   => 0,
-        ]);
-
-        $log = new LogEntry();
-        $log->create($guild_id, $user->name.' requested membership. (Via App)');
+        $guild->requestMembership($user);
 
         return response(null, Response::HTTP_OK);
     }
@@ -122,18 +109,7 @@ class GuildController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
 
-        if ($guild->isOwner($user->id)) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
-        if ($guild->isAdmin($user->id)) {
-            $guild->removeAdmin($user->id, $user->id);
-        }
-
-        DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $guild->id)->delete();
-
-        $log = new LogEntry();
-        $log->create($guild->id, $user->name.' left the guild. (Via App)');
+        $guild->leave($user);
 
         return response(null, Response::HTTP_OK);
     }
@@ -155,17 +131,14 @@ class GuildController extends ApiController
 
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
+        /** @var User $user_1 */
+        $user_1 = User::query()->find($user_id);
 
-        if (!$guild->isAdmin($user->id)) {
+        if (!$guild->isAdmin($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        DB::table('user_guilds')->where('user_id', '=', $user_id)->where('guild_id', '=', $guild_id)->update(['status' => 1]);
-
-        $user_1 = User::query()->find($user_id);
-
-        $log = new LogEntry();
-        $log->create($guild->id, $user->name.' approved the membership request of '.$user_1->name.'. (Via App)');
+        $guild->approveMembership($user_1, $user);
 
         return response(null, Response::HTTP_OK);
     }
@@ -185,21 +158,19 @@ class GuildController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
+        /** @var User $user_1 */
+        $user_1 = User::query()->find($user_id);
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
 
-        if ($guild->owner_id === $user_id || !$guild->isAdmin($user->id)) {
+        if (!$guild->isAdmin($user)) {
+            return response(null, Response::HTTP_UNAUTHORIZED);
+        }
+        if (!$guild->isOwner($user) && $guild->isAdmin($user_1)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        DB::table('user_guilds')->where('user_id', '=', $user_id)->where('guild_id', '=', $guild_id)->delete();
-
-        $guild->removeAdmin($user_id, $user->id);
-
-        $user_1 = User::query()->find($user_id);
-
-        $log = new LogEntry();
-        $log->create($guild->id, $user->name.' removed '.$user_1->name.' from the guild. (Via App)');
+        $guild->removeMembership($user_1, $user);
 
         return response(null, Response::HTTP_OK);
     }
@@ -221,19 +192,14 @@ class GuildController extends ApiController
 
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
+        /** @var User $user_1 */
+        $user_1 = User::query()->find($user_id);
 
-        if ($guild->owner_id !== $user->id) {
+        if (!$guild->isOwner($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        if (!$guild->isAdmin($user_id)) {
-            $guild->makeAdmin($user_id, $user->id);
-
-            $u = User::query()->find($user_id);
-
-            $log = new LogEntry();
-            $log->create($guild->id, $user->name.' promoted '.$u->name.' to admin.');
-        }
+        $guild->makeAdmin($user_1, $user);
 
         return response(null, Response::HTTP_OK);
     }
@@ -255,25 +221,22 @@ class GuildController extends ApiController
 
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
+        /** @var User $user_1 */
+        $user_1 = User::query()->find($user_id);
 
-        if ($guild->owner_id !== $user->id || $guild->owner_id === $user_id) {
+        if (!$guild->isOwner($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        if ($guild->isAdmin($user_id)) {
-            $guild->removeAdmin($user_id, $user->id);
-
-            $u = User::query()->find($user_id);
-
-            $log = new LogEntry();
-            $log->create($guild->id, $user->name.' demoted '.$u->name.' to member.');
-        }
+        $guild->removeAdmin($user_1, $user);
 
         return response(null, Response::HTTP_OK);
     }
 
     /**
      * Get all upcoming events for a guild.
+     *
+     * NEEDS TO BE REDONE TO NOT GIVE PAST EVENTS
      *
      * @param Request $request
      * @param int     $guild_id
@@ -287,7 +250,7 @@ class GuildController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
 
-        if (false === $user || !$guild->isMember($user->id)) {
+        if (false === $user || !$guild->isMember($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -327,7 +290,7 @@ class GuildController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
 
-        if (false === $user || !$guild->isMember($user->id)) {
+        if (false === $user || !$guild->isMember($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -355,7 +318,7 @@ class GuildController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
 
-        if (false === $user || !$guild->isAdmin($user->id)) {
+        if (false === $user || !$guild->isAdmin($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 

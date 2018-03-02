@@ -46,7 +46,7 @@ class CommentController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function modify(string $slug, int $event_id, int $comment_id)
+    public function edit(string $slug, int $event_id, int $comment_id)
     {
         $comment = Comment::query()
             ->where('id', '=', $comment_id)

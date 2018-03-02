@@ -145,26 +145,27 @@ class EventsController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
      */
-    public function createPage(string $slug)
+    public function new(string $slug)
     {
+        /** @var Guild $guild */
         $guild = Guild::query()
             ->where('slug', '=', $slug)
         ->first();
 
-        if (!$guild->isAdmin(Auth::id())) {
+        if (!$guild->isAdmin(Auth::user())) {
             return redirect('g/'.$slug);
         }
 
         return view('event.create', compact('guild'));
     }
 
-    public function editPage(string $slug, int $id)
+    public function show(string $slug, int $id)
     {
         $event = Event::query()->find($id);
 
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::id())) {
+        if (!$guild->isAdmin(Auth::user())) {
             return redirect('g/'.$slug);
         }
 
@@ -243,7 +244,7 @@ class EventsController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::id()) || !$this->eventBelongsToGuild($slug, $id)) {
+        if (!$guild->isAdmin(Auth::user()) || !$this->eventBelongsToGuild($slug, $id)) {
             return redirect('g/'.$slug);
         }
 
@@ -334,7 +335,7 @@ class EventsController extends Controller
 
         $signup = Signup::query()->find($id);
 
-        if ($guild->isAdmin(Auth::id())) {
+        if ($guild->isAdmin(Auth::user())) {
             Signup::query()
                 ->where('id', '=', $id)
                 ->delete();
@@ -390,7 +391,7 @@ class EventsController extends Controller
             ->where('slug', '=', $slug)
             ->first();
 
-        if (!$guild->isAdmin(Auth::id())) {
+        if (!$guild->isAdmin(Auth::user())) {
             return redirect('g/'.$slug);
         }
 
@@ -424,7 +425,7 @@ class EventsController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function modifyEvent(string $slug, int $id)
+    public function edit(string $slug, int $id)
     {
         if (12 === Auth::user()->clock) {
             $date = new DateTime(Input::get('year').'-'.Input::get('month').'-'.Input::get('day').' '.Input::get('hour').':'.Input::get('minute').' '.Input::get('meridiem'), new DateTimeZone(Auth::user()->timezone));
@@ -438,7 +439,7 @@ class EventsController extends Controller
             ->where('slug', '=', $slug)
             ->first();
 
-        if (!$guild->isAdmin(Auth::id())) {
+        if (!$guild->isAdmin(Auth::user())) {
             return redirect('g/'.$slug);
         }
 
@@ -460,11 +461,11 @@ class EventsController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function deleteEvent(string $slug, int $id)
+    public function delete(string $slug, int $id)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::id())) {
+        if (!$guild->isAdmin(Auth::user())) {
             return redirect('g/'.$slug);
         }
 
@@ -510,7 +511,7 @@ class EventsController extends Controller
 
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isAdmin(Auth::id())) {
+        if (!$guild->isAdmin(Auth::user())) {
             return redirect('g/'.$guild->slug.'/event/'.$signup->event_id);
         }
 
@@ -542,7 +543,7 @@ class EventsController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::id())) {
+        if (!$guild->isAdmin(Auth::user())) {
             return redirect('/g/'.$slug.'/event/'.$event_id);
         }
 

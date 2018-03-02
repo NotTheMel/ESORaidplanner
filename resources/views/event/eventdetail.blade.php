@@ -11,7 +11,7 @@
                         </div>
                         <div class="content">
 
-                            @if ($guild->isAdmin(Auth::id()))
+                            @if ($guild->isAdmin(Auth::user()))
                                 <div class="pull-right">
                                     <a href="{{ '/g/' . $guild->slug . '/events/edit/' . $event->id }}">
                                         <button type="button" class="btn">Edit event</button>
@@ -166,7 +166,7 @@
                             <h3 align="center">Tanks</h3>
                             <table class="table table-hover table-striped">
                                 <thead>
-                                @if ($guild->isAdmin(Auth::id()))
+                                @if ($guild->isAdmin(Auth::user()))
                                     <th width="20%">Player</th>
                                     <th width="15%">Class</th>
                                     <th width="20%">Role</th>
@@ -196,7 +196,7 @@
                                             <td>{!! $signup->getSetsFormatted() !!}</td>
                                             <td><i class="fa fa-clock-o"
                                                    title="Signup time: {{ $signup->getNiceDate() }}"></td>
-                                            @if ($guild->isAdmin(Auth::id()))
+                                            @if ($guild->isAdmin(Auth::user()))
                                                 <td>
                                                     <a href="{{ '/signup/' . $signup->id . '/1' }}">
                                                         <button type="button" class="btn  btn-success form-control">
@@ -229,7 +229,7 @@
                             <h3 align="center">Healers</h3>
                             <table class="table table-hover table-striped">
                                 <thead>
-                                @if ($guild->isAdmin(Auth::id()))
+                                @if ($guild->isAdmin(Auth::user()))
                                     <th width="20%">Player</th>
                                     <th width="15%">Class</th>
                                     <th width="20%">Role</th>
@@ -259,7 +259,7 @@
                                             <td>{!! $signup->getSetsFormatted() !!}</td>
                                             <td><i class="fa fa-clock-o"
                                                    title="Signup time: {{ $signup->getNiceDate() }}"></td>
-                                            @if ($guild->isAdmin(Auth::id()))
+                                            @if ($guild->isAdmin(Auth::user()))
                                                 <td>
                                                     <a href="{{ '/signup/' . $signup->id . '/1' }}">
                                                         <button type="button" class="btn  btn-success form-control">
@@ -292,7 +292,7 @@
                             <h3 align="center">Magicka DD's</h3>
                             <table class="table table-hover table-striped">
                                 <thead>
-                                @if ($guild->isAdmin(Auth::id()))
+                                @if ($guild->isAdmin(Auth::user()))
                                     <th width="20%">Player</th>
                                     <th width="15%">Class</th>
                                     <th width="20%">Role</th>
@@ -322,7 +322,7 @@
                                             <td>{!! $signup->getSetsFormatted() !!}</td>
                                             <td><i class="fa fa-clock-o"
                                                    title="Signup time: {{ $signup->getNiceDate() }}"></td>
-                                            @if ($guild->isAdmin(Auth::id()))
+                                            @if ($guild->isAdmin(Auth::user()))
                                                 <td>
                                                     <a href="{{ '/signup/' . $signup->id . '/1' }}">
                                                         <button type="button" class="btn  btn-success form-control">
@@ -355,7 +355,7 @@
                             <h3 align="center">Stamina DD's</h3>
                             <table class="table table-hover table-striped">
                                 <thead>
-                                @if ($guild->isAdmin(Auth::id()))
+                                @if ($guild->isAdmin(Auth::user()))
                                     <th width="20%">Player</th>
                                     <th width="15%">Class</th>
                                     <th width="20%">Role</th>
@@ -385,7 +385,7 @@
                                             <td>{!! $signup->getSetsFormatted() !!}</td>
                                             <td><i class="fa fa-clock-o"
                                                    title="Signup time: {{ $signup->getNiceDate() }}"></td>
-                                            @if ($guild->isAdmin(Auth::id()))
+                                            @if ($guild->isAdmin(Auth::user()))
                                                 <td>
                                                     <a href="{{ '/signup/' . $signup->id . '/1' }}">
                                                         <button type="button" class="btn  btn-success form-control">
@@ -419,7 +419,7 @@
                                 <h3 align="center">Others</h3>
                                 <table class="table table-hover table-striped">
                                     <thead>
-                                    @if ($guild->isAdmin(Auth::id()))
+                                    @if ($guild->isAdmin(Auth::user()))
                                         <th width="20%">Player</th>
                                         <th width="15%">Class</th>
                                         <th width="20%">Role</th>
@@ -449,7 +449,7 @@
                                                 <td>{!! $signup->getSetsFormatted() !!}</td>
                                                 <td><i class="fa fa-clock-o"
                                                        title="Signup time: {{ $signup->getNiceDate() }}"></td>
-                                                @if ($guild->isAdmin(Auth::id()))
+                                                @if ($guild->isAdmin(Auth::user()))
                                                     <td>
                                                         <a href="{{ '/signup/' . $signup->id . '/1' }}">
                                                             <button type="button" class="btn  btn-success form-control">
@@ -479,7 +479,7 @@
                             </div>
                         @endif
 
-                        @if($guild->isAdmin(Auth::id()) && count($members) > 0)
+                        @if($guild->isAdmin(Auth::user()) && count($members) > 0)
                             <div class="alert alert-success">
                                 <strong>You are an admin.</strong> Here you can sign up someone else for this event.
                                 {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/other/'.$event->id)) }}

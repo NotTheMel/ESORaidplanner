@@ -109,23 +109,9 @@ class GuildController extends Controller
      */
     public function requestMembership(string $slug, int $id)
     {
-        $count = DB::table('user_guilds')
-            ->where('user_id', '=', Auth::id())
-            ->where('guild_id', '=', $id)
-            ->count();
+        $guild = Guild::query()->find($id);
 
-        if ($count > 0) {
-            return redirect('/');
-        }
-
-        DB::table('user_guilds')->insert([
-            'user_id'  => Auth::id(),
-            'guild_id' => $id,
-            'status'   => 0,
-        ]);
-
-        $log = new LogEntry();
-        $log->create($id, Auth::user()->name.' requested membership.');
+        $guild->requestMembership(Auth::user());
 
         return redirect('/');
     }
@@ -139,18 +125,15 @@ class GuildController extends Controller
      */
     public function approveMembership(string $slug, int $guild_id, int $user_id)
     {
-        $guild = Guild::query()->where('id', '=', $guild_id)->first();
+        $guild = Guild::query()->find($guild_id);
 
-        if (!$guild->isAdmin(Auth::id())) {
+        if (!$guild->isAdmin(Auth::user())) {
             return redirect('/g/'.$guild->slug);
         }
 
-        DB::table('user_guilds')->where('user_id', '=', $user_id)->where('guild_id', '=', $guild_id)->update(['status' => 1]);
-
         $user = User::query()->find($user_id);
 
-        $log = new LogEntry();
-        $log->create($guild->id, Auth::user()->name.' approved the membership request of '.$user->name.'.');
+        $guild->approveMembership($user);
 
         return redirect('/g/'.$guild->slug.'/members');
     }
@@ -164,38 +147,28 @@ class GuildController extends Controller
      */
     public function removeMembership(string $slug, int $guild_id, int $user_id)
     {
-        $guild = Guild::query()->where('id', '=', $guild_id)->first();
+        /** @var Guild $guild */
+        $guild = Guild::query()->find($guild_id);
+        /** @var User $user */
+        $user = User::query()->find($user_id);
 
-        if (!$guild->isAdmin(Auth::id()) || $guild->owner_id === $user_id) {
+        if (!$guild->isAdmin(Auth::user())) {
+            return redirect('/g/'.$guild->slug);
+        }
+        if (!$guild->isOwner(Auth::user()) && $guild->isAdmin($user)) {
             return redirect('/g/'.$guild->slug);
         }
 
-        DB::table('user_guilds')->where('user_id', '=', $user_id)->where('guild_id', '=', $guild_id)->delete();
-
-        $guild->removeAdmin($user_id);
-
-        $user = User::query()->find($user_id);
-
-        $log = new LogEntry();
-        $log->create($guild->id, Auth::user()->name.' removed '.$user->name.' from the guild.');
+        $guild->removeMembership($user);
 
         return redirect('/g/'.$guild->slug.'/members');
     }
 
-    public function leaveGuild(string $slug)
+    public function leave(string $slug)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if ($guild->isOwner(Auth::id())) {
-            return redirect('/g/'.$slug);
-        }
-
-        $guild->removeAdmin(Auth::id());
-
-        DB::table('user_guilds')->where('user_id', '=', Auth::id())->where('guild_id', '=', $guild->id)->delete();
-
-        $log = new LogEntry();
-        $log->create($guild->id, Auth::user()->name.' left the guild.');
+        $guild->leave(Auth::user());
 
         return redirect('/');
     }
@@ -210,7 +183,9 @@ class GuildController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        $guild->makeAdmin($user_id);
+        if ($guild->owner_id === Auth::id()) {
+            $guild->makeAdmin(User::query()->find($user_id));
+        }
 
         return redirect('/g/'.$slug.'/members');
     }
@@ -225,7 +200,9 @@ class GuildController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        $guild->removeAdmin($user_id);
+        if ($guild->owner_id === Auth::id()) {
+            $guild->removeAdmin(User::query()->find($user_id));
+        }
 
         return redirect('/g/'.$slug.'/members');
     }
@@ -237,19 +214,19 @@ class GuildController extends Controller
      */
     public function detail($slug)
     {
+        /** @var Guild $guild */
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (0 === $guild->userStatus()) {
+        if (0 === $guild->userStatus(Auth::user())) {
             return view('guild.guild_awaiting_confirmation', compact('guild'));
         }
 
-        if ($guild->isMember()) {
-            $members = DB::table('user_guilds')->where('guild_id', '=', $guild->id)->where('status', '>=', 1)->get();
+        if ($guild->isMember(Auth::user())) {
+            $members = $guild->getMembers();
 
-            $pending = DB::table('user_guilds')->where('guild_id', '=', $guild->id)->where('status', '=', 0)->count();
+            $pending = $guild->getPendingMembers();
 
-            $events = Event::query()->where('guild_id', '=', $guild->id)->
-            where('start_date', '>=', date('Y-m-d H:i:s'))->orderBy('start_date', 'asc')->get();
+            $events = $guild->getEvents();
 
             $count = Event::query()->where('guild_id', '=', $guild->id)->count();
 
@@ -265,7 +242,7 @@ class GuildController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::id())) {
+        if (!$guild->isAdmin(Auth::user())) {
             return redirect('/g/'.$guild->slug);
         }
 
@@ -288,11 +265,11 @@ class GuildController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::id())) {
+        if (!$guild->isAdmin(Auth::user())) {
             return redirect('/g/'.$slug);
         }
 
-        $pending = DB::table('user_guilds')->where('guild_id', '=', $guild->id)->where('status', '=', 0)->get();
+        $pending = $guild->getPendingMembers();
 
         return view('guild.settings', compact('guild', 'pending'));
     }
@@ -301,7 +278,7 @@ class GuildController extends Controller
     {
         $guild = Guild::query()->find($id);
 
-        if ($guild->owner_id !== Auth::id()) {
+        if (!$guild->isOwner(Auth::user())) {
             return redirect('/g/'.$guild->slug);
         }
 
@@ -310,25 +287,16 @@ class GuildController extends Controller
 
     public function members(String $slug)
     {
+        /** @var Guild $guild */
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isMember()) {
+        if (!$guild->isMember(Auth::user())) {
             return redirect('/g/'.$slug);
         }
 
-        $members = DB::table('user_guilds')
-            ->join('users', 'user_guilds.user_id', 'users.id')
-            ->where('user_guilds.guild_id', '=', $guild->id)
-            ->where('user_guilds.status', '>=', 1)
-            ->orderBy('users.name', 'asc')
-            ->get();
+        $members = $guild->getMembers();
 
-        $pending = DB::table('user_guilds')
-            ->join('users', 'user_guilds.user_id', 'users.id')
-            ->where('user_guilds.guild_id', '=', $guild->id)
-            ->where('user_guilds.status', '=', 0)
-            ->orderBy('users.name', 'asc')
-            ->get();
+        $pending = $guild->getPendingMembers();
 
         return view('guild.members', compact('guild', 'members', 'pending'));
     }
@@ -337,7 +305,7 @@ class GuildController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::id())) {
+        if (!$guild->isAdmin(Auth::user())) {
             return redirect('/g/'.$slug);
         }
 

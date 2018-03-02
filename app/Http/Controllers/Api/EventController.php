@@ -47,7 +47,7 @@ class EventController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($request->input('guild_id'));
 
-        if (!$guild->isAdmin($user->id)) {
+        if (!$guild->isAdmin($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -99,7 +99,7 @@ class EventController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isAdmin($user->id)) {
+        if (!$guild->isAdmin($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -140,7 +140,7 @@ class EventController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isAdmin($user->id)) {
+        if (!$guild->isAdmin($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -216,7 +216,7 @@ class EventController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isMember($user->id) || 1 === $event->locked) {
+        if (!$guild->isMember($user) || 1 === $event->locked) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -277,7 +277,7 @@ class EventController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isMember($user->id) || 1 === $event->locked) {
+        if (!$guild->isMember($user) || 1 === $event->locked) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -331,7 +331,7 @@ class EventController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($event->guild_id);
 
-        if (1 === $event->locked || !$guild->isMember($user->id)) {
+        if (1 === $event->locked || !$guild->isMember($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -366,7 +366,7 @@ class EventController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isAdmin($user->id)) {
+        if (!$guild->isAdmin($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -399,7 +399,7 @@ class EventController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isAdmin($user->id)) {
+        if (!$guild->isAdmin($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -434,7 +434,7 @@ class EventController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isAdmin($user->id)) {
+        if (!$guild->isAdmin($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 

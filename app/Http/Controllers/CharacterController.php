@@ -50,7 +50,7 @@ class CharacterController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function modify(int $id)
+    public function edit(int $id)
     {
         $character = Character::query()
             ->where('id', '=', $id)

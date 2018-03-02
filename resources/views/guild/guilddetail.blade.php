@@ -23,7 +23,7 @@
                                 <hr>
                                 <div class="stats"><i class="fa fa-refresh"></i><!-- react-text: 231 -->
                                     <!-- /react-text --><!-- react-text: 232 -->
-                                    @if ($guild->isAdmin(Auth::id()))
+                                    @if ($guild->isAdmin(Auth::user()))
                                         <a href="{{ '/g/' . $guild->slug . '/settings' }}">Go to Guild settings</a>
                                     @else
                                         <s>Go to Guild settings</s>
@@ -43,7 +43,7 @@
                                 </div>
                                 <div class="col-xs-7">
                                     <div class="numbers"><p>Members</p><!-- react-text: 243 -->{{ count($members) }}
-                                        ({{ $pending }} pending)
+                                        ({{ count($pending) }} pending)
                                         <!-- /react-text --></div>
                                 </div>
                             </div>
@@ -100,7 +100,7 @@
                                 <hr>
                                 <div class="stats"><i class="fa fa-refresh"></i><!-- react-text: 282 -->
                                     <!-- /react-text --><!-- react-text: 283 -->
-                                    @if ($guild->isAdmin(Auth::id()))
+                                    @if ($guild->isAdmin(Auth::user()))
                                         <a href="{{ '/g/' . $guild->slug . '/logs' }}">Go to Guild logs</a>
                                     @else
                                         <s>Go to Guild logs</s>
@@ -121,7 +121,7 @@
                                 @endif
                                 <div class="card">
                                     <div class="header">
-                                        @if ($guild->isAdmin(Auth::id()))
+                                        @if ($guild->isAdmin(Auth::user()))
                                             <div class="pull-right">
                                                 <a href="{{ '/g/' . $guild->slug . '/events/create' }}">
                                                     <button type="button" class="btn">Create an Event</button>

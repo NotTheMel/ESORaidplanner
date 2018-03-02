@@ -28,7 +28,7 @@ class HookController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function hookList()
+    public function all()
     {
         $guild_ids = DB::table('user_guilds')->where('user_id', '=', Auth::id())->get();
 
@@ -40,7 +40,7 @@ class HookController extends Controller
             $guild = Guild::query()->find($guild_id->guild_id);
 
             /** @var Guild $guild */
-            if ($guild->isAdmin(Auth::id())) {
+            if ($guild->isAdmin(Auth::user())) {
                 $guilds[] = $guild->id;
             }
         }
@@ -56,13 +56,13 @@ class HookController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
      */
-    public function modifyView(int $type, int $id)
+    public function show(int $type, int $id)
     {
-        if (!$this->isAdmin($id)) {
+        $hook = Hook::query()->find($id);
+
+        if (!$hook->isOwner($id)) {
             return redirect('/hooks');
         }
-
-        $hook = Hook::query()->find($id);
 
         return view('hook.hookdetail', compact('hook'));
     }
@@ -72,7 +72,7 @@ class HookController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function createView(int $type)
+    public function new(int $type)
     {
         $guilds_user = Auth::user()->getGuilds();
 
@@ -81,7 +81,7 @@ class HookController extends Controller
 
         /** @var Guild $guild */
         foreach ($guilds_user as $key => $guild) {
-            if ($guild->isAdmin(Auth::id())) {
+            if ($guild->isAdmin(Auth::user())) {
                 $guilds[$guild->id] = $guild->name;
             }
         }
@@ -130,7 +130,7 @@ class HookController extends Controller
             /** @var Guild $guild */
             $guild            = Guild::query()->find($hook->guild_id);
 
-            if (!$guild->isAdmin(Auth::id())) {
+            if (!$guild->isAdmin(Auth::user())) {
                 return redirect('/hooks');
             }
         }
@@ -146,12 +146,8 @@ class HookController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function modify(Request $request, int $type, int $id)
+    public function edit(Request $request, int $type, int $id)
     {
-        if (!$this->isAdmin($id)) {
-            return redirect('/hooks');
-        }
-
         if (Hook::TYPE_DISCORD === $type) {
             $request->validate([
                 'url' => new \App\Rules\DiscordHook(),
@@ -163,6 +159,11 @@ class HookController extends Controller
         }
 
         $hook      = Hook::query()->find($id);
+
+        if (!$hook->isOwner(Auth::id())) {
+            return redirect('/hooks');
+        }
+
         $hook->url = Input::get('url') ?? null;
         if (Hook::TYPE_TELEGRAM === $type) {
             $hook->token = $hook->token ?? env('TELEGRAM_TOKEN_NOTIFICATIONS');
@@ -197,23 +198,5 @@ class HookController extends Controller
         }
 
         return redirect('/hooks');
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return bool
-     */
-    private function isAdmin(int $id): bool
-    {
-        $hook = Hook::query()->where('id', '=', $id)->first();
-
-        foreach (Auth::user()->getGuilds() as $guild) {
-            if ($hook->guild_id === $guild->id && $guild->isAdmin(Auth::id())) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

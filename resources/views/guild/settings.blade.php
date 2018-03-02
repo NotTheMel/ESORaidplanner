@@ -20,7 +20,7 @@
                             {!! Form::close() !!}
                             {{ Form::close() }}
 
-                            @if ($guild->isOwner(Auth::id()))
+                            @if ($guild->isOwner(Auth::user()))
                                 <br><br><br><br><a href="{{ '/guild/delete/' . $guild->id }}">
                                     <button type="button" class="btn btn-danger">Delete Guild</button>
                                 </a>
@@ -29,7 +29,7 @@
                     </div>
                 </div>
 
-                @if ($guild->isAdmin(Auth::id()) || Auth::user()->global_admin === 1)
+                @if ($guild->isAdmin(Auth::user()) || Auth::user()->global_admin === 1)
                     <div class="col-md-6">
                         <div class="card">
                             <div class="header">
@@ -47,7 +47,7 @@
                                         <tr>
                                             <td>{{ $guild->getMemberName($member->user_id) }}</td>
                                             <td>Membership pending</td>
-                                            @if ($guild->isAdmin(Auth::id()) || Auth::user()->global_admin === 1)
+                                            @if ($guild->isAdmin(Auth::user()) || Auth::user()->global_admin === 1)
                                                 <td>
                                                     {{ Form::open(array('url' => '/g/' . $guild->slug . '/member/approve/'.$guild->id.'/'.$member->user_id)) }}
                                                     {!! Form::open([]) !!}

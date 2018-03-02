@@ -82,15 +82,15 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('/g/{slug}/sign/modify/{id}', 'EventsController@modifySignup');
 
-    Route::get('/g/{slug}/events/create', 'EventsController@createPage');
+    Route::get('/g/{slug}/events/create', 'EventsController@new');
 
     Route::post('/g/{slug}/events/create', 'EventsController@create');
 
-    Route::get('/g/{slug}/events/edit/{id}', 'EventsController@editPage');
+    Route::get('/g/{slug}/events/edit/{id}', 'EventsController@show');
 
-    Route::post('/g/{slug}/events/edit/{id}', 'EventsController@modifyEvent');
+    Route::post('/g/{slug}/events/edit/{id}', 'EventsController@edit');
 
-    Route::get('/g/{slug}/events/delete/{id}', 'EventsController@deleteEvent');
+    Route::get('/g/{slug}/events/delete/{id}', 'EventsController@delete');
 
     Route::get('/g/{slug}/events/lock/{event_id}/{lockstatus}', 'EventsController@changeLockStatus');
 
@@ -105,15 +105,15 @@ Route::group(['middleware' => 'auth'], function () {
      *
      */
 
-    Route::get('/hooks', 'HookController@hookList');
+    Route::get('/hooks', 'HookController@all');
 
-    Route::get('/hooks/create/{type}', 'HookController@createView');
+    Route::get('/hooks/create/{type}', 'HookController@new');
 
     Route::post('/hooks/create/{type}', 'HookController@create');
 
-    Route::get('/hooks/modify/{type}/{id}', 'HookController@modifyView');
+    Route::get('/hooks/modify/{type}/{id}', 'HookController@show');
 
-    Route::post('/hooks/modify/{type}/{id}', 'HookController@modify');
+    Route::post('/hooks/modify/{type}/{id}', 'HookController@edit');
 
     Route::post('/hooks/delete/{id}', 'HookController@delete');
 
@@ -165,7 +165,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('/g/{slug}/event/{event_id}/comment/create', 'CommentController@create');
 
-    Route::post('/g/{slug}/event/{event_id}/comment/modify/{comment_id}', 'CommentController@modify');
+    Route::post('/g/{slug}/event/{event_id}/comment/modify/{comment_id}', 'CommentController@edit');
 
     Route::get('/g/{slug}/event/{event_id}/comment/delete/{comment_id}', 'CommentController@delete');
 
@@ -203,7 +203,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('/profile/character/create', 'CharacterController@create');
 
-    Route::post('/profile/character/modify/{id}', 'CharacterController@modify');
+    Route::post('/profile/character/modify/{id}', 'CharacterController@edit');
 
     Route::post('/profile/character/delete/{id}', 'CharacterController@delete');
 

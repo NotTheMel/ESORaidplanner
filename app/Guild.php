@@ -42,11 +42,11 @@ class Guild extends Model
     /**
      * @return int
      */
-    public function userStatus(): int
+    public function userStatus(User $user): int
     {
         $guild = DB::table('user_guilds')
             ->where('guild_id', '=', $this->id)
-            ->where('user_id', '=', Auth::id())
+            ->where('user_id', '=', $user->id)
             ->first();
 
         if (empty($guild)) {
@@ -71,29 +71,19 @@ class Guild extends Model
     }
 
     /**
-     * @param int $id
+     * @param User $user
      *
      * @return bool
      */
-    public function isAdmin(int $id): bool
+    public function isAdmin(User $user): bool
     {
         $admins = json_decode($this->admins, true);
 
-        if (in_array($id, $admins, false)) {
+        if (in_array($user->id, $admins, false)) {
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return bool
-     */
-    public function isOwner(int $id): bool
-    {
-        return $this->owner_id === $id;
     }
 
     /**
@@ -111,51 +101,36 @@ class Guild extends Model
     }
 
     /**
-     * @param int $user_id
+     * @param User      $user
+     * @param User|null $admin
      */
-    public function makeAdmin(int $user_id, int $admin_id = null)
+    public function makeAdmin(User $user, User $admin = null)
     {
-        if (!$this->isOwner($admin_id ?? Auth::id())) {
+        $admin = $admin ?? Auth::user();
+        if (!$this->isOwner($admin)) {
             return;
         }
         $admins = json_decode($this->admins, true);
 
-        $admins[] = $user_id;
+        if (!in_array($user->id, $admins)) {
+            $admins[] = $user->id;
+            $log      = new LogEntry();
+            $log->create($this->id, $admin->name.' promoted '.$user->name.' to admin.');
+        }
 
         self::query()
             ->where('id', '=', $this->id)
             ->update(['admins' => json_encode($admins)]);
-
-        $user  = User::query()->find($user_id);
-        $admin = User::query()->find($admin_id ?? Auth::id());
-
-        $log = new LogEntry();
-        $log->create($this->id, $admin->name.' promoted '.$user->name.' to admin.');
     }
 
     /**
-     * @param int $user_id
+     * @param User $user
+     *
+     * @return bool
      */
-    public function removeAdmin(int $user_id, int $admin_id = null)
+    public function isOwner(User $user): bool
     {
-        if (!$this->isOwner($admin_id ?? Auth::id())) {
-            return;
-        }
-        $admins = json_decode($this->admins, true);
-
-        if (in_array($user_id, $admins)) {
-            $arr = array_diff($admins, [$user_id]);
-
-            self::query()
-                ->where('id', '=', $this->id)
-                ->update(['admins' => json_encode($arr)]);
-
-            $user  = User::query()->find($user_id);
-            $admin = User::query()->find($admin_id ?? Auth::id());
-
-            $log = new LogEntry();
-            $log->create($this->id, $admin->name.' demoted '.$user->name.' to member.');
-        }
+        return $this->owner_id === $user->id;
     }
 
     /**
@@ -175,14 +150,14 @@ class Guild extends Model
     }
 
     /**
-     * @param int|null $id
+     * @param User $user
      *
      * @return bool
      */
-    public function isMember(int $id = null): bool
+    public function isMember(User $user): bool
     {
         $count = DB::table('user_guilds')->where('guild_id', '=', $this->id)
-            ->where('user_id', '=', $id ?? Auth::id())
+            ->where('user_id', '=', $user->id)
             ->where('status', '>=', 1)
             ->count();
 
@@ -191,5 +166,106 @@ class Guild extends Model
         }
 
         return false;
+    }
+
+    public function leave(User $user)
+    {
+        if ($this->isOwner($user)) {
+            return;
+        }
+
+        $this->removeAdmin($user);
+
+        DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $this->id)->delete();
+
+        $log = new LogEntry();
+        $log->create($this->id, $user->name.' left the guild.');
+    }
+
+    /**
+     * @param User      $user
+     * @param User|null $admin
+     */
+    public function removeAdmin(User $user, User $admin = null)
+    {
+        $admin = $admin ?? Auth::user();
+        if (!$this->isOwner($admin)) {
+            return;
+        }
+        $admins = json_decode($this->admins, true);
+
+        if (in_array($user->id, $admins)) {
+            $arr = array_diff($admins, [$user->id]);
+
+            self::query()
+                ->where('id', '=', $this->id)
+                ->update(['admins' => json_encode($arr)]);
+
+            $log = new LogEntry();
+            $log->create($this->id, $admin->name.' demoted '.$user->name.' to member.');
+        }
+    }
+
+    public function getMembers()
+    {
+        return User::query()
+            ->join('user_guilds', 'users.id', 'user_guilds.user_id')
+            ->where('user_guilds.guild_id', '=', $this->id)
+            ->where('user_guilds.status', '>=', 1)
+            ->orderBy('users.name', 'asc')
+            ->get(['users.*'])->all();
+    }
+
+    public function getPendingMembers()
+    {
+        return User::query()
+            ->join('user_guilds', 'users.id', 'user_guilds.user_id')
+            ->where('user_guilds.guild_id', '=', $this->id)
+            ->where('user_guilds.status', '=', 0)
+            ->orderBy('users.name', 'asc')
+            ->get(['users.*'])->all();
+    }
+
+    public function requestMembership(User $user)
+    {
+        $count = DB::table('user_guilds')
+            ->where('user_id', '=', $user->id)
+            ->where('guild_id', '=', $this->id)
+            ->count();
+
+        if ($count > 0) {
+            return;
+        }
+
+        DB::table('user_guilds')->insert([
+            'user_id'  => $user->id,
+            'guild_id' => $this->id,
+            'status'   => 0,
+        ]);
+
+        $log = new LogEntry();
+        $log->create($this->id, $user->name.' requested membership.');
+    }
+
+    public function approveMembership(User $user, User $admin = null)
+    {
+        DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $this->id)->update(['status' => 1]);
+
+        $admin = $admin ?? Auth::user();
+
+        $log = new LogEntry();
+        $log->create($this->id, $admin->name.' approved the membership request of '.$user->name.'.');
+    }
+
+    public function removeMembership(User $user, User $admin = null)
+    {
+        DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $this->id)->delete();
+
+        $this->removeAdmin($user);
+
+        $admin = $admin ?? Auth::user();
+
+        $log = new LogEntry();
+        $log->create($this->id, $admin->name.' removed '.$user->name.' from the guild.');
     }
 }

@@ -3,7 +3,7 @@
 @section('content')
     <div class="content">
 
-        @if (($guild->isAdmin(Auth::id()) || Auth::user()->global_admin === 1) && count($pending ) > 0)
+        @if (($guild->isAdmin(Auth::user()) || Auth::user()->global_admin === 1) && count($pending ) > 0)
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
@@ -25,17 +25,17 @@
                                 <tbody>
                                 @foreach ($pending as $member)
                                     <tr>
-                                        <td>{{ $guild->getMemberName($member->user_id) }}</td>
+                                        <td>{{ $member->name }}</td>
                                         <td>Membership pending</td>
-                                        @if ($guild->isAdmin(Auth::id()) || Auth::user()->global_admin === 1)
+                                        @if ($guild->isAdmin(Auth::user()) || Auth::user()->global_admin === 1)
                                             <td>
-                                                {{ Form::open(array('url' => '/g/' . $guild->slug . '/member/approve/'.$guild->id.'/'.$member->user_id)) }}
+                                                {{ Form::open(array('url' => '/g/' . $guild->slug . '/member/approve/'.$guild->id.'/'.$member->id)) }}
                                                 {!! Form::open([]) !!}
                                                 {!! Form::submit('Approve', ['class' => 'btn btn-success']) !!}
 
                                                 {!! Form::close() !!}
                                                 {{ Form::close() }}
-                                                <a href="{{ '/g/' . $guild->slug . '/member/remove/'.$guild->id.'/'.$member->user_id }}">
+                                                <a href="{{ '/g/' . $guild->slug . '/member/remove/'.$guild->id.'/'.$member->id }}">
                                                     <button type="button" class="btn btn-danger">Remove</button>
                                                 </a>
                                             </td>
@@ -74,31 +74,31 @@
                             <tbody>
                             @foreach ($members as $member)
                                 <tr>
-                                    <td>{{ $guild->getMemberName($member->user_id) }}</td>
-                                    @if ($guild->isOwner($member->user_id))
+                                    <td>{{ $member->name }}</td>
+                                    @if ($guild->isOwner($member))
                                         <td>Owner</td>
-                                    @elseif ($guild->isAdmin($member->user_id))
+                                    @elseif ($guild->isAdmin($member))
                                         <td>Admin</td>
                                     @else
                                         <td>Member</td>
                                     @endif
-                                    @if ($guild->isAdmin(Auth::id()))
-                                        @if (Auth::id() === $member->user_id)
+                                    @if ($guild->isAdmin(Auth::user()))
+                                        @if (Auth::id() === $member->id)
                                             <td></td>
                                             <td></td>
                                         @else
                                             <td width="40%">
-                                                @if ($guild->isOwner(Auth::id()) && !$guild->isAdmin($member->user_id))
-                                                    <a href="{{ '/g/' . $guild->slug . '/member/makeadmin/'.$member->user_id }}">
+                                                @if ($guild->isOwner(Auth::user()) && !$guild->isAdmin($member))
+                                                    <a href="{{ '/g/' . $guild->slug . '/member/makeadmin/'.$member->id }}">
                                                         <button type="button" class="btn">Promote to admin</button>
                                                     </a>
-                                                @elseif ($guild->isOwner(Auth::id()) && $guild->isAdmin($member->user_id))
-                                                    <a href="{{ '/g/' . $guild->slug . '/member/removeadmin/'.$member->user_id }}">
+                                                @elseif ($guild->isOwner(Auth::user()) && $guild->isAdmin($member))
+                                                    <a href="{{ '/g/' . $guild->slug . '/member/removeadmin/'.$member->id }}">
                                                         <button type="button" class="btn">Demote admin</button>
                                                     </a>
                                                 @endif
-                                                @if (!$guild->isOwner($member->user_id))
-                                                    <a href="{{ '/g/' . $guild->slug . '/member/remove/'.$guild->id.'/'.$member->user_id }}">
+                                                @if (!$guild->isOwner($member))
+                                                    <a href="{{ '/g/' . $guild->slug . '/member/remove/'.$guild->id.'/'.$member->id }}">
                                                         <button type="button" class="btn btn-danger">Remove</button>
                                                     </a>
                                                 @endif
@@ -114,7 +114,7 @@
                 </div>
             </div>
         </div>
-        @if (!$guild->isOwner(Auth::id()))
+        @if (!$guild->isOwner(Auth::user()))
             <div class="row">
                 <div class="col-md-2 pull-right">
                     <div class="card">
