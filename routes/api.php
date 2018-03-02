@@ -29,7 +29,7 @@ Route::post('/timezones', 'ApiController@getTimezones');
 
 Route::post('/characters', 'ApiController@getCharacters');
 
-Route::post('/guild/{guild_id}', 'ApiController@getGuild');
+Route::post('/guild/{guild_id}', 'Api\GuildController@get');
 
 Route::post('/user/create', 'ApiController@createUser');
 
