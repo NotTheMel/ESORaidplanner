@@ -19,6 +19,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class ApiController extends Controller
@@ -50,9 +51,9 @@ class ApiController extends Controller
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function checkLogin(Request $request): JsonResponse
+    public function checkLogin(Request $request): Response
     {
         $user = $this->login($request);
 
