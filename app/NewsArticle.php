@@ -31,7 +31,11 @@ class NewsArticle extends Model
     {
         $date = new DateTime($this->created_at);
 
-        $date->setTimezone(new DateTimeZone(Auth::user()->timezone));
+        $date->setTimezone(new DateTimeZone(Auth::user()->timezone ?? env('DEFAULT_TIMEZONE')));
+
+        if (!Auth::check()) {
+            return $date->format('F jS H:i');
+        }
 
         if (12 === Auth::user()->clock) {
             return $date->format('F jS g:i a');
