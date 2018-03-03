@@ -40,7 +40,7 @@ class Hook extends Model
                 [
                     'content' => $message,
                     'username' => 'ESO Raidplanner',
-                    'avatar' => env('APP_URL').self::AVATAR_URL,
+                    'avatar_url' => env('APP_URL').self::AVATAR_URL,
                 ]
             ));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
