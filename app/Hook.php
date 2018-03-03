@@ -23,6 +23,7 @@ class Hook extends Model
     const TYPE_DISCORD  = 1;
     const TYPE_TELEGRAM = 2;
     const TYPE_SLACK    = 3;
+    const AVATAR_URL = '/storage/assets/app_icon.jpg';
 
     /**
      * @param Event $event
@@ -35,7 +36,13 @@ class Hook extends Model
         if (self::TYPE_DISCORD === $this->type) {
             $ch = curl_init($this->url);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['content' => $message, 'username' => 'ESO Raidplanner']));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(
+                [
+                    'content' => $message,
+                    'username' => 'ESO Raidplanner',
+                    'avatar' => env('APP_URL').self::AVATAR_URL,
+                ]
+            ));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $result = curl_exec($ch);
             curl_close($ch);
