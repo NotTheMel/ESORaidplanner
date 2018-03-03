@@ -26,6 +26,9 @@ use Illuminate\Support\Facades\DB;
  */
 class Event extends Model
 {
+    const STATUS_LOCKED   = 1;
+    const STATUS_UNLOCKED = 0;
+
     /**
      * @return int
      */
@@ -211,6 +214,39 @@ class Event extends Model
         $log->create($this->guild_id, $user->name.' signed up for <a href="/g/'.$this->getGuildSlug().'/event/'.$this->id.'">'.$this->name.'</a>.');
     }
 
+    public function signupOther(User $user, User $admin = null, int $role_id = null, int $class_id = null, array $sets = [], Character $character = null)
+    {
+        $admin = $admin ?? Auth::user();
+
+        Signup::query()->where('event_id', '=', $this->id)
+            ->where('user_id', '=', $user->id)
+            ->delete();
+
+        $sign           = new Signup();
+        $sign->user_id  = $user->id;
+        $sign->event_id = $this->id;
+
+        if (null !== $character) {
+            $sign->class_id     = $character->class;
+            $sign->role_id      = $character->role;
+            $sign->sets         = $character->sets;
+            $sign->character_id = $character->id;
+        } else {
+            $sign->class_id = $class_id;
+            $sign->role_id  = $role_id;
+
+            if (count($sets) > 0) {
+                $sign->sets = implode(', ', $sets);
+            }
+        }
+
+        $sign->save();
+
+        $log = new LogEntry();
+        $log->create($this->guild_id,
+            $admin->name.' signed up '.$user->name.' for <a href="/g/'.$this->getGuildSlug().'/event/'.$this->id.'">'.$this->name.'</a>.');
+    }
+
     /**
      * @param User $user
      */
@@ -222,6 +258,22 @@ class Event extends Model
 
         $log = new LogEntry();
         $log->create($this->guild_id, $user->name.' signed off for <a href="/g/'.$this->getGuildSlug().'/event/'.$this->id.'">'.$this->name.'</a>.');
+    }
+
+    /**
+     * @param User      $user
+     * @param User|null $admin
+     */
+    public function signoffOther(User $user, User $admin = null)
+    {
+        $admin = $admin ?? Auth::user();
+
+        Signup::query()->where('event_id', '=', $this->id)
+            ->where('user_id', '=', $user->id)
+            ->delete();
+
+        $log = new LogEntry();
+        $log->create($this->guild_id, $admin->name.' signed off '.$user->name.' for <a href="/g/'.$this->getGuildSlug().'/event/'.$this->id.'">'.$this->name.'</a>.');
     }
 
     /**
@@ -253,6 +305,40 @@ class Event extends Model
         }
 
         $sign->save();
+    }
+
+    public function callEventCreationHooks()
+    {
+        $hooks = Hook::query()->where('call_type', '=', 1)->where('guild_id', '=', $this->guild_id)->get()->all();
+
+        foreach ($hooks as $hook) {
+            if ($hook->matchesEventTags($this)) {
+                $hook->call($this);
+            }
+        }
+    }
+
+    /**
+     * @param int $signup_id
+     * @param int $status
+     */
+    public function setSignupStatus(int $signup_id, int $status)
+    {
+        $signup         = Signup::query()->find($signup_id);
+        $signup->status = $status;
+        $signup->save();
+    }
+
+    public function lock()
+    {
+        $this->locked = self::STATUS_LOCKED;
+        $this->save();
+    }
+
+    public function unlock()
+    {
+        $this->locked = self::STATUS_UNLOCKED;
+        $this->save();
     }
 
     /**
