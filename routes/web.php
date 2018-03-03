@@ -13,8 +13,6 @@
 
 Route::get('/', 'HomeController@index');
 
-Route::get('/news/{article_id}', 'NewsController@show');
-
 // Authentication Routes...
 Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
@@ -60,6 +58,8 @@ Route::get('/termsofuse', function () {
  */
 
 Route::group(['middleware' => 'auth'], function () {
+
+    Route::get('/news/{article_id}', 'NewsController@show');
 
     /*
      *
