@@ -23,7 +23,7 @@ class Hook extends Model
     const TYPE_DISCORD  = 1;
     const TYPE_TELEGRAM = 2;
     const TYPE_SLACK    = 3;
-    const AVATAR_URL = '/storage/assets/app_icon.jpg';
+    const AVATAR_URL    = '/storage/assets/app_icon.jpg';
 
     /**
      * @param Event $event
@@ -38,8 +38,8 @@ class Hook extends Model
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(
                 [
-                    'content' => $message,
-                    'username' => 'ESO Raidplanner',
+                    'content'    => $message,
+                    'username'   => 'ESO Raidplanner',
                     'avatar_url' => env('APP_URL').self::AVATAR_URL,
                 ]
             ));
