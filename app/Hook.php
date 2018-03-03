@@ -136,11 +136,9 @@ class Hook extends Model
     public function isOwner(int $id): bool
     {
         if (!empty($this->guild_id)) {
-            $guild = Guild::query()
-                ->where('id', '=', $this->guild_id)
-                ->get();
+            $guild = Guild::query()->find($this->guild_id);
 
-            if (in_array($id, json_decode($guild[0]->admins, true))) {
+            if (in_array($id, json_decode($guild->admins, true))) {
                 return true;
             }
         } elseif (!empty($this->user_id)) {

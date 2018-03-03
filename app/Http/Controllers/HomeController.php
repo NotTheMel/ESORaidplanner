@@ -16,6 +16,7 @@
 namespace App\Http\Controllers;
 
 use App\Guild;
+use App\NewsArticle;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -36,15 +37,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        //$events = DB::table('events')->where('start_date', '>=', date('Y-m-d H:i:s'))->get();
-
-        $events = \App\Event::query()->where('start_date', '>=', date('Y-m-d H:i:s'))->get();
-
-        foreach ($events as $event) {
-            $event->totalSignups = $event->getTotalSignups();
+        if(Auth::check()){
+            $news = NewsArticle::query()->orderBy('created_at', 'desc')->limit(10)->get()->all();
+            return view('dashboard', compact('news'));
         }
-
-        return view('home', compact('events'));
+        return view('auth.login');
     }
 
     /**

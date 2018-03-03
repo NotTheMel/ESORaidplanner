@@ -60,7 +60,7 @@ class HookController extends Controller
     {
         $hook = Hook::query()->find($id);
 
-        if (!$hook->isOwner($id)) {
+        if (!$hook->isOwner(Auth::id())) {
             return redirect('/hooks');
         }
 

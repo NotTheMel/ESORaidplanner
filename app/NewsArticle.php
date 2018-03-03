@@ -39,4 +39,12 @@ class NewsArticle extends Model
 
         return $date->format('F jS H:i');
     }
+
+    /**
+     * @return User
+     */
+    public function getAuthor(): User
+    {
+        return User::query()->find($this->author_id);
+    }
 }

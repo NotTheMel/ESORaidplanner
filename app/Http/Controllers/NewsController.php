@@ -109,4 +109,12 @@ class NewsController extends Controller
 
         return redirect('/');
     }
+
+    public function show(int $article_id)
+    {
+        $article = NewsArticle::query()->find($article_id);
+        $news = NewsArticle::query()->orderBy('created_at', 'desc')->limit(10)->get()->all();
+
+        return view('news.newsdetail', compact('article', 'news'));
+    }
 }

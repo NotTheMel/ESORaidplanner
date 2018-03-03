@@ -39,7 +39,7 @@ class UserController extends Controller
      */
     public function showRegistrationForm()
     {
-        $timezones = $this->generate_timezone_list();
+        $timezones = TimeZones::list();
 
         return view('auth.register', compact('timezones'));
     }
@@ -49,7 +49,7 @@ class UserController extends Controller
      */
     public function editProfilePage()
     {
-        $timezones = $this->generate_timezone_list();
+        $timezones = TimeZones::list();
 
         $sets = $this->getSets();
 
@@ -70,7 +70,7 @@ class UserController extends Controller
         $layout          = Input::get('layout');
         $telegram        = str_replace('@', '', Input::get('telegram_username'));
 
-        $timezones = $this->generate_timezone_list();
+        $timezones = TimeZones::list();
 
         if ($password !== $password_repeat) {
             $error = 'Given passwords do not match';

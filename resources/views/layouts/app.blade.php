@@ -70,7 +70,7 @@
         <div class="sidebar-wrapper">
             <div class="logo">
                 <a href="https://esoraidplanner.com" class="simple-text">
-                    ESO Raidplanner Beta
+                    ESO Raidplanner
                 </a>
             </div>
 

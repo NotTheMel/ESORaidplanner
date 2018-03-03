@@ -11,12 +11,9 @@
 |
 */
 
-Route::get('/', function () {
-    if(Auth::check()){
-        return view('dashboard');
-    }
-    return view('auth.login');
-});
+Route::get('/', 'HomeController@index');
+
+Route::get('/news/{article_id}', 'NewsController@show');
 
 // Authentication Routes...
 Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
