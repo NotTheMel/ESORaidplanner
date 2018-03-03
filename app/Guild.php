@@ -95,7 +95,18 @@ class Guild extends Model
             ->where('guild_id', '=', $this->id)
             ->where('start_date', '>=', date('Y-m-d H:i:s'))
             ->orderBy('start_date', 'asc')
-            ->get();
+            ->get()->all();
+
+        return $events;
+    }
+
+    public function getPastEvents()
+    {
+        $events = Event::query()
+            ->where('guild_id', '=', $this->id)
+            ->where('start_date', '<', date('Y-m-d H:i:s'))
+            ->orderBy('start_date', 'desc')
+            ->get()->all();
 
         return $events;
     }

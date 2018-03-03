@@ -407,23 +407,13 @@ class EventsController extends Controller
         return redirect('g/'.$guild->slug.'/event/'.$signup->event_id);
     }
 
-    public function pastEvents(string $slug)
-    {
-        if (!$this->isGuildMember($slug)) {
-            return redirect('g/'.$slug);
-        }
-
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        $events = Event::query()
-            ->where('guild_id', '=', $guild->id)
-            ->where('start_date', '<', date('Y-m-d H:i:s'))
-            ->orderBy('start_date', 'desc')
-            ->get();
-
-        return view('event.events', compact('events', 'guild'));
-    }
-
+    /**
+     * @param string $slug
+     * @param int    $event_id
+     * @param int    $lockstatus
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function changeLockStatus(string $slug, int $event_id, int $lockstatus)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
@@ -444,6 +434,12 @@ class EventsController extends Controller
         return redirect('/g/'.$slug.'/event/'.$event_id);
     }
 
+    /**
+     * @param string $slug
+     * @param int    $event_id
+     *
+     * @return bool
+     */
     private function eventBelongsToGuild(string $slug, int $event_id): bool
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
@@ -455,12 +451,5 @@ class EventsController extends Controller
         }
 
         return false;
-    }
-
-    private function getGuildId(string $slug): int
-    {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        return $guild->id;
     }
 }

@@ -323,4 +323,19 @@ class GuildController extends Controller
 
         return redirect('/g/'.$slug.'/settings');
     }
+
+    /**
+     * @param string $slug
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     */
+    public function pastEvents(string $slug)
+    {
+        /** @var Guild $guild */
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        $events = $guild->getPastEvents();
+
+        return view('event.events', compact('events', 'guild'));
+    }
 }

@@ -94,7 +94,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/g/{slug}/events/lock/{event_id}/{lockstatus}', 'EventsController@changeLockStatus');
 
-    Route::get('/g/{slug}/pastevents', 'EventsController@pastEvents');
+    Route::get('/g/{slug}/pastevents', 'GuildController@pastEvents');
 
     Route::get('/g/{slug}/logs', 'GuildController@logs');
 
