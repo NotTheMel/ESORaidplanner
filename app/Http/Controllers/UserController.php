@@ -20,8 +20,6 @@ use App\Character;
 use App\Set;
 use App\Singleton\TimeZones;
 use App\User;
-use DateTime;
-use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

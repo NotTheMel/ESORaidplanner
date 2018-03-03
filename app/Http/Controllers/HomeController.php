@@ -37,10 +37,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        if(Auth::check()){
+        if (Auth::check()) {
             $news = NewsArticle::query()->orderBy('created_at', 'desc')->limit(10)->get()->all();
+
             return view('dashboard', compact('news'));
         }
+
         return view('auth.login');
     }
 
