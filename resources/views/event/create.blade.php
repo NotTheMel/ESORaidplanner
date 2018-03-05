@@ -9,6 +9,15 @@
                         <div class="header">
                             <h4 class="title">Create an event for {{ $guild->name }}</h4>
                         </div>
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <div class="content">
                             {{ Form::open(array('url' => 'g/' . $guild->slug . '/events/create')) }}
 
