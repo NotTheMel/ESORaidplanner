@@ -193,4 +193,16 @@ class Hook extends Model
 
         return false;
     }
+
+    /**
+     * @return Guild|null
+     */
+    public function getGuild(): ?Guild
+    {
+        if (null === $this->guild_id) {
+            return null;
+        }
+
+        return Guild::query()->find($this->guild_id);
+    }
 }

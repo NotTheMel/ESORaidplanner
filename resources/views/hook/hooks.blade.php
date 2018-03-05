@@ -39,7 +39,7 @@
                                             @if ($hook->user_id === Auth::id())
                                                 <td>You</td>
                                             @else
-                                                <td>Guild</td>
+                                                <td>{{ $hook->getGuild()->name }} (Guild)</td>
                                             @endif
                                             <td>
                                                 {{ Form::open(array('url' => '/hooks/delete/' . $hook->id)) }}
