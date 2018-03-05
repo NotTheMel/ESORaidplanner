@@ -106,7 +106,7 @@
                                 @else
                                     @if (count(Auth::user()->getCharacters(true)) === 0)
                                         <br>You do not have any character presets. Did you know you can create character
-                                        presets in your <a href="/profile/edit">user profile</a> and use these to sign
+                                        presets in your <a href="/profile/characters">user profile</a> and use these to sign
                                         up
                                         faster?<br><br>
                                     @else
