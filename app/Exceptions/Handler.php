@@ -32,7 +32,8 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
-        $str = '```'.$exception->getMessage().'```'.PHP_EOL;
+        $str = 'New `' . get_class($exception) . '`' . PHP_EOL;
+        $str .= '```'.$exception->getMessage().'```'.PHP_EOL;
         $str .= '`In '.$exception->getFile().' on line '.$exception->getLine().'.`';
 
         $ch = curl_init(env('DEBUG_HOOK'));
