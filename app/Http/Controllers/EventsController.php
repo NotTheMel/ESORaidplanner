@@ -25,6 +25,7 @@ use App\Singleton\RoleTypes;
 use App\User;
 use DateTime;
 use DateTimeZone;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
@@ -269,8 +270,17 @@ class EventsController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function create(string $slug)
+    public function create(Request $request, string $slug)
     {
+        $request->validate([
+            'name'   => 'required',
+            'year'   => 'required',
+            'month'  => 'required',
+            'day'    => 'required',
+            'hour'   => 'required',
+            'minute' => 'required',
+        ]);
+
         if (12 === Auth::user()->clock) {
             $date = new DateTime(Input::get('year').'-'.Input::get('month').'-'.Input::get('day').' '.Input::get('hour').':'.Input::get('minute').' '.Input::get('meridiem'), new DateTimeZone(Auth::user()->timezone));
         } else {
@@ -311,8 +321,17 @@ class EventsController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function edit(string $slug, int $id)
+    public function edit(Request $request, string $slug, int $id)
     {
+        $request->validate([
+            'name'   => 'required',
+            'year'   => 'required',
+            'month'  => 'required',
+            'day'    => 'required',
+            'hour'   => 'required',
+            'minute' => 'required',
+        ]);
+
         if (12 === Auth::user()->clock) {
             $date = new DateTime(Input::get('year').'-'.Input::get('month').'-'.Input::get('day').' '.Input::get('hour').':'.Input::get('minute').' '.Input::get('meridiem'), new DateTimeZone(Auth::user()->timezone));
         } else {
