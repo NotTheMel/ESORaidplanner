@@ -220,8 +220,8 @@ Route::group(['middleware' => 'auth'], function () {
      *
      */
 
-    Route::get('/dashboard', 'HomeController@dashboard');
-    Route::get('/home', 'HomeController@dashboard');
+    Route::get('/dashboard', 'HomeController@index');
+    Route::get('/home', 'HomeController@index');
 
     Route::get('/patreon/error', 'PatreonController@error');
 
