@@ -20,12 +20,14 @@ use App\Event;
 use App\Guild;
 use App\Hook;
 use App\LogEntry;
+use App\Set;
 use App\Signup;
 use App\User;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Input;
 
 class EventController extends ApiController
 {
@@ -211,6 +213,7 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
+        /** @var Event $event */
         $event = Event::query()->find($event_id);
 
         /** @var Guild $guild */
@@ -220,38 +223,12 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $signup           = new Signup();
-        $signup->event_id = $event->id;
-        $signup->user_id  = $user->id;
-
-        Signup::query()->where('event_id', '=', $event_id)->where('user_id', '=', $user->id)->delete();
-
-        if (!empty($request->input('character'))) {
-            if (0 === $request->input('character')) {
-                return response('Bad character parameter', 400);
-            }
-
-            $character = Character::query()
-                ->find($request->input('character'));
-            $signup->class_id     = $character->class;
-            $signup->role_id      = $character->role;
-            $signup->sets         = $character->sets;
-            $signup->character_id = $character->id;
+        if (!empty(Input::get('character'))) {
+            $character = Character::query()->find(Input::get('character'));
+            $event->signup($user, null, null, [], $character);
         } else {
-            $signup->class_id = $request->input('class');
-            $signup->role_id  = $request->input('role');
-
-            if (!empty($request->input('sets'))) {
-                $signup->sets = $request->input('sets');
-            } else {
-                $signup->sets = '';
-            }
+            $event->signup($user, $request->input('role'), $request->input('class'), Set::Array($request->input('sets') ?? []));
         }
-
-        $signup->save();
-
-        $log = new LogEntry();
-        $log->create($guild->id, $user->name.' signed up for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>. (Via App)');
 
         return response(null, Response::HTTP_OK);
     }
