@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Hook;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -44,6 +45,22 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        $str = '```'.$exception->getMessage().'```'.PHP_EOL;
+        $str .= '`In '.$exception->getFile().' on line '.$exception->getLine().'.`';
+
+        $ch = curl_init(env('DEBUG_HOOK'));
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(
+            [
+                'content'    => $str,
+                'username'   => 'ESO Raidplanner',
+                'avatar_url' => env('APP_URL').Hook::AVATAR_URL,
+            ]
+        ));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($ch);
+        curl_close($ch);
+
         return parent::render($request, $exception);
     }
 
