@@ -33,7 +33,8 @@ class Handler extends ExceptionHandler
     public function report(Exception $exception)
     {
         if ($this->shouldReport($exception)) {
-            $str = 'New `'.get_class($exception).'`'.PHP_EOL;
+            $str = '----- '.date('Y-m-d H:i:s').' '.env('DEFAULT_TIMEZONE').' -----'.PHP_EOL;
+            $str .= 'New `'.get_class($exception).'`'.PHP_EOL;
             $str .= '```'.$exception->getMessage().'```'.PHP_EOL;
             $str .= '`In '.$exception->getFile().' on line '.$exception->getLine().'.`';
 
