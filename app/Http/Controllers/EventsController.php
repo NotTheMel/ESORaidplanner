@@ -164,7 +164,7 @@ class EventsController extends Controller
             $character = Character::query()->find(Input::get('character'));
             $event->signup(Auth::user(), null, null, [], $character);
         } else {
-            $event->signup(Auth::user(), Input::get('role'), Input::get('class'), Set::Array(Input::get('sets') ?? ''));
+            $event->signup(Auth::user(), Input::get('role'), Input::get('class'), Input::get('sets') ?? '');
         }
 
         return redirect('g/'.$slug.'/event/'.$id);
@@ -192,7 +192,7 @@ class EventsController extends Controller
             $character = Character::query()->find(Input::get('character'));
             $event->signupOther($user, Auth::user(), null, null, [], $character);
         } else {
-            $event->signupOther($user, Auth::user(), Input::get('role'), Input::get('class'), Set::Array(Input::get('sets') ?? ''));
+            $event->signupOther($user, Auth::user(), Input::get('role'), Input::get('class'), Input::get('sets') ?? '');
         }
 
         return redirect('g/'.$slug.'/event/'.$id);
@@ -217,7 +217,7 @@ class EventsController extends Controller
             $character = Character::query()->find(Input::get('character'));
             $event->editSignup(Auth::user(), null, null, [], $character);
         } else {
-            $event->editSignup(Auth::user(), Input::get('role'), Input::get('class'), Set::Array(Input::get('sets') ?? ''));
+            $event->editSignup(Auth::user(), Input::get('role'), Input::get('class'), Input::get('sets') ?? '');
         }
 
         return redirect('g/'.$slug.'/event/'.$id);
