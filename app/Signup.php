@@ -22,6 +22,9 @@ use Illuminate\Support\Facades\Auth;
 
 class Signup extends Model
 {
+    const SIGNUP_STATUS_CONFIRMED = 1;
+    const SIGNUP_STATUS_BACKUP    = 2;
+
     /**
      * @return string
      */

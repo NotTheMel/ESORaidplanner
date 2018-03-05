@@ -249,6 +249,7 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
+        /** @var Event $event */
         $event = Event::query()->find($event_id);
 
         /** @var Guild $guild */
@@ -258,32 +259,12 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $signup = Signup::query()->where('user_id', '=', $user->id)->where('event_id', '=', $event_id)->first();
-
-        if (!empty($request->input('character'))) {
-            if (0 === $request->input('character')) {
-                return response('Bad character parameter', 400);
-            }
-
-            $character = Character::query()
-                ->find($request->input('character'));
-            $signup->class_id     = $character->class;
-            $signup->role_id      = $character->role;
-            $signup->sets         = $character->sets;
-            $signup->character_id = $character->id;
+        if (!empty(Input::get('character'))) {
+            $character = Character::query()->find(Input::get('character'));
+            $event->editSignup($user, null, null, [], $character);
         } else {
-            $signup->class_id     = $request->input('class');
-            $signup->role_id      = $request->input('role');
-            $signup->character_id = null;
-
-            if (!empty($request->input('sets'))) {
-                $signup->sets = $request->input('sets');
-            } else {
-                $signup->sets = '';
-            }
+            $event->editSignup($user, $request->input('role'), $request->input('class'), Set::Array($request->input('sets') ?? []));
         }
-
-        $signup->save();
 
         return response(null, Response::HTTP_OK);
     }
@@ -303,6 +284,7 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
+        /** @var Event $event */
         $event = Event::query()->find($event_id);
 
         /** @var Guild $guild */
@@ -312,10 +294,7 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        Signup::query()->where('event_id', '=', $event_id)->where('user_id', '=', $user->id)->delete();
-
-        $log = new LogEntry();
-        $log->create($guild->id, $user->name.' signed off for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>. (Via App)');
+        $event->signoff($user);
 
         return response(null, Response::HTTP_OK);
     }
@@ -336,9 +315,8 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $signup = Signup::query()->find($signup_id);
-
-        $event = Event::query()->find($signup->event_id);
+        /** @var Event $event */
+        $event = Event::query()->find(Signup::query()->find($signup_id)->event_id);
 
         /** @var Guild $guild */
         $guild = Guild::query()->find($event->guild_id);
@@ -347,8 +325,7 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $signup->status = 1;
-        $signup->save();
+        $event->setSignupStatus($signup_id, Signup::SIGNUP_STATUS_CONFIRMED);
 
         return response(null, Response::HTTP_OK);
     }
@@ -369,9 +346,8 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $signup = Signup::query()->find($signup_id);
-
-        $event = Event::query()->find($signup->event_id);
+        /** @var Event $event */
+        $event = Event::query()->find(Signup::query()->find($signup_id)->event_id);
 
         /** @var Guild $guild */
         $guild = Guild::query()->find($event->guild_id);
@@ -380,8 +356,7 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $signup->status = 2;
-        $signup->save();
+        $event->setSignupStatus($signup_id, Signup::SIGNUP_STATUS_BACKUP);
 
         return response(null, Response::HTTP_OK);
     }
