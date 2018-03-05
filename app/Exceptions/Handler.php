@@ -32,19 +32,6 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
-        parent::report($exception);
-    }
-
-    /**
-     * Render an exception into an HTTP response.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param \Exception               $exception
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function render($request, Exception $exception)
-    {
         $str = '```'.$exception->getMessage().'```'.PHP_EOL;
         $str .= '`In '.$exception->getFile().' on line '.$exception->getLine().'.`';
 
@@ -61,6 +48,19 @@ class Handler extends ExceptionHandler
         curl_exec($ch);
         curl_close($ch);
 
+        parent::report($exception);
+    }
+
+    /**
+     * Render an exception into an HTTP response.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param \Exception               $exception
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function render($request, Exception $exception)
+    {
         return parent::render($request, $exception);
     }
 
