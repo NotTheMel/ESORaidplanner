@@ -33,17 +33,17 @@ class Handler extends ExceptionHandler
     public function report(Exception $exception)
     {
         if ($this->shouldReport($exception)) {
-            $str = 'New `' . get_class($exception) . '`' . PHP_EOL;
-            $str .= '```' . $exception->getMessage() . '```' . PHP_EOL;
-            $str .= '`In ' . $exception->getFile() . ' on line ' . $exception->getLine() . '.`';
+            $str = 'New `'.get_class($exception).'`'.PHP_EOL;
+            $str .= '```'.$exception->getMessage().'```'.PHP_EOL;
+            $str .= '`In '.$exception->getFile().' on line '.$exception->getLine().'.`';
 
             $ch = curl_init(env('DEBUG_HOOK'));
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(
                 [
-                    'content' => $str,
-                    'username' => 'ESO Raidplanner',
-                    'avatar_url' => env('APP_URL') . Hook::AVATAR_URL,
+                    'content'    => $str,
+                    'username'   => 'ESO Raidplanner',
+                    'avatar_url' => env('APP_URL').Hook::AVATAR_URL,
                 ]
             ));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
