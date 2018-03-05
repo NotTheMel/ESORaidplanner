@@ -381,6 +381,7 @@ class EventController extends ApiController
 
         $u2 = User::query()->find($signup->user_id);
 
+        /** @var Event $event */
         $event = Event::query()->find($signup->event_id);
 
         /** @var Guild $guild */
@@ -390,10 +391,7 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $signup->delete();
-
-        $log = new LogEntry();
-        $log->create($guild->id, $user->name.' signed off '.$u2->name.' for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>. (Via App)');
+        $event->signoffOther($u2, $user);
 
         return response(null, Response::HTTP_OK);
     }

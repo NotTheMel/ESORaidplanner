@@ -72,7 +72,7 @@ class EventsController extends Controller
             ->where('slug', '=', $slug)
             ->first();
 
-        if (empty($guild) || empty($event)|| $guild->id !== $event->guild_id) {
+        if (empty($guild) || empty($event) || $guild->id !== $event->guild_id) {
             return redirect('g/'.$slug);
         }
 

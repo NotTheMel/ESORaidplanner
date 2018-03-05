@@ -15,14 +15,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Event;
 use App\Guild;
 use App\User;
-use DateTime;
-use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 
 class GuildController extends ApiController
 {
@@ -254,25 +250,13 @@ class GuildController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $events = Event::query()
-            ->where('guild_id', '=', $guild->id)
-            ->where('start_date', '>', date('Y-m-d H:i:s'))
-            ->orderBy('start_date', 'asc')
-            ->get();
-
-        $e = [];
+        $events = $guild->getEvents();
 
         foreach ($events as $event) {
-            $date = new DateTime($event->start_date);
-
-            $date->setTimezone(new DateTimeZone('UTC'));
-
-            $event->start_date = $date->format('Y-m-d H:i:s');
-
-            $e[] = $event;
+            $event->start_date = $event->getUtcTime();
         }
 
-        return response($e ?? [], Response::HTTP_OK);
+        return response($events ?? [], Response::HTTP_OK);
     }
 
     /**
@@ -294,13 +278,12 @@ class GuildController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $members = DB::table('user_guilds')
-            ->select('users.id as user_id', 'users.name as name', 'users.avatar as avatar', 'user_guilds.guild_id as guild_id', 'user_guilds.status as status')
-            ->join('users', 'user_guilds.user_id', 'users.id')
-            ->where('user_guilds.guild_id', '=', $guild->id)
-            ->where('user_guilds.status', '>=', 1)
-            ->orderBy('users.name', 'asc')
-            ->get();
+        $members = $guild->getMembers();
+
+        /* For deprecated app */
+        foreach ($members as $member) {
+            $member->user_id = $member->id;
+        }
 
         return response($members ?? [], Response::HTTP_OK);
     }
@@ -322,13 +305,12 @@ class GuildController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
-        $members = DB::table('user_guilds')
-            ->select('users.id as user_id', 'users.name as name', 'users.avatar as avatar', 'user_guilds.guild_id as guild_id', 'user_guilds.status as status')
-            ->join('users', 'user_guilds.user_id', 'users.id')
-            ->where('user_guilds.guild_id', '=', $guild->id)
-            ->where('user_guilds.status', '=', 0)
-            ->orderBy('users.name', 'asc')
-            ->get();
+        $members = $guild->getPendingMembers();
+
+        /* For deprecated app */
+        foreach ($members as $member) {
+            $member->user_id = $member->id;
+        }
 
         return response($members ?? [], Response::HTTP_OK);
     }
