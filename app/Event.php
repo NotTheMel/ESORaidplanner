@@ -205,6 +205,8 @@ class Event extends Model
 
             if (count($sets) > 0) {
                 $sign->sets = implode(', ', $sets);
+            } else {
+                $sign->sets = '';
             }
         }
 
@@ -237,6 +239,8 @@ class Event extends Model
 
             if (count($sets) > 0) {
                 $sign->sets = implode(', ', $sets);
+            } else {
+                $sign->sets = '';
             }
         }
 
@@ -300,6 +304,8 @@ class Event extends Model
 
             if (count($sets) > 0) {
                 $sign->sets = implode(', ', $sets);
+            } else {
+                $sign->sets = '';
             }
             $sign->character_id = null;
         }
