@@ -144,7 +144,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/g/{slug}/member/removeadmin/{user_id}', 'GuildController@removeAdmin');
 
-    Route::get('/g/{slug}/member/leave', 'GuildController@leaveGuild');
+    Route::get('/g/{slug}/member/leave', 'GuildController@leave');
 
     Route::get('/g/{slug}/settings', 'GuildController@settings');
 
