@@ -18,7 +18,7 @@ namespace App\Http\Controllers\Api;
 use App\Character;
 use App\Event;
 use App\Guild;
-use App\Hook;
+use App\Hook\EventCreationNotification;
 use App\LogEntry;
 use App\Set;
 use App\Signup;
@@ -69,7 +69,7 @@ class EventController extends ApiController
         $log = new LogEntry();
         $log->create($guild->id, $user->name.' created the event '.$event->name.'. (Via App)');
 
-        $hooks = Hook::query()->where('call_type', '=', 1)->where('guild_id', '=', $guild->id)->get();
+        $hooks = EventCreationNotification::query()->where('call_type', '=', 1)->where('guild_id', '=', $guild->id)->get();
 
         foreach ($hooks as $hook) {
             if ($hook->matchesEventTags($event)) {

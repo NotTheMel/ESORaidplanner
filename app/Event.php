@@ -15,6 +15,7 @@
 
 namespace App;
 
+use App\Hook\EventCreationNotification;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Database\Eloquent\Model;
@@ -315,7 +316,7 @@ class Event extends Model
 
     public function callEventCreationHooks()
     {
-        $hooks = Hook::query()->where('call_type', '=', 1)->where('guild_id', '=', $this->guild_id)->get()->all();
+        $hooks = EventCreationNotification::query()->where('call_type', '=', 1)->where('guild_id', '=', $this->guild_id)->get()->all();
 
         foreach ($hooks as $hook) {
             if ($hook->matchesEventTags($this)) {

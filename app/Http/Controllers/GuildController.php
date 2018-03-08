@@ -17,7 +17,7 @@ namespace App\Http\Controllers;
 
 use App\Event;
 use App\Guild;
-use App\Hook;
+use App\Hook\NotificationHook;
 use App\LogEntry;
 use App\Signup;
 use App\User;
@@ -83,7 +83,7 @@ class GuildController extends Controller
             return redirect('/g/'.$guild->slug);
         }
 
-        Hook::query()->where('guild_id', '=', $id)->delete();
+        NotificationHook::query()->where('guild_id', '=', $id)->delete();
         $events = Event::query()->where('guild_id', '=', $id)->get();
 
         foreach ($events as $event) {
