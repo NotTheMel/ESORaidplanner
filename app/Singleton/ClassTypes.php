@@ -15,11 +15,11 @@
 
 namespace App\Singleton;
 
-class RoleTypes
+class ClassTypes
 {
-    const ROLE_TANK       = 1;
-    const ROLE_HEALER     = 2;
-    const ROLE_MAGICKA_DD = 3;
-    const ROLE_STAMINA_DD = 4;
-    const ROLE_OTHER      = 5;
+    const CLASS_DRAGONKNIGHT = 1;
+    const CLASS_SORCERER     = 2;
+    const CLASS_NIGHTBLADE   = 3;
+    const CLASS_WARDEN       = 4;
+    const CLASS_TEMPLAR      = 6;
 }

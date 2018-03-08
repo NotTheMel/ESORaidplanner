@@ -1,9 +1,16 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: woeler
- * Date: 07.03.18
- * Time: 08:57.
+ * This file is part of the ESO Raidplanner project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 3
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ *
+ * @see https://github.com/ESORaidplanner/ESORaidplanner
  */
 
 namespace App\Hook;
@@ -21,10 +28,7 @@ class EventCreationNotification extends NotificationHook
     {
         $guild = $event->getGuild();
 
-        $message = str_replace('{EVENT_NAME}', $event->name, $this->message);
-        $message = str_replace('{EVENT_DESCRIPTION}', $event->description, $message);
-        $message = str_replace('{EVENT_NUM_SIGNUPS}', $event->getTotalSignups(), $message);
-        $message = str_replace('{EVENT_URL}', 'https://esoraidplanner.com/g/'.$guild->slug.'/event/'.$event->id, $message);
+        $message = str_replace(['{EVENT_NAME}', '{EVENT_DESCRIPTION}', '{EVENT_NUM_SIGNUPS}', '{EVENT_URL}'], [$event->name, $event->description, $event->getTotalSignups(), 'https://esoraidplanner.com/g/'.$guild->slug.'/event/'.$event->id], $this->message);
 
         return $message;
     }

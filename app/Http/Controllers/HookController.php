@@ -89,8 +89,8 @@ class HookController extends Controller
 
     /**
      * @param Request $request
-     * @param int $call_type
-     * @param int $type
+     * @param int     $call_type
+     * @param int     $type
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */

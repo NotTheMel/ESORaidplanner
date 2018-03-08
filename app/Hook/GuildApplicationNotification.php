@@ -1,9 +1,16 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: woeler
- * Date: 07.03.18
- * Time: 08:59.
+ * This file is part of the ESO Raidplanner project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 3
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ *
+ * @see https://github.com/ESORaidplanner/ESORaidplanner
  */
 
 namespace App\Hook;
@@ -22,9 +29,7 @@ class GuildApplicationNotification extends NotificationHook
     {
         $guild = Guild::query()->find($this->guild_id);
 
-        $message = str_replace('{GUILD_NAME}', $guild->name, $this->message);
-        $message = str_replace('{APPLICANT_NAME}', $applicant->name, $message);
-        $message = str_replace('{GUILD_URL}', 'https://esoraidplanner.com/g/'.$guild->slug, $message);
+        $message = str_replace(['{GUILD_NAME}', '{APPLICANT_NAME}', '{GUILD_URL}'], [$guild->name, $applicant->name, env('APP_URL').'/g/'.$guild->slug], $this->message);
 
         return $message;
     }

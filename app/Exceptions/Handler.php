@@ -32,20 +32,20 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
-        if (env('APP_ENV') === 'production') {
+        if ('production' === env('APP_ENV')) {
             if ($this->shouldReport($exception)) {
-                $str = '----- ' . date('Y-m-d H:i:s') . ' ' . env('DEFAULT_TIMEZONE') . ' -----' . PHP_EOL;
-                $str .= 'New `' . get_class($exception) . '`' . PHP_EOL;
-                $str .= '```' . $exception->getMessage() . '```' . PHP_EOL;
-                $str .= '`In ' . $exception->getFile() . ' on line ' . $exception->getLine() . '.`';
+                $str = '----- '.date('Y-m-d H:i:s').' '.env('DEFAULT_TIMEZONE').' -----'.PHP_EOL;
+                $str .= 'New `'.get_class($exception).'`'.PHP_EOL;
+                $str .= '```'.$exception->getMessage().'```'.PHP_EOL;
+                $str .= '`In '.$exception->getFile().' on line '.$exception->getLine().'.`';
 
                 $ch = curl_init(env('DEBUG_HOOK'));
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(
                     [
-                        'content' => $str,
-                        'username' => 'ESO Raidplanner',
-                        'avatar_url' => env('APP_URL') . NotificationHook::AVATAR_URL,
+                        'content'    => $str,
+                        'username'   => 'ESO Raidplanner',
+                        'avatar_url' => env('APP_URL').NotificationHook::AVATAR_URL,
                     ]
                 ));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
