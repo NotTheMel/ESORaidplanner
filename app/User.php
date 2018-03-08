@@ -69,6 +69,22 @@ class User extends Authenticatable
     /**
      * @return array
      */
+    public function getGuildsWhereIsAdmin(): array
+    {
+        $guilds = $this->getGuilds();
+        $return = [];
+        foreach ($guilds as $guild) {
+            if ($guild->isAdmin($this)) {
+                $return[] = $guild;
+            }
+        }
+
+        return $return;
+    }
+
+    /**
+     * @return array
+     */
     public function getEvents(): array
     {
         $guilds = $this->getGuilds();
