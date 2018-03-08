@@ -104,13 +104,17 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/hooks', 'HookController@all');
 
-    Route::get('/hooks/create/{type}', 'HookController@new');
+    Route::get('/hooks/calltypeselect', 'HookController@callTypeSelectForm');
 
-    Route::post('/hooks/create/{type}', 'HookController@create');
+    Route::get('/hooks/typeselect/{call_type}', 'HookController@typeSelectForm');
 
-    Route::get('/hooks/modify/{type}/{id}', 'HookController@show');
+    Route::get('/hooks/create/{call_type}/{type}', 'HookController@new');
 
-    Route::post('/hooks/modify/{type}/{id}', 'HookController@edit');
+    Route::post('/hooks/create/{call_type}/{type}', 'HookController@create');
+
+    Route::get('/hooks/modify/{hook_id}', 'HookController@show');
+
+    Route::post('/hooks/modify/{hook_id}', 'HookController@edit');
 
     Route::post('/hooks/delete/{id}', 'HookController@delete');
 

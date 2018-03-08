@@ -15,6 +15,8 @@
 
 namespace App;
 
+use App\Hook\GuildApplicationNotification;
+use App\Singleton\HookTypes;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Database\Eloquent\Model;
@@ -256,6 +258,14 @@ class Guild extends Model
 
         $log = new LogEntry();
         $log->create($this->id, $user->name.' requested membership.');
+
+        $hooks = GuildApplicationNotification::query()->where('guild_id', '=', $this->id)
+            ->where('call_type', '=', HookTypes::ON_GUIDMEMBER_APPLICATION)
+            ->get()->all();
+
+        foreach ($hooks as $hook) {
+            $hook->call();
+        }
     }
 
     public function approveMembership(User $user, User $admin = null)

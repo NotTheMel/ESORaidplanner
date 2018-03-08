@@ -10,14 +10,8 @@
                             <h4 class="title">Notifications</h4>
                         </div>
                         <div class="content">
-                            <a href="{{ '/hooks/create/1' }}">
-                                <button type="button" class="btn">Create a Discord notification</button>
-                            </a>
-                            <a href="{{ '/hooks/create/2' }}">
-                                <button type="button" class="btn">Create a Telegram notification</button>
-                            </a>
-                            <a href="{{ '/hooks/create/3' }}">
-                                <button type="button" class="btn">Create a Slack notification</button>
+                            <a href="{{ '/hooks/calltypeselect' }}">
+                                <button type="button" class="btn">Create a new notification</button>
                             </a>
                             <br>
                             <div class="content table-responsive table-full-width">

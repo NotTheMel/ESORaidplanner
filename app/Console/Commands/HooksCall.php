@@ -17,7 +17,7 @@ namespace App\Console\Commands;
 
 use App\Event;
 use App\Guild;
-use App\Hook;
+use App\Hook\ReminderNotification;
 use DateTime;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -58,7 +58,7 @@ class HooksCall extends Command
         foreach ($guilds as $guild) {
             $events = Event::query()->where('guild_id', '=', $guild->id)->where('start_date', '>=', date('Y-m-d H:i:s'))->get();
 
-            $hooks = Hook::query()->where('guild_id', '=', $guild->id)->where('call_type', '=', 2)->get();
+            $hooks = ReminderNotification::query()->where('guild_id', '=', $guild->id)->where('call_type', '=', 2)->get();
 
             foreach ($events as $event) {
                 foreach ($hooks as $hook) {

@@ -287,7 +287,7 @@ class EventsController extends Controller
             $date = new DateTime(Input::get('year').'-'.Input::get('month').'-'.Input::get('day').' '.Input::get('hour').':'.Input::get('minute'), new DateTimeZone(Auth::user()->timezone));
         }
 
-        $date->setTimezone(new DateTimeZone(date_default_timezone_get()));
+        $date->setTimezone(new DateTimeZone(env('DEFAULT_TIMEZONE')));
 
         $guild = Guild::query()
             ->where('slug', '=', $slug)
@@ -338,7 +338,7 @@ class EventsController extends Controller
             $date = new DateTime(Input::get('year').'-'.Input::get('month').'-'.Input::get('day').' '.Input::get('hour').':'.Input::get('minute'), new DateTimeZone(Auth::user()->timezone));
         }
 
-        $date->setTimezone(new DateTimeZone(date_default_timezone_get()));
+        $date->setTimezone(new DateTimeZone(env('DEFAULT_TIMEZONE')));
 
         $guild = Guild::query()
             ->where('slug', '=', $slug)
