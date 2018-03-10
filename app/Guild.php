@@ -25,6 +25,17 @@ use Illuminate\Support\Facades\DB;
 
 class Guild extends Model
 {
+    protected $fillable = [
+        'name',
+        'slug',
+        'megaserver',
+        'platform',
+        'admins',
+        'owner_id',
+        'image',
+        'discord_widget',
+    ];
+
     /**
      * @return string
      */
@@ -264,7 +275,7 @@ class Guild extends Model
             ->get()->all();
 
         foreach ($hooks as $hook) {
-            $hook->call();
+            $hook->call($user);
         }
     }
 
