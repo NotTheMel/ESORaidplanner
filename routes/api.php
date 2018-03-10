@@ -95,6 +95,10 @@ Route::post('/event/modify/{event_id}', 'Api\EventController@edit');
 
 Route::post('/event/delete/{event_id}', 'Api\EventController@delete');
 
+Route::post('/news', 'Api\NewsController@all');
+
+Route::post('/news/{article_id}', 'Api\NewsController@get');
+
 
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

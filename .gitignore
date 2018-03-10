@@ -20,3 +20,5 @@ yarn-error.log
 /bin/php-parse
 /bin/phpunit
 /bin/psysh
+/_ide_helper.php
+/_ide_helper_models.php
