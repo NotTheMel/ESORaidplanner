@@ -28,7 +28,7 @@
                                         @foreach ($hooks as $hook)
                                             <tr>
                                                 <td>
-                                                    <a href="{{ url('hooks/modify/'.$hook->type . '/' . $hook->id) }}">{{ $hook->name }}</a>
+                                                    <a href="{{ url('hooks/modify/'.$hook->id) }}">{{ $hook->name }}</a>
                                                 </td>
                                                 <td>
                                                     {{ $hook->getHookType() }}
