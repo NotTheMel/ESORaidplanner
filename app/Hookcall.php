@@ -19,4 +19,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Hookcall extends Model
 {
+    protected $fillable = [
+        'hook_id',
+        'event_id',
+    ];
 }

@@ -15,7 +15,8 @@
 
 namespace App\Telegram\Menu;
 
-use App\DataMapper;
+use App\Singleton\ClassTypes;
+use App\Singleton\RoleTypes;
 use App\Telegram\Api\EsoRaidPlannerAPI;
 use App\Telegram\Api\TelegramAPI;
 use App\Telegram\Button\Button;
@@ -297,7 +298,7 @@ class RoleButton extends Button
      */
     public function buttonClicked($sender): SelectClassMenu
     {
-        $role = DataMapper::getRoleId($this->buttonText);
+        $role = RoleTypes::getRoleId($this->buttonText);
 
         TelegramAPI::setRole($role);
 
@@ -316,7 +317,7 @@ class ClassButton extends Button
     {
         $class = $this->buttonText;
 
-        TelegramAPI::setClass(DataMapper::getClassId($class));
+        TelegramAPI::setClass(ClassTypes::getClassId($class));
 
         return new EnterSupportSetsMenu();
     }

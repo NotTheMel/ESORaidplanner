@@ -43,31 +43,6 @@ class DataMapper
     }
 
     /**
-     * @param int $role
-     *
-     * @return string
-     */
-    public static function getRoleIcon(int $role): string
-    {
-        switch ($role) {
-            case 1:
-                return '🔰';
-
-            case 2:
-                return '⛑';
-
-            case 4:
-                return '⚔';
-
-            case 3:
-                return '🔮';
-
-            default:
-                return '';
-        }
-    }
-
-    /**
      * @param int $id
      *
      * @return string
@@ -106,62 +81,6 @@ class DataMapper
     }
 
     /**
-     * @param string $class
-     *
-     * @return int
-     */
-    public static function getClassId(string $class): int
-    {
-        switch ($class) {
-            case 'Dragonknight':
-                return 1;
-
-            case 'Sorcerer':
-                return 2;
-
-            case 'Nightblade':
-                return 3;
-
-            case 'Warden':
-                return 4;
-
-            case 'Templar':
-                return 6;
-
-            default:
-                return '';
-        }
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return string
-     */
-    public static function getClassName(int $id): string
-    {
-        switch ($id) {
-            case 1:
-                return 'Dragonknight';
-
-            case 2:
-                return 'Sorcerer';
-
-            case 3:
-                return 'Nightblade';
-
-            case 4:
-                return 'Warden';
-
-            case 6:
-                return 'Templar';
-
-            default:
-                return '';
-        }
-    }
-
-    /**
      * @param int $value
      *
      * @return string
@@ -177,52 +96,5 @@ class DataMapper
         }
 
         return 'Unknown';
-    }
-
-    /**
-     * @param int $value
-     *
-     * @return string
-     */
-    public static function getRoleName(int $value): string
-    {
-        if (1 === $value) {
-            return 'Tank';
-        } elseif (2 === $value) {
-            return 'Healer';
-        } elseif (3 === $value) {
-            return 'Damage Dealer (Magicka)';
-        } elseif (4 === $value) {
-            return 'Damage Dealer (Stamina)';
-        } elseif (5 === $value) {
-            return 'Other';
-        }
-
-        return 'Unknown';
-    }
-
-    /**
-     * @param string $role
-     *
-     * @return int
-     */
-    public static function getRoleId(string $role): int
-    {
-        switch ($role) {
-            case 'Tank':
-                return 1;
-
-            case 'Healer':
-                return 2;
-
-            case 'Stamina DD':
-                return 4;
-
-            case 'Magicka DD':
-                return 3;
-
-            default:
-                return 0;
-        }
     }
 }

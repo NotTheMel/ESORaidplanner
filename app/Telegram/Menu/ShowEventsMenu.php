@@ -15,7 +15,8 @@
 
 namespace App\Telegram\Menu;
 
-use App\DataMapper;
+use App\Singleton\ClassTypes;
+use App\Singleton\RoleTypes;
 use App\Telegram\Api\EsoRaidPlannerAPI;
 use App\Telegram\Api\TelegramAPI;
 use App\Telegram\Button\Button;
@@ -121,9 +122,9 @@ class EventItemButton extends Button
 
             foreach ($signups as $key => $signup) {
                 $profile = EsoRaidPlannerAPI::getProfileById($signup->user_id);
-                $icon    = DataMapper::getRoleIcon($signup->role_id);
+                $icon    = RoleTypes::getRoleIcon($signup->role_id);
 
-                $signupsFormatted .= ($key + 1).') '.$icon.' '.$profile->name.' - '.DataMapper::getClassName($signup->class_id).PHP_EOL;
+                $signupsFormatted .= ($key + 1).') '.$icon.' '.$profile->name.' - '.ClassTypes::getClassName($signup->class_id).PHP_EOL;
 
                 if (!empty($signup->sets)) {
                     $supportFormatted .= ' - '.$profile->name.': '.$signup->sets.PHP_EOL;

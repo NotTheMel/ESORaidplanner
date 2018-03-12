@@ -42,13 +42,8 @@ class GuildController extends Controller
 
         $check = Guild::query()->where('slug', '=', Input::get('slug'))->count();
 
-        $guild = new Guild();
-
         if (0 === $check) {
-            $guild->name       = Input::get('name');
-            $guild->slug       = Input::get('slug');
-            $guild->megaserver = Input::get('megaserver');
-            $guild->platform   = Input::get('platform');
+            $guild             = new Guild($request->all());
             $guild->admins     = json_encode([Auth::id()]);
             $guild->owner_id   = Auth::id();
             $guild->image      = 'default.png';

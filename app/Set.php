@@ -19,6 +19,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Set extends Model
 {
+    protected $fillable = [
+        'name',
+        'version',
+    ];
+
     public static function Array(string $sets): array
     {
         if (false !== strpos($sets, ', ')) {

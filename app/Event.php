@@ -30,6 +30,16 @@ class Event extends Model
     const STATUS_LOCKED   = 1;
     const STATUS_UNLOCKED = 0;
 
+    protected $fillable = [
+        'name',
+        'description',
+        'start_date',
+        'type',
+        'guild_id',
+        'locked',
+        'tags',
+    ];
+
     /**
      * @return int
      */

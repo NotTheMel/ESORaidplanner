@@ -23,6 +23,12 @@ use Illuminate\Support\Facades\DB;
 
 class Badge extends Model
 {
+    protected $fillable = [
+        'name',
+        'image',
+        'description',
+    ];
+
     /**
      * @param int      $badge_id
      * @param int|null $user_id

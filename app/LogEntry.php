@@ -22,7 +22,11 @@ use Illuminate\Support\Facades\Auth;
 
 class LogEntry extends Model
 {
-    protected $table = 'guildlogs';
+    protected $table    = 'guildlogs';
+    protected $fillable = [
+        'guild_id',
+        'message',
+    ];
 
     /**
      * @param int    $guild_id

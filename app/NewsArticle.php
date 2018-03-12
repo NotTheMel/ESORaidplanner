@@ -22,7 +22,13 @@ use Illuminate\Support\Facades\Auth;
 
 class NewsArticle extends Model
 {
-    protected $table = 'newsarticles';
+    protected $table    = 'newsarticles';
+    protected $fillable = [
+        'title',
+        'content',
+        'image',
+        'author_id',
+    ];
 
     /**
      * @return string

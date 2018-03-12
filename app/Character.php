@@ -15,6 +15,8 @@
 
 namespace App;
 
+use App\Singleton\ClassTypes;
+use App\Singleton\RoleTypes;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -22,12 +24,21 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Character extends Model
 {
+    protected $fillable = [
+        'user_id',
+        'name',
+        'class',
+        'role',
+        'sets',
+        'public',
+    ];
+
     /**
      * @return string
      */
     public function getClassName(): string
     {
-        return DataMapper::getClassName($this->class);
+        return ClassTypes::getClassName($this->class);
     }
 
     /**
@@ -35,7 +46,7 @@ class Character extends Model
      */
     public function getRoleName(): string
     {
-        return DataMapper::getRoleName($this->role);
+        return RoleTypes::getRoleName($this->role);
     }
 
     /**

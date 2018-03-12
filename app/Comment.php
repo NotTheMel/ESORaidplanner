@@ -25,6 +25,12 @@ use Illuminate\Support\Facades\Auth;
  */
 class Comment extends Model
 {
+    protected $fillable = [
+        'user_id',
+        'event_id',
+        'text',
+    ];
+
     /**
      * @return string
      */

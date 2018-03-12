@@ -15,6 +15,8 @@
 
 namespace App;
 
+use App\Singleton\ClassTypes;
+use App\Singleton\RoleTypes;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +26,16 @@ class Signup extends Model
 {
     const SIGNUP_STATUS_CONFIRMED = 1;
     const SIGNUP_STATUS_BACKUP    = 2;
+
+    protected $fillable = [
+        'user_id',
+        'event_id',
+        'class_id',
+        'role_id',
+        'sets',
+        'character_id',
+        'status',
+    ];
 
     /**
      * @return string
@@ -56,7 +68,7 @@ class Signup extends Model
      */
     public function getClassName(): string
     {
-        return DataMapper::getClassName($this->class_id);
+        return ClassTypes::getClassName($this->class_id);
     }
 
     /**
@@ -64,7 +76,7 @@ class Signup extends Model
      */
     public function getRoleName(): string
     {
-        return DataMapper::getRoleName($this->role_id);
+        return RoleTypes::getRoleName($this->role_id);
     }
 
     /**
