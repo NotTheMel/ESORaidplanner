@@ -238,7 +238,7 @@ class EventsController extends Controller
         $signup = Signup::query()->find($id);
         $guild  = Guild::query()->find($event->guild_id);
 
-        if ($guild->isAdmin(Auth::user())) {
+        if (isset($signup->user_id) && $guild->isAdmin(Auth::user())) {
             $event->signoffOther(User::query()->find($signup->user_id));
         }
 
