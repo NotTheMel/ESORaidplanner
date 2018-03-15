@@ -45,17 +45,17 @@
                                     <tbody>
                                     @foreach ($pending as $member)
                                         <tr>
-                                            <td>{{ $guild->getMemberName($member->user_id) }}</td>
+                                            <td>{{ $guild->getMemberName($member->id) }}</td>
                                             <td>Membership pending</td>
                                             @if ($guild->isAdmin(Auth::user()) || Auth::user()->global_admin === 1)
                                                 <td>
-                                                    {{ Form::open(array('url' => '/g/' . $guild->slug . '/member/approve/'.$guild->id.'/'.$member->user_id)) }}
+                                                    {{ Form::open(array('url' => '/g/' . $guild->slug . '/member/approve/'.$guild->id.'/'.$member->id)) }}
                                                     {!! Form::open([]) !!}
                                                     {!! Form::submit('Approve', ['class' => 'btn btn-success']) !!}
 
                                                     {!! Form::close() !!}
                                                     {{ Form::close() }}
-                                                    {{ Form::open(array('url' => '/g/' . $guild->slug . '/member/remove/'.$guild->id.'/'.$member->user_id)) }}
+                                                    {{ Form::open(array('url' => '/g/' . $guild->slug . '/member/remove/'.$guild->id.'/'.$member->id)) }}
                                                     {!! Form::open([]) !!}
                                                     {!! Form::submit('Remove', ['class' => 'btn btn-danger']) !!}
 
