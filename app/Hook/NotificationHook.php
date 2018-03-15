@@ -170,7 +170,7 @@ class NotificationHook extends Model
     /**
      * @return Guild|null
      */
-    public function getGuild(): ?Guild
+    public function getGuild()
     {
         if (null === $this->guild_id) {
             return null;
