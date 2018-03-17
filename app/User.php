@@ -268,10 +268,13 @@ class User extends Authenticatable
         $signups = [];
 
         foreach ($events as $event) {
-            $signups[] = Signup::query()
+            $s = Signup::query()
                 ->where('user_id', '=', $this->id)
                 ->where('event_id', '=', $event->id)
                 ->first();
+            if (!empty($s)) {
+                $signups[] = $s;
+            }
         }
 
         return $signups;
