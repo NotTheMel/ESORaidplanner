@@ -108,18 +108,20 @@ class CharacterController extends ApiController
 
         $signups = $user->getSignups();
 
-        foreach ($signups as $signup) {
-            $event = Event::query()->find($signup->event_id);
+        if (count($signups) > 0) {
+            foreach ($signups as $signup) {
+                $event = Event::query()->find($signup->event_id);
 
-            $dt  = new DateTime($event->start_date);
-            $now = new DateTime();
+                $dt  = new DateTime($event->start_date);
+                $now = new DateTime();
 
-            if ($signup->character_id === $character->id && $dt > $now) {
-                $sign           = Signup::query()->find($signup->id);
-                $sign->class_id = $character->class;
-                $sign->role_id  = $character->role;
-                $sign->sets     = $character->sets;
-                $sign->save();
+                if ($signup->character_id === $character->id && $dt > $now) {
+                    $sign           = Signup::query()->find($signup->id);
+                    $sign->class_id = $character->class;
+                    $sign->role_id  = $character->role;
+                    $sign->sets     = $character->sets;
+                    $sign->save();
+                }
             }
         }
 
@@ -150,11 +152,13 @@ class CharacterController extends ApiController
 
         $signups = $user->getSignups();
 
-        foreach ($signups as $signup) {
-            if ($signup->character_id === $character->id) {
-                $sign               = Signup::query()->find($signup->id);
-                $sign->character_id = null;
-                $sign->save();
+        if (count($signups) > 0) {
+            foreach ($signups as $signup) {
+                if ($signup->character_id === $character->id) {
+                    $sign               = Signup::query()->find($signup->id);
+                    $sign->character_id = null;
+                    $sign->save();
+                }
             }
         }
 

@@ -16,7 +16,6 @@
 namespace App\Http\Controllers;
 
 use App\User;
-use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -28,7 +27,7 @@ class PatreonController extends Controller
     /**
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function OAuth(): Redirector
+    public function OAuth()
     {
         $client_id     = env('PATREON_ID');
         $client_secret = env('PATREON_SECRET');

@@ -67,6 +67,10 @@ class UserController extends ApiController
             ->where('id', '=', $user_id)
             ->first();
 
+        if (empty($u)) {
+            return response(null, Response::HTTP_NOT_FOUND);
+        }
+
         $u1         = new User();
         $u1->avatar = $u->avatar;
         $u1->name   = $u->name;

@@ -412,6 +412,10 @@ class EventsController extends Controller
     {
         $signup = Signup::query()->find($signup_id);
 
+        if (empty($signup)) {
+            return redirect('/');
+        }
+
         /** @var Event $event */
         $event = Event::query()->find($signup->event_id);
 
