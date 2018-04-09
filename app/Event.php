@@ -149,10 +149,16 @@ class Event extends Model
     /**
      * @return array
      */
-    public function getSignups(): array
+    public function getSignups(int $status = 0): array
     {
-        return DB::table('signups')
-            ->where('event_id', $this->id);
+        if ($status === 0) {
+            $signups = Signup::query()->where('event_id', '=', $this->id)->get()->all();
+        } else {
+            $signups = Signup::query()->where('event_id', '=', $this->id)
+                ->where('status', '=', $status)->get()->all();
+        }
+
+        return $signups;
     }
 
     public function getSignupsByRole(int $role_id): array

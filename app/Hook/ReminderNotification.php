@@ -16,6 +16,10 @@
 namespace App\Hook;
 
 use App\Event;
+use App\Singleton\ClassTypes;
+use App\Singleton\RoleTypes;
+use App\Singleton\SignupStatusses;
+use App\User;
 
 class ReminderNotification extends NotificationHook
 {
@@ -30,7 +34,21 @@ class ReminderNotification extends NotificationHook
     {
         $guild = $event->getGuild();
 
+        $signups = $event->getSignups(SignupStatusses::STATUS_CONFIRMED);
+
         $message = str_replace(['{EVENT_NAME}', '{EVENT_DESCRIPTION}', '{EVENT_NUM_SIGNUPS}', '{EVENT_URL}'], [$event->name, $event->description, $event->getTotalSignups(), 'https://esoraidplanner.com/g/'.$guild->slug.'/event/'.$event->id], $this->message);
+
+        if (strpos($message, '{CONFIRMED_SIGNUPS}') !== false){
+            $m = '```';
+
+            foreach ($signups as $signup){
+                $u = User::query()->find($signup->user_id);
+                $m .= $u->name . ' - ' . ClassTypes::getClassName($signup->class_id) . ' - ' . RoleTypes::getRoleName($signup->role_id) . PHP_EOL;
+            }
+            $m .= '```';
+
+            $message = str_replace('{CONFIRMED_SIGNUPS}', $m, $message);
+        }
 
         return $message;
     }
