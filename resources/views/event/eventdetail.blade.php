@@ -161,6 +161,11 @@
                                 </div>
                             @endif
                         </div>
+
+                        @if($guild->isAdmin(Auth::user()))
+                            {{ Form::open(array('url' => '/g/'.$guild->slug.'/event/'.$event->id.'signup/status')) }}
+                        @endif
+
                         <div class="content table-responsive table-full-width" style="z-index: 9999">
                             <br>
                             <h3 align="center">Tanks</h3>
@@ -172,7 +177,7 @@
                                     <th width="20%">Role</th>
                                     <th width="20%">Sets</th>
                                     <th width="5%"></th>
-                                    <th width="20%" colspan="3">Actions</th>
+                                    <th width="20%" colspan="3" class="text-center">Actions</th>
                                 @else
                                     <th width="25%">Player</th>
                                     <th width="20%">Class</th>
@@ -198,25 +203,7 @@
                                                    title="Signup time: {{ $signup->getNiceDate() }}"></td>
                                             @if ($guild->isAdmin(Auth::user()))
                                                 <td>
-                                                    <a href="{{ '/signup/' . $signup->id . '/1' }}">
-                                                        <button type="button" class="btn  btn-success form-control">
-                                                            Confirm
-                                                        </button>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ '/signup/' . $signup->id . '/2' }}">
-                                                        <button type="button" class="btn btn-warning form-control">
-                                                            Backup
-                                                        </button>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ '/signup/delete/' . $guild->slug . '/' . $event->id . '/' . $signup->id }}">
-                                                        <button type="button" class="btn btn-danger form-control">
-                                                            Delete
-                                                        </button>
-                                                    </a>
+                                                    {{ Form::checkbox($signup->id, $signup->id) }}
                                                 </td>
                                             @endif
                                         </tr>
@@ -235,7 +222,7 @@
                                     <th width="20%">Role</th>
                                     <th width="20%">Sets</th>
                                     <th width="5%"></th>
-                                    <th width="20%" colspan="3">Actions</th>
+                                    <th width="20%" colspan="3" class="text-center">Actions</th>
                                 @else
                                     <th width="25%">Player</th>
                                     <th width="20%">Class</th>
@@ -260,26 +247,8 @@
                                             <td><i class="fa fa-clock-o"
                                                    title="Signup time: {{ $signup->getNiceDate() }}"></td>
                                             @if ($guild->isAdmin(Auth::user()))
-                                                <td>
-                                                    <a href="{{ '/signup/' . $signup->id . '/1' }}">
-                                                        <button type="button" class="btn  btn-success form-control">
-                                                            Confirm
-                                                        </button>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ '/signup/' . $signup->id . '/2' }}">
-                                                        <button type="button" class="btn btn-warning form-control">
-                                                            Backup
-                                                        </button>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ '/signup/delete/' . $guild->slug . '/' . $event->id . '/' . $signup->id }}">
-                                                        <button type="button" class="btn btn-danger form-control">
-                                                            Delete
-                                                        </button>
-                                                    </a>
+                                                <td align="center">
+                                                    {{ Form::checkbox($signup->id, $signup->id) }}
                                                 </td>
                                             @endif
                                         </tr>
@@ -298,7 +267,7 @@
                                     <th width="20%">Role</th>
                                     <th width="20%">Sets</th>
                                     <th width="5%"></th>
-                                    <th width="20%" colspan="3">Actions</th>
+                                    <th width="20%" colspan="3" class="text-center">Actions</th>
                                 @else
                                     <th width="25%">Player</th>
                                     <th width="20%">Class</th>
@@ -323,26 +292,8 @@
                                             <td><i class="fa fa-clock-o"
                                                    title="Signup time: {{ $signup->getNiceDate() }}"></td>
                                             @if ($guild->isAdmin(Auth::user()))
-                                                <td>
-                                                    <a href="{{ '/signup/' . $signup->id . '/1' }}">
-                                                        <button type="button" class="btn  btn-success form-control">
-                                                            Confirm
-                                                        </button>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ '/signup/' . $signup->id . '/2' }}">
-                                                        <button type="button" class="btn btn-warning form-control">
-                                                            Backup
-                                                        </button>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ '/signup/delete/' . $guild->slug . '/' . $event->id . '/' . $signup->id }}">
-                                                        <button type="button" class="btn btn-danger form-control">
-                                                            Delete
-                                                        </button>
-                                                    </a>
+                                                <td align="center">
+                                                    {{ Form::checkbox($signup->id, $signup->id) }}
                                                 </td>
                                             @endif
                                         </tr>
@@ -361,7 +312,7 @@
                                     <th width="20%">Role</th>
                                     <th width="20%">Sets</th>
                                     <th width="5%"></th>
-                                    <th width="20%" colspan="3">Actions</th>
+                                    <th width="20%" colspan="3" class="text-center">Actions</th>
                                 @else
                                     <th width="25%">Player</th>
                                     <th width="20%">Class</th>
@@ -386,26 +337,8 @@
                                             <td><i class="fa fa-clock-o"
                                                    title="Signup time: {{ $signup->getNiceDate() }}"></td>
                                             @if ($guild->isAdmin(Auth::user()))
-                                                <td>
-                                                    <a href="{{ '/signup/' . $signup->id . '/1' }}">
-                                                        <button type="button" class="btn  btn-success form-control">
-                                                            Confirm
-                                                        </button>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ '/signup/' . $signup->id . '/2' }}">
-                                                        <button type="button" class="btn btn-warning form-control">
-                                                            Backup
-                                                        </button>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ '/signup/delete/' . $guild->slug . '/' . $event->id . '/' . $signup->id }}">
-                                                        <button type="button" class="btn btn-danger form-control">
-                                                            Delete
-                                                        </button>
-                                                    </a>
+                                                <td align="center">
+                                                    {{ Form::checkbox($signup->id, $signup->id) }}
                                                 </td>
                                             @endif
                                         </tr>
@@ -425,7 +358,7 @@
                                         <th width="20%">Role</th>
                                         <th width="20%">Sets</th>
                                         <th width="5%"></th>
-                                        <th width="20%" colspan="3">Actions</th>
+                                        <th width="20%" colspan="3" class="text-center">Actions</th>
                                     @else
                                         <th width="25%">Player</th>
                                         <th width="20%">Class</th>
@@ -450,26 +383,8 @@
                                                 <td><i class="fa fa-clock-o"
                                                        title="Signup time: {{ $signup->getNiceDate() }}"></td>
                                                 @if ($guild->isAdmin(Auth::user()))
-                                                    <td>
-                                                        <a href="{{ '/signup/' . $signup->id . '/1' }}">
-                                                            <button type="button" class="btn  btn-success form-control">
-                                                                Confirm
-                                                            </button>
-                                                        </a>
-                                                    </td>
-                                                    <td>
-                                                        <a href="{{ '/signup/' . $signup->id . '/2' }}">
-                                                            <button type="button" class="btn btn-warning form-control">
-                                                                Backup
-                                                            </button>
-                                                        </a>
-                                                    </td>
-                                                    <td>
-                                                        <a href="{{ '/signup/delete/' . $guild->slug . '/' . $event->id . '/' . $signup->id }}">
-                                                            <button type="button" class="btn btn-danger form-control">
-                                                                Delete
-                                                            </button>
-                                                        </a>
+                                                    <td align="center">
+                                                        {{ Form::checkbox($signup->id, $signup->id) }}
                                                     </td>
                                                 @endif
                                             </tr>
@@ -479,7 +394,20 @@
                             </div>
                         @endif
 
+                        @if($guild->isAdmin(Auth::user()))
+                            <div class="content">
+                                <div class="pull-right">
+                            {!! Form::submit('Confirm selected', ['class' => 'btn btn-success', 'name' => 'action', 'value' => 'confirm']) !!}
+                            {!! Form::submit('Backup selected', ['class' => 'btn btn-warning', 'name' => 'action', 'value' => 'backup']) !!}
+                            {!! Form::submit('Reset selected', ['class' => 'btn btn-info', 'name' => 'action', 'value' => 'reset']) !!}
+                                </div></div>
+
+                            {{ Form::close() }}
+                            <br><br>
+                        @endif
+
                         @if($guild->isAdmin(Auth::user()) && count($members) > 0)
+                            <div class="content">
                             <div class="alert alert-success">
                                 <strong>You are an admin.</strong> Here you can sign up someone else for this event.
                                 {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/other/'.$event->id)) }}
@@ -510,6 +438,7 @@
 
                                 {!! Form::close() !!}
                                 {{ Form::close() }}
+                            </div>
                             </div>
                         @endif
                     </div>

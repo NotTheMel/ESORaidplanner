@@ -403,31 +403,41 @@ class EventsController extends Controller
     }
 
     /**
-     * @param int $signup_id
-     * @param int $status
+     * @param Request $request
+     * @param string  $slug
+     * @param int     $event_id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function setSignupStatus(int $signup_id, int $status)
+    public function setSignupStatus(Request $request, string $slug, int $event_id)
     {
-        $signup = Signup::query()->find($signup_id);
-
-        if (empty($signup)) {
-            return redirect('/');
+        if ('Confirm selected' === $request->post('action')) {
+            $status = 1;
+        } elseif ('Backup selected' === $request->post('action')) {
+            $status = 2;
+        } else {
+            $status = 0;
         }
 
-        /** @var Event $event */
-        $event = Event::query()->find($signup->event_id);
+        $request->offsetUnset('action');
 
+        $event = Event::query()->find($event_id);
         $guild = Guild::query()->find($event->guild_id);
 
         if (!$guild->isAdmin(Auth::user())) {
-            return redirect('g/'.$guild->slug.'/event/'.$signup->event_id);
+            return redirect('/g/'.$slug.'/event/'.$event_id);
         }
 
-        $event->setSignupStatus($signup_id, $status);
+        foreach ($request->all() as $signup) {
+            if (is_numeric($signup)) {
+                if (!$guild->isAdmin(Auth::user())) {
+                    return redirect('g/'.$guild->slug.'/event/'.$event_id);
+                }
+                $event->setSignupStatus($signup, $status);
+            }
+        }
 
-        return redirect('g/'.$guild->slug.'/event/'.$signup->event_id);
+        return redirect('g/'.$guild->slug.'/event/'.$event->id);
     }
 
     /**

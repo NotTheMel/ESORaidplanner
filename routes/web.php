@@ -225,7 +225,7 @@ Route::group(['middleware' => 'auth'], function () {
      *
      */
 
-    Route::get('/signup/{signup_id}/{status}', 'EventsController@setSignupStatus');
+    Route::post('/g/{slug}/event/{event_id}signup/status', 'EventsController@setSignupStatus');
 
     Route::get('/signup/delete/{slug}/{event_id}/{id}', 'EventsController@deleteSignup');
 
