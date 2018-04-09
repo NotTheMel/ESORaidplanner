@@ -126,6 +126,18 @@ class RepeatableController extends Controller
         $repeatable->create_interval = ((int) Input::get('create_interval') * 86400);
         $repeatable->save();
 
+        $events = Event::query()->where('parent_repeatable', '=', $repeatable->id)
+            ->where('start_date', '>', date('Y-m-d H:i:s'))
+            ->get()->all();
+
+        foreach ($events as $event) {
+            $event->name        = $repeatable->name;
+            $event->type        = $repeatable->type;
+            $event->description = $repeatable->description;
+            $event->tags        = $repeatable->tags;
+            $event->save();
+        }
+
         return redirect('/g/'.$guild->slug.'/settings');
     }
 
