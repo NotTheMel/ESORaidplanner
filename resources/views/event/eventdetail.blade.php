@@ -202,7 +202,7 @@
                                             <td><i class="fa fa-clock-o"
                                                    title="Signup time: {{ $signup->getNiceDate() }}"></td>
                                             @if ($guild->isAdmin(Auth::user()))
-                                                <td>
+                                                <td align="center">
                                                     {{ Form::checkbox($signup->id, $signup->id) }}
                                                 </td>
                                             @endif
