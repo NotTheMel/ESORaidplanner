@@ -19,6 +19,7 @@ use App\Event;
 use App\Guild;
 use App\Hook\NotificationHook;
 use App\LogEntry;
+use App\RepeatableEvent;
 use App\Signup;
 use App\User;
 use Illuminate\Http\Request;
@@ -266,7 +267,9 @@ class GuildController extends Controller
 
         $pending = $guild->getPendingMembers();
 
-        return view('guild.settings', compact('guild', 'pending'));
+        $repeatables = RepeatableEvent::query()->where('guild_id', '=', $guild->id)->get()->all() ?? [];
+
+        return view('guild.settings', compact('guild', 'pending', 'repeatables'));
     }
 
     public function deleteConfirm(int $id)

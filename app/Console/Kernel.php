@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\HooksCall::class,
         Commands\RenewPatreon::class,
+        Commands\RepeatableEventsCommand::class,
     ];
 
     /**

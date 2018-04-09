@@ -96,6 +96,17 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/g/{slug}/logs', 'GuildController@logs');
 
 
+    // Repeatables //
+    Route::get('/g/{slug}/repeatable/create', 'RepeatableController@new');
+
+    Route::post('/g/{slug}/repeatable/create', 'RepeatableController@create');
+
+    Route::get('/g/{slug}/repeatable/edit/{repeatable_id}', 'RepeatableController@view');
+
+    Route::post('/g/{slug}/repeatable/edit/{repeatable_id}', 'RepeatableController@edit');
+
+    Route::get('/g/{slug}/repeatable/delete/{repeatable_id}', 'RepeatableController@delete');
+
     /*
      *
      * ROUTES FOR WEBHOOKS

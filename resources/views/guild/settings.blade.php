@@ -27,6 +27,41 @@
                             @endif
                         </div>
                     </div>
+
+                    <div class="card">
+                        <div class="header">
+                            <div class="pull-right">
+                                <a href="{{ '/g/' . $guild->slug . '/repeatable/create' }}">
+                                    <button type="button" class="btn">Create a Repeatable Event</button>
+                                </a>
+                            </div>
+                            <h4 class="title">Repeatable events for {{ $guild->name }}</h4>
+                        </div>
+                        <div class="content table-responsive table-full-width">
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                <th>Name</th>
+                                <th>Interval</th>
+                                </thead>
+                                <tbody>
+                                @foreach($repeatables as $repeatable)
+                                    <tr>
+                                        <td>{{ $repeatable->name }}</td>
+                                        <td>{{ $repeatable->getRepetitionString() }}</td>
+                                        <td>
+                                            <a href="{{ '/g/' . $guild->slug . '/repeatable/edit/' . $repeatable->id }}">
+                                                <button type="button" class="btn">Edit</button>
+                                            </a>
+                                            <a href="{{ '/g/' . $guild->slug . '/repeatable/delete/' . $repeatable->id }}">
+                                                <button type="button" class="btn btn-danger">Delete</button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
                 @if ($guild->isAdmin(Auth::user()) || Auth::user()->global_admin === 1)
