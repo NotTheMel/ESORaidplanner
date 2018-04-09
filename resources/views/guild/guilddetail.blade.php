@@ -126,6 +126,9 @@
                                                 <a href="{{ '/g/' . $guild->slug . '/events/create' }}">
                                                     <button type="button" class="btn">Create an Event</button>
                                                 </a>
+                                                <a href="{{ '/g/' . $guild->slug . '/repeatable/create' }}">
+                                                    <button type="button" class="btn">Create a recurring Event</button>
+                                                </a>
                                             </div>
                                         @endif
                                         <h4 class="title">{{ $guild->name }}</h4>

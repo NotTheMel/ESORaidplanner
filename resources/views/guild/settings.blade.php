@@ -35,7 +35,7 @@
                                     <button type="button" class="btn">Create a Repeatable Event</button>
                                 </a>
                             </div>
-                            <h4 class="title">Repeatable events for {{ $guild->name }}</h4>
+                            <h4 class="title">Recurring events for {{ $guild->name }}</h4>
                         </div>
                         <div class="content table-responsive table-full-width">
                             <table class="table table-hover table-striped">

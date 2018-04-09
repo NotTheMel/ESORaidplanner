@@ -7,7 +7,7 @@
                 <div class="col-md-6">
                     <div class="card">
                         <div class="header">
-                            <h4 class="title">Create a repeatable event for {{ $guild->name }}</h4>
+                            <h4 class="title">Create a recurring event for {{ $guild->name }}</h4>
                         </div>
                         @if ($errors->any())
                             <div class="alert alert-danger">

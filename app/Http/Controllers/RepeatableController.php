@@ -47,13 +47,13 @@ class RepeatableController extends Controller
     public function create(Request $request, string $slug)
     {
         $request->validate([
-            'name'   => 'required',
-            'year'   => 'required',
-            'month'  => 'required',
-            'day'    => 'required',
-            'hour'   => 'required',
-            'minute' => 'required',
-            'interval' => 'required',
+            'name'            => 'required',
+            'year'            => 'required',
+            'month'           => 'required',
+            'day'             => 'required',
+            'hour'            => 'required',
+            'minute'          => 'required',
+            'interval'        => 'required',
             'create_interval' => 'required',
         ]);
 
@@ -106,13 +106,13 @@ class RepeatableController extends Controller
     public function edit(Request $request, string $slug, int $repeatable_id)
     {
         $request->validate([
-            'name' => 'required',
-            'interval' => 'required',
+            'name'            => 'required',
+            'interval'        => 'required',
             'create_interval' => 'required',
         ]);
 
         $repeatable                  = RepeatableEvent::query()->find($repeatable_id);
-        $guild = Guild::query()->find($repeatable->guild_id);
+        $guild                       = Guild::query()->find($repeatable->guild_id);
 
         if (!$guild->isAdmin(Auth::user())) {
             return redirect('g/'.$slug);
@@ -132,7 +132,7 @@ class RepeatableController extends Controller
     public function delete(string $slug, int $repeatable_id)
     {
         $repeatable = RepeatableEvent::query()->find($repeatable_id);
-        $guild = Guild::query()->find($repeatable->guild_id);
+        $guild      = Guild::query()->find($repeatable->guild_id);
 
         if (!$guild->isAdmin(Auth::user())) {
             return redirect('g/'.$slug);

@@ -23,6 +23,6 @@ class RepeatableEvent extends Model
         $dt = new DateTime($this->latest_event);
         $dt->setTimezone(new DateTimeZone(Auth::user()->timezone));
 
-        return $dt->format('l') . ' ' . EventTimeIntervals::INTERVALS[$this->interval];
+        return $dt->format('l').' '.EventTimeIntervals::INTERVALS[$this->interval];
     }
 }
