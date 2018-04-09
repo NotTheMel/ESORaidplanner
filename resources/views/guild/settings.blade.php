@@ -32,7 +32,7 @@
                         <div class="header">
                             <div class="pull-right">
                                 <a href="{{ '/g/' . $guild->slug . '/repeatable/create' }}">
-                                    <button type="button" class="btn">Create a Repeatable Event</button>
+                                    <button type="button" class="btn">Create a recurring event</button>
                                 </a>
                             </div>
                             <h4 class="title">Recurring events for {{ $guild->name }}</h4>
@@ -60,6 +60,11 @@
                                 @endforeach
                                 </tbody>
                             </table>
+                            <div class="content">
+                                <div class="alert alert-danger">
+                            <p>Take note that deleting a recurring event will not delete any of the events that it created. It will just stop new events from being created.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
