@@ -151,7 +151,7 @@ class Event extends Model
      */
     public function getSignups(int $status = 0): array
     {
-        if ($status === 0) {
+        if (0 === $status) {
             $signups = Signup::query()->where('event_id', '=', $this->id)->get()->all();
         } else {
             $signups = Signup::query()->where('event_id', '=', $this->id)

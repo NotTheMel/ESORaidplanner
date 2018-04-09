@@ -38,12 +38,12 @@ class ReminderNotification extends NotificationHook
 
         $message = str_replace(['{EVENT_NAME}', '{EVENT_DESCRIPTION}', '{EVENT_NUM_SIGNUPS}', '{EVENT_URL}'], [$event->name, $event->description, $event->getTotalSignups(), 'https://esoraidplanner.com/g/'.$guild->slug.'/event/'.$event->id], $this->message);
 
-        if (strpos($message, '{CONFIRMED_SIGNUPS}') !== false){
+        if (false !== strpos($message, '{CONFIRMED_SIGNUPS}')) {
             $m = '```';
 
-            foreach ($signups as $signup){
+            foreach ($signups as $signup) {
                 $u = User::query()->find($signup->user_id);
-                $m .= $u->name . ' - ' . ClassTypes::getClassName($signup->class_id) . ' - ' . RoleTypes::getRoleName($signup->role_id) . PHP_EOL;
+                $m .= $u->name.' - '.ClassTypes::getClassName($signup->class_id).' - '.RoleTypes::getRoleName($signup->role_id).PHP_EOL;
             }
             $m .= '```';
 
