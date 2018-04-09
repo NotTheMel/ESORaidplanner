@@ -40,13 +40,17 @@ class ReminderNotification extends NotificationHook
 
         if (false !== strpos($message, '{CONFIRMED_SIGNUPS}')) {
             if (count($signups) > 0) {
-                $m = '```';
+                if (NotificationHook::TYPE_DISCORD === $this->type || NotificationHook::TYPE_SLACK === $this->type) {
+                    $m = '```';
+                }
 
                 foreach ($signups as $signup) {
                     $u = User::query()->find($signup->user_id);
                     $m .= $u->name.' - '.ClassTypes::getClassName($signup->class_id).' - '.RoleTypes::getRoleName($signup->role_id).PHP_EOL;
                 }
-                $m .= '```';
+                if (NotificationHook::TYPE_DISCORD === $this->type || NotificationHook::TYPE_SLACK === $this->type) {
+                    $m .= '```';
+                }
 
                 $message = str_replace('{CONFIRMED_SIGNUPS}', $m, $message);
             } else {
