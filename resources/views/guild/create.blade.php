@@ -35,7 +35,7 @@
                             Platform:{!! Form::select('platform', array('1' => 'PC/Mac', '2' => 'Playstation 4', '3' => 'XBOX One'), null, array('class' => 'form-control')) !!}
                             <br>
 
-                            {!! Form::submit('Create Guild', ['class' => 'btn']) !!}<br>
+                            {!! Form::submit('Create Guild', ['class' => 'btn btn-info']) !!}<br>
 
                             {{ Form::close() }}
                         </div>

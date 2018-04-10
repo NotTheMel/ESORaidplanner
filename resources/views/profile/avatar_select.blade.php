@@ -9,7 +9,7 @@
                         <div class="header">
                             <div class="pull-right">
                                 <a href="{{ '/profile/menu' }}">
-                                    <button type="button" class="btn">Back to user menu</button>
+                                    <button type="button" class="btn btn-info">Back to user menu</button>
                                 </a>
                             </div>
                             <h4 class="title">Your avatar</h4>
@@ -36,7 +36,7 @@
                                 @endif
                                 {{ Form::open(array('url' => '/profile/edit/avatar/upload', 'enctype' => 'multipart/form-data')) }}
                                 Image:{!! Form::file('avatar', array()) !!}<br>
-                                {!! Form::submit('Upload Avatar', ['class' => 'btn']) !!}<br>
+                                {!! Form::submit('Upload Avatar', ['class' => 'btn btn-info']) !!}<br>
 
                                 {{ Form::close() }}
                             @else
@@ -81,7 +81,7 @@
                                 </tbody>
                             </table>
 
-                            {!! Form::submit('Save Avatar', ['class' => 'btn']) !!}<br>
+                            {!! Form::submit('Save Avatar', ['class' => 'btn btn-info']) !!}<br>
 
                             {{ Form::close() }}
                         </div>

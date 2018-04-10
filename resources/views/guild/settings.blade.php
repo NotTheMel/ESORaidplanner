@@ -32,7 +32,7 @@
                         <div class="header">
                             <div class="pull-right">
                                 <a href="{{ '/g/' . $guild->slug . '/repeatable/create' }}">
-                                    <button type="button" class="btn">Create a recurring event</button>
+                                    <button type="button" class="btn btn-info">Create a recurring event</button>
                                 </a>
                             </div>
                             <h4 class="title">Recurring events for {{ $guild->name }}</h4>
@@ -50,7 +50,7 @@
                                         <td>{{ $repeatable->getRepetitionString() }}</td>
                                         <td>
                                             <a href="{{ '/g/' . $guild->slug . '/repeatable/edit/' . $repeatable->id }}">
-                                                <button type="button" class="btn">Edit</button>
+                                                <button type="button" class="btn btn-info">Edit</button>
                                             </a>
                                             <a href="{{ '/g/' . $guild->slug . '/repeatable/delete/' . $repeatable->id }}">
                                                 <button type="button" class="btn btn-danger">Delete</button>

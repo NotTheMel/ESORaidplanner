@@ -61,7 +61,7 @@
                             list of shortcodes below.<br>
                             {!! Form::textarea('message', '', ['class' => 'form-control', 'required']) !!}<br>
 
-                            {!! Form::submit('Create Notification', ['class' => 'btn']) !!}<br>
+                            {!! Form::submit('Create Notification', ['class' => 'btn btn-info']) !!}<br>
 
                             {{ Form::close() }}
                             <div class="content table-responsive table-full-width">

@@ -10,7 +10,7 @@
                         <div class="header">
                             <div class="pull-right">
                                 <a href="{{ '/g/' . $guild->slug }}">
-                                    <button type="button" class="btn">Back to {{ $guild->name }}</button>
+                                    <button type="button" class="btn btn-info">Back to {{ $guild->name }}</button>
                                 </a>
                             </div>
                             <h4 class="title">Membership requests</h4>
@@ -57,7 +57,7 @@
                     <div class="header">
                         <div class="pull-right">
                             <a href="{{ '/g/' . $guild->slug }}">
-                                <button type="button" class="btn">Back to {{ $guild->name }}</button>
+                                <button type="button" class="btn btn-info">Back to {{ $guild->name }}</button>
                             </a>
                         </div>
                         <h4 class="title">Members of {{ $guild->name }}</h4>
@@ -90,11 +90,11 @@
                                             <td width="40%">
                                                 @if ($guild->isOwner(Auth::user()) && !$guild->isAdmin($member))
                                                     <a href="{{ '/g/' . $guild->slug . '/member/makeadmin/'.$member->id }}">
-                                                        <button type="button" class="btn">Promote to admin</button>
+                                                        <button type="button" class="btn btn-info">Promote to admin</button>
                                                     </a>
                                                 @elseif ($guild->isOwner(Auth::user()) && $guild->isAdmin($member))
                                                     <a href="{{ '/g/' . $guild->slug . '/member/removeadmin/'.$member->id }}">
-                                                        <button type="button" class="btn">Demote admin</button>
+                                                        <button type="button" class="btn btn-info">Demote admin</button>
                                                     </a>
                                                 @endif
                                                 @if (!$guild->isOwner($member))

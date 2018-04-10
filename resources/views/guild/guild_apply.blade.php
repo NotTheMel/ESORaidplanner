@@ -16,7 +16,7 @@
                             You are not a member of {{ $guild->name }}.<br>
                             {{ Form::open(array('url' => '/g/' . $guild->slug . '/member/request/'.$guild->id)) }}
                             {!! Form::open([]) !!}
-                            {!! Form::submit('Request membership', ['class' => 'btn']) !!}
+                            {!! Form::submit('Request membership', ['class' => 'btn btn-info']) !!}
 
                             {!! Form::close() !!}
                             {{ Form::close() }}

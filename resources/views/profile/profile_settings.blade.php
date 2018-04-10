@@ -8,7 +8,7 @@
                     <div class="header">
                         <div class="pull-right">
                             <a href="{{ '/profile/menu' }}">
-                                <button type="button" class="btn">Back to user menu</button>
+                                <button type="button" class="btn btn-info">Back to user menu</button>
                             </a>
                         </div>
                         <h4 class="title">Your public profile</h4>
@@ -42,7 +42,7 @@
                         Bio:{!! Form::textarea('description', Auth::user()->description, array('class' => 'form-control')) !!}
                         <br>
 
-                        {!! Form::submit('Save changes', ['class' => 'btn']) !!}<br>
+                        {!! Form::submit('Save changes', ['class' => 'btn btn-info']) !!}<br>
 
                         {{ Form::close() }}
                     </div>

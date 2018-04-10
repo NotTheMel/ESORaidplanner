@@ -46,7 +46,7 @@
                             sent:{!! Form::textarea('message', $hook->message, ['class' => 'form-control', 'required']) !!}
                             <br>
 
-                            {!! Form::submit('Save Notification', ['class' => 'btn']) !!}<br>
+                            {!! Form::submit('Save Notification', ['class' => 'btn btn-info']) !!}<br>
 
                             {{ Form::close() }}
                             <div class="content table-responsive table-full-width">

@@ -13,7 +13,6 @@
     <!-- Styles -->
     <link href="{{ asset('css/all.css') }}" rel="stylesheet"/>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/raidplanner.css') }}" rel="stylesheet">
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
 
@@ -38,6 +37,7 @@
     <link href="{{ asset('css/pe-icon-7-stroke.css') }}" rel="stylesheet"/>
 
     <link href="{{ asset('css/raidplanner.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('css/buttons.css') }}" rel="stylesheet">
 
     @if(env('APP_ENV') === 'production')
     <!-- Global site tag (gtag.js) - Google Analytics -->

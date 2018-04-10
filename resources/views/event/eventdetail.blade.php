@@ -14,7 +14,7 @@
                             @if ($guild->isAdmin(Auth::user()))
                                 <div class="pull-right">
                                     <a href="{{ '/g/' . $guild->slug . '/events/edit/' . $event->id }}">
-                                        <button type="button" class="btn">Edit event</button>
+                                        <button type="button" class="btn btn-info">Edit event</button>
                                     </a>
                                     @if($event->locked === 1)
                                         <a href="{{ '/g/' . $guild->slug . '/events/lock/' . $event->id . '/0' }}">
@@ -62,7 +62,7 @@
                                                 @endif
                                             </div>
                                             <div class="col-md-2">
-                                                <br>{!! Form::submit('Save changes', ['class' => 'btn']) !!}
+                                                <br>{!! Form::submit('Save changes', ['class' => 'btn btn-info']) !!}
                                                 <br>
                                             </div>
                                         </div>
@@ -88,7 +88,7 @@
                                             {!! Form::select('sets[]', $sets, explode(', ', $event->getUserSignup('sets')), array('class' => 'chosen-select', 'multiple')) !!}
                                         </div>
                                         <div class="col-md-2">
-                                            <br>{!! Form::submit('Save changes', ['class' => 'btn']) !!}
+                                            <br>{!! Form::submit('Save changes', ['class' => 'btn btn-info']) !!}
                                             <br>
                                         </div>
                                     </div>
@@ -120,7 +120,7 @@
                                                 <br>
                                             </div>
                                             <div class="col-md-2">
-                                                <br>{!! Form::submit('Sign up', ['class' => 'btn']) !!}
+                                                <br>{!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
                                                 <br>
                                             </div>
                                         </div>
@@ -144,7 +144,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             Supportive sets<br>
-                                            {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!} &nbsp; {!! Form::submit('Sign up', ['class' => 'btn']) !!}
+                                            {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!} &nbsp; {!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
                                         </div>
                                     </div>
 
@@ -431,7 +431,7 @@
                                         {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!}
                                     </div>
                                     <div class="col-md-2">
-                                        <br>{!! Form::submit('Sign up', ['class' => 'form-control btn-success']) !!}
+                                        <br>{!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
                                         <br>
                                     </div>
                                 </div>
@@ -481,7 +481,7 @@
 
                             {!! Form::textarea('text', '', ['class' => 'form-control', 'required']) !!}<br>
 
-                            {!! Form::submit('Comment', ['class' => 'btn']) !!}
+                            {!! Form::submit('Comment', ['class' => 'btn btn-info']) !!}
                         </div>
                     </div>
                 </div>

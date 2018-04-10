@@ -14,7 +14,7 @@
                                 You cannot use this feature as you are not an admin in any guild.
                             @else
                                 <a href="{{ '/hooks/calltypeselect' }}">
-                                    <button type="button" class="btn">Create a new notification</button>
+                                    <button type="button" class="btn btn-info">Create a new notification</button>
                                 </a>
                                 <br>
                                 <div class="content table-responsive table-full-width">

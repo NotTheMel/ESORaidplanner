@@ -33,7 +33,7 @@
                             Repeat this event{!! Form::select('interval', \App\Singleton\EventTimeIntervals::INTERVALS, $repeatable->interval, array('class' => 'form-control', 'required')) !!}<br>
                             How many days in advance should this event be created? (max 28 days, aka 4 weeks):{!! Form::number('create_interval', ($repeatable->create_interval / 86400), array('min' => '0', 'max' => '28', 'class' => 'form-control', 'required')) !!}
 
-                            {!! Form::submit('Save', ['class' => 'btn']) !!}<br>
+                            {!! Form::submit('Save', ['class' => 'btn btn-info']) !!}<br>
 
                             {{ Form::close() }}
                         </div>

@@ -8,7 +8,7 @@
                     <div class="header">
                         <div class="pull-right">
                             <a href="{{ '/profile/menu' }}">
-                                <button type="button" class="btn">Back to user menu</button>
+                                <button type="button" class="btn btn-info">Back to user menu</button>
                             </a>
                         </div>
                         <h4 class="title">Your membership</h4>

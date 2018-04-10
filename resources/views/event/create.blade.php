@@ -81,7 +81,7 @@
                             {!! Form::text('tags', '', ['class' => 'form-control']) !!}<br><br>
                             Description:{!! Form::textarea('description', '', array('class' => 'form-control')) !!}<br>
 
-                            {!! Form::submit('Create Event', ['class' => 'btn']) !!}<br>
+                            {!! Form::submit('Create Event', ['class' => 'btn btn-info']) !!}<br>
 
                             {{ Form::close() }}
                         </div>

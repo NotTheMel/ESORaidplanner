@@ -82,7 +82,7 @@
                             Description:{!! Form::textarea('description', $event->description, array('class' => 'form-control')) !!}
                             <br>
 
-                            {!! Form::submit('Save Event', ['class' => 'btn']) !!}<br>
+                            {!! Form::submit('Save Event', ['class' => 'btn btn-info']) !!}<br>
 
                             {{ Form::close() }}
                         </div>

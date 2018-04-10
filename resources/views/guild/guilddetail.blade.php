@@ -124,10 +124,10 @@
                                         @if ($guild->isAdmin(Auth::user()))
                                             <div class="pull-right">
                                                 <a href="{{ '/g/' . $guild->slug . '/events/create' }}">
-                                                    <button type="button" class="btn">Create an Event</button>
+                                                    <button type="button" class="btn btn-info">Create an Event</button>
                                                 </a>
                                                 <a href="{{ '/g/' . $guild->slug . '/repeatable/create' }}">
-                                                    <button type="button" class="btn">Create a recurring Event</button>
+                                                    <button type="button" class="btn btn-info">Create a recurring Event</button>
                                                 </a>
                                             </div>
                                         @endif

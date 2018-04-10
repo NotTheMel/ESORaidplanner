@@ -8,7 +8,7 @@
                     <div class="header">
                         <div class="pull-right">
                             <a href="{{ '/profile/menu' }}">
-                                <button type="button" class="btn">Back to user menu</button>
+                                <button type="button" class="btn btn-info">Back to user menu</button>
                             </a>
                         </div>
                         <h4 class="title">Character presets for {{ Auth::user()->name }}</h4>
@@ -74,7 +74,7 @@
                                 This character is publicly visible on my
                                 profile: {!! Form::checkbox('public', 1, true); !!}
                                 <br><br>
-                                {!! Form::submit('Create character preset', ['class' => 'btn']) !!}
+                                {!! Form::submit('Create character preset', ['class' => 'btn btn-info']) !!}
 
                                 {!! Form::close() !!}
                                 {{ Form::close() }}
