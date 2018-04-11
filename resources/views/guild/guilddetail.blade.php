@@ -136,7 +136,7 @@
                                             - {{ $guild->getMegaserver() }}</p>
                                     </div>
                                     <div class="content table-responsive table-full-width">
-                                        <table class="table table-hover table-striped">
+                                        <table class="table  table-striped">
                                             <thead>
                                             <th>Event</th>
                                             <th>Date and Time</th>

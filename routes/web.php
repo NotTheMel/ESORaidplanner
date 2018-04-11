@@ -207,6 +207,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('/profile/edit/avatar/upload', 'UserController@uploadAvatar');
 
+    Route::get('/profile/nightmode/{mode}', 'UserController@setNightMode');
+
     /*
      *
      * ROUTES FOR CHARACTERS

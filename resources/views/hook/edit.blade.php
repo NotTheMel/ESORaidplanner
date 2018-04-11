@@ -62,7 +62,7 @@
 
                             {{ Form::close() }}
                             <div class="content table-responsive table-full-width">
-                                <table class="table table-hover table-striped">
+                                <table class="table  table-striped">
                                     <thead>
                                     <th width="50%">Shortcode</th>
                                     <th width="50%">Description</th>

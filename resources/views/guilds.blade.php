@@ -14,7 +14,7 @@
                                    placeholder="Search for guilds..." class="form-control">
                         </div>
                         <div class="content table-responsive table-full-width">
-                            <table id="guild-table" class="table table-hover table-striped">
+                            <table id="guild-table" class="table  table-striped">
                                 <thead>
                                 <th>Guild name</th>
                                 <th>Platform</th>

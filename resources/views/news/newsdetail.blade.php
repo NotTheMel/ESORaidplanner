@@ -27,7 +27,7 @@
                             <h4 class="title">Latest News</h4>
                         </div>
                         <div class="content table-responsive table-full-width">
-                            <table class="table table-hover table-striped">
+                            <table class="table  table-striped">
                                 <thead>
                                 <th>Title</th>
                                 <th>Date</th>

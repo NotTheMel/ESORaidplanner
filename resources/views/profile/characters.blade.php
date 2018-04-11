@@ -15,7 +15,7 @@
                     </div>
                     <div class="content">
                         <div class="content table-responsive table-full-width">
-                            <table class="table table-hover table-striped">
+                            <table class="table  table-striped">
                                 <thead>
                                 <th width="25%">Name</th>
                                 <th width="25%">Class</th>

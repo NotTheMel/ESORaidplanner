@@ -221,6 +221,13 @@ class UserController extends Controller
         return view('profile.profile', compact('user', 'characters', 'badges'));
     }
 
+    public function setNightMode(Request $request, int $mode) {
+        Auth::user()->nightmode = $mode;
+        Auth::user()->save();
+
+        return redirect($request->get('url'));
+    }
+
     /**
      * @return array
      */

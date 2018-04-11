@@ -169,7 +169,7 @@
                         <div class="content table-responsive table-full-width" style="z-index: 9999">
                             <br>
                             <h3 align="center">Tanks</h3>
-                            <table class="table table-hover table-striped">
+                            <table class="table  table-striped">
                                 <thead>
                                 @if ($guild->isAdmin(Auth::user()))
                                     <th width="20%">Player</th>
@@ -214,7 +214,7 @@
 
                         <div class="content table-responsive table-full-width" style="z-index: 9999">
                             <h3 align="center">Healers</h3>
-                            <table class="table table-hover table-striped">
+                            <table class="table  table-striped">
                                 <thead>
                                 @if ($guild->isAdmin(Auth::user()))
                                     <th width="20%">Player</th>
@@ -259,7 +259,7 @@
 
                         <div class="content table-responsive table-full-width" style="z-index: 9999">
                             <h3 align="center">Magicka DD's</h3>
-                            <table class="table table-hover table-striped">
+                            <table class="table  table-striped">
                                 <thead>
                                 @if ($guild->isAdmin(Auth::user()))
                                     <th width="20%">Player</th>
@@ -304,7 +304,7 @@
 
                         <div class="content table-responsive table-full-width" style="z-index: 9999">
                             <h3 align="center">Stamina DD's</h3>
-                            <table class="table table-hover table-striped">
+                            <table class="table  table-striped">
                                 <thead>
                                 @if ($guild->isAdmin(Auth::user()))
                                     <th width="20%">Player</th>
@@ -350,7 +350,7 @@
                         @if(count($others) > 0)
                             <div class="content table-responsive table-full-width" style="z-index: 9999">
                                 <h3 align="center">Others</h3>
-                                <table class="table table-hover table-striped">
+                                <table class="table  table-striped">
                                     <thead>
                                     @if ($guild->isAdmin(Auth::user()))
                                         <th width="20%">Player</th>

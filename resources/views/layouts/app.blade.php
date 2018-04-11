@@ -21,6 +21,10 @@
 
     <!--  Light Bootstrap Table core CSS    -->
     <link href="{{ asset('css/light-bootstrap-dashboard.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('css/raidplanner.css') }}" rel="stylesheet"/>
+    @if(Auth::user()->nightmode === 1)
+    <link href="{{ asset('css/nightmode.css') }}" rel="stylesheet"/>
+    @endif
 
 
     <!--  CSS for Demo Purpose, don't include it in your project     -->
@@ -36,7 +40,6 @@
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
     <link href="{{ asset('css/pe-icon-7-stroke.css') }}" rel="stylesheet"/>
 
-    <link href="{{ asset('css/raidplanner.css') }}" rel="stylesheet"/>
     <link href="{{ asset('css/buttons.css') }}" rel="stylesheet">
 
     @if(env('APP_ENV') === 'production')
@@ -59,22 +62,26 @@
 <div class="wrapper">
     <div class="sidebar"
          @if(Auth::check())
-         @if (Auth::user()->layout === 1)
-         data-color="orange"
-         @elseif (Auth::user()->layout === 2)
-         data-color="red"
-         @elseif (Auth::user()->layout === 3)
-         data-color="green"
-         @elseif (Auth::user()->layout === 4)
-         data-color="blue"
-         @elseif (Auth::user()->layout === 5)
-         data-color="green"
-         @else
-         data-color="purple"
-         @endif
-         @else
-         data-color="purple"
+            @if(Auth::user()->nightmode === 0)
+                 @if (Auth::user()->layout === 1)
+                 data-color="orange"
+                 @elseif (Auth::user()->layout === 2)
+                 data-color="red"
+                 @elseif (Auth::user()->layout === 3)
+                 data-color="green"
+                 @elseif (Auth::user()->layout === 4)
+                 data-color="blue"
+                 @elseif (Auth::user()->layout === 5)
+                 data-color="green"
+                 @else
+                 data-color="purple"
+                 @endif
+            @else
+                data-color="grey"
             @endif
+         @else
+         data-color="purple"
+        @endif
     >
 
         <!--   you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple" -->
@@ -148,20 +155,24 @@
 
     <div class="main-panel
     @if (Auth::check())
-    @if (Auth::user()->layout === 1)
-            rp-main-background-1
-@elseif (Auth::user()->layout === 2)
-            rp-main-background-2
-@elseif (Auth::user()->layout === 3)
-            rp-main-background-3
-@elseif (Auth::user()->layout === 4)
-            rp-main-background-4
-@elseif (Auth::user()->layout === 5)
-            rp-main-background-5
+            @if(Auth::user()->nightmode === 0)
+                @if (Auth::user()->layout === 1)
+                        rp-main-background-1
+                @elseif (Auth::user()->layout === 2)
+                        rp-main-background-2
+                @elseif (Auth::user()->layout === 3)
+                        rp-main-background-3
+                @elseif (Auth::user()->layout === 4)
+                        rp-main-background-4
+                @elseif (Auth::user()->layout === 5)
+                        rp-main-background-5
+                @else
+                        rp-main-background-0
+                @endif
+            @else
+                rp-main-background-0
+            @endif
 @else
-            rp-main-background-0
-@endif
-    @else
             rp-main-background-0
     @endif
             ">
@@ -186,6 +197,20 @@
                             <li><a href="{{ route('login') }}"><p>Login</p></a></li>
                             <li><a href="{{ route('register') }}"><p>Register</p></a></li>
                         @else
+                            <li>
+                                <a href="#">
+                                    <p>Nightmode</p></a>
+                            </li>
+                            <li>
+                                <label class="switch">
+                                    @if(Auth::user()->nightmode === 0)
+                                        {!! Form::checkbox('nightmode', 1, false, ['onchange' => 'nightmode(this)']); !!}
+                                    @else
+                                        {!! Form::checkbox('nightmode', 1, true, ['onchange' => 'nightmode(this)']); !!}
+                                    @endif
+                                        <span class="slider round"></span>
+                                </label>
+                            </li>
                             <li>
                                 <a href="/profile/menu">
                                     <p>Account</p>
@@ -336,6 +361,16 @@
                     tr[i].style.display = "none";
                 }
             }
+        }
+    }
+</script>
+
+<script>
+    function nightmode(checkboxElem) {
+        if (checkboxElem.checked) {
+            window.location.href = "{{ env('APP_URL') . '/profile/nightmode/1?url=' . $_SERVER['REQUEST_URI'] }}";
+        } else {
+            window.location.href = "{{ env('APP_URL') . '/profile/nightmode/0?url=' . $_SERVER['REQUEST_URI'] }}";
         }
     }
 </script>
