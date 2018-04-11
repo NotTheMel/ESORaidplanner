@@ -409,7 +409,6 @@
 
                         @if($guild->isAdmin(Auth::user()) && count($members) > 0)
                             <div class="content">
-                            <div class="alert alert-success">
                                 <strong>You are an admin.</strong> Here you can sign up someone else for this event.
                                 {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/other/'.$event->id)) }}
                                 {!! Form::open([]) !!}
@@ -439,7 +438,6 @@
 
                                 {!! Form::close() !!}
                                 {{ Form::close() }}
-                            </div>
                             </div>
                         @endif
                     </div>
