@@ -415,6 +415,8 @@ class EventsController extends Controller
             $status = 1;
         } elseif ('Backup selected' === $request->post('action')) {
             $status = 2;
+        } elseif ('Delete selected' === $request->post('action')) {
+            $status = 'delete';
         } else {
             $status = 0;
         }
@@ -429,11 +431,13 @@ class EventsController extends Controller
         }
 
         foreach ($request->all() as $signup) {
-            if (is_numeric($signup)) {
+            if (is_numeric($signup) && is_numeric($status)) {
                 if (!$guild->isAdmin(Auth::user())) {
                     return redirect('g/'.$guild->slug.'/event/'.$event_id);
                 }
                 $event->setSignupStatus($signup, $status);
+            } elseif (is_numeric($signup) && 'delete' === $status) {
+                Signup::query()->where('id', '=', $signup)->delete();
             }
         }
 

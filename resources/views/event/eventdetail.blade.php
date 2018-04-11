@@ -400,6 +400,7 @@
                             {!! Form::submit('Confirm selected', ['class' => 'btn btn-success', 'name' => 'action', 'value' => 'confirm']) !!}
                             {!! Form::submit('Backup selected', ['class' => 'btn btn-warning', 'name' => 'action', 'value' => 'backup']) !!}
                             {!! Form::submit('Reset selected', ['class' => 'btn btn-info', 'name' => 'action', 'value' => 'reset']) !!}
+                            {!! Form::submit('Delete selected', ['class' => 'btn btn-danger', 'name' => 'action', 'value' => 'delete']) !!}
                                 </div></div>
 
                             {{ Form::close() }}
