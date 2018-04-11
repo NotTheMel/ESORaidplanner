@@ -102,6 +102,9 @@ class UserController extends Controller
         return redirect('/profile/accountsettings');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function profileEdit()
     {
         $r        = DB::table('races')->orderBy('name')->get();
@@ -131,6 +134,10 @@ class UserController extends Controller
         return view('profile.profile_settings', compact('races', 'classes', 'alliances'));
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function profileEditPost(Request $request)
     {
         $request->validate([
@@ -154,11 +161,17 @@ class UserController extends Controller
         return redirect('/profile/'.$user->id);
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function menuProfilePage()
     {
         return view('profile.menu');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function profileCharacters()
     {
         $sets = $this->getSets();
@@ -166,11 +179,17 @@ class UserController extends Controller
         return view('profile.characters', compact('sets'));
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function profileMembership()
     {
         return view('profile.membership');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function avatarEditPage()
     {
         $avatars = Avatar::query()->orderBy('name', 'asc')->get();
@@ -178,6 +197,9 @@ class UserController extends Controller
         return view('profile.avatar_select', compact('avatars'));
     }
 
+    /**
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function editAvatar()
     {
         User::query()->where('id', '=', Auth::id())->update(['avatar' => Input::get('avatar')]);
@@ -185,6 +207,10 @@ class UserController extends Controller
         return redirect('/profile/edit/avatar');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function uploadAvatar(Request $request)
     {
         if (Auth::user()->membership_level < 1) {
@@ -206,6 +232,10 @@ class UserController extends Controller
         return redirect('/profile/edit/avatar');
     }
 
+    /**
+     * @param int $user_id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function profile(int $user_id)
     {
         $user = User::query()->find($user_id);
@@ -221,6 +251,11 @@ class UserController extends Controller
         return view('profile.profile', compact('user', 'characters', 'badges'));
     }
 
+    /**
+     * @param Request $request
+     * @param int $mode
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function setNightMode(Request $request, int $mode)
     {
         Auth::user()->nightmode = $mode;

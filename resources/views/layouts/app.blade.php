@@ -22,8 +22,10 @@
     <!--  Light Bootstrap Table core CSS    -->
     <link href="{{ asset('css/light-bootstrap-dashboard.css') }}" rel="stylesheet"/>
     <link href="{{ asset('css/raidplanner.css') }}" rel="stylesheet"/>
+    @if(Auth::check())
     @if(Auth::user()->nightmode === 1)
     <link href="{{ asset('css/nightmode.css') }}" rel="stylesheet"/>
+    @endif
     @endif
 
 
