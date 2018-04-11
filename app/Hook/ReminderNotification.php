@@ -34,7 +34,7 @@ class ReminderNotification extends NotificationHook
     {
         $guild = $event->getGuild();
 
-        $signups = $event->getSignups(SignupStatusses::STATUS_CONFIRMED);
+        $signups = $event->getSignupsOrderedByRole(SignupStatusses::STATUS_CONFIRMED);
 
         $message = str_replace(['{EVENT_NAME}', '{EVENT_DESCRIPTION}', '{EVENT_NUM_SIGNUPS}', '{EVENT_URL}'], [$event->name, $event->description, $event->getTotalSignups(), 'https://esoraidplanner.com/g/'.$guild->slug.'/event/'.$event->id], $this->message);
 

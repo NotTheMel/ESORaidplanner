@@ -161,6 +161,22 @@ class Event extends Model
         return $signups;
     }
 
+    public function getSignupsOrderedByRole(int $status = 0): array
+    {
+        if (0 === $status) {
+            $signups = Signup::query()->where('event_id', '=', $this->id)
+                ->orderBy('role_id', 'asc')
+                ->get()->all();
+        } else {
+            $signups = Signup::query()->where('event_id', '=', $this->id)
+                ->where('status', '=', $status)
+                ->orderBy('role_id', 'asc')
+                ->get()->all();
+        }
+
+        return $signups;
+    }
+
     public function getSignupsByRole(int $role_id): array
     {
         return Signup::query()
