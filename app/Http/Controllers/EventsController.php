@@ -432,9 +432,6 @@ class EventsController extends Controller
 
         foreach ($request->all() as $signup) {
             if (is_numeric($signup) && is_numeric($status)) {
-                if (!$guild->isAdmin(Auth::user())) {
-                    return redirect('g/'.$guild->slug.'/event/'.$event_id);
-                }
                 $event->setSignupStatus($signup, $status);
             } elseif (is_numeric($signup) && 'delete' === $status) {
                 Signup::query()->where('id', '=', $signup)->delete();
