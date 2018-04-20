@@ -55,3 +55,7 @@ h1 h2 h3 h4 h5 h6 {
     background-color: #444649;
     color: white;
 }
+
+.confirmed {
+    background-color: rgba(50, 205, 50, 0.9);
+}

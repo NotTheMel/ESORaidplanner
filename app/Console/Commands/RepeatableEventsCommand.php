@@ -52,6 +52,7 @@ class RepeatableEventsCommand extends Command
                 $event                    =  new Event();
                 $event->name              = $repeatable->name;
                 $event->description       = $repeatable->description;
+                $event->tags              = $repeatable->tags;
                 $event->type              = $repeatable->type;
                 $event->start_date        = $next_event->format('Y-m-d H:i:s');
                 $event->guild_id          = $repeatable->guild_id;

@@ -136,6 +136,7 @@ class UserController extends Controller
 
     /**
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function profileEditPost(Request $request)
@@ -209,6 +210,7 @@ class UserController extends Controller
 
     /**
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function uploadAvatar(Request $request)
@@ -234,6 +236,7 @@ class UserController extends Controller
 
     /**
      * @param int $user_id
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function profile(int $user_id)
@@ -253,7 +256,8 @@ class UserController extends Controller
 
     /**
      * @param Request $request
-     * @param int $mode
+     * @param int     $mode
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function setNightMode(Request $request, int $mode)
