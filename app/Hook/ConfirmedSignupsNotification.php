@@ -32,6 +32,8 @@ class ConfirmedSignupsNotification extends NotificationHook
             if (count($signups) > 0) {
                 if (NotificationHook::TYPE_DISCORD === $this->type || NotificationHook::TYPE_SLACK === $this->type) {
                     $m = '```';
+                } else {
+                    $m = '';
                 }
 
                 $m .= 'CONFIRMED:'.PHP_EOL;
@@ -55,6 +57,8 @@ class ConfirmedSignupsNotification extends NotificationHook
             if (count($signups) > 0) {
                 if (NotificationHook::TYPE_DISCORD === $this->type || NotificationHook::TYPE_SLACK === $this->type) {
                     $m = '```';
+                } else {
+                    $m = '';
                 }
 
                 $m .= 'BACKUP:'.PHP_EOL;

@@ -34,8 +34,6 @@ class ReminderNotification extends NotificationHook
     {
         $guild = $event->getGuild();
 
-        $signups = $event->getSignupsOrderedByRole(SignupStatusses::STATUS_CONFIRMED);
-
         $message = str_replace(['{EVENT_NAME}', '{EVENT_DESCRIPTION}', '{EVENT_NUM_SIGNUPS}', '{EVENT_URL}'], [$event->name, $event->description, $event->getTotalSignups(), 'https://esoraidplanner.com/g/'.$guild->slug.'/event/'.$event->id], $this->message);
 
         if (false !== strpos($message, '{CONFIRMED_SIGNUPS}')) {
@@ -43,6 +41,8 @@ class ReminderNotification extends NotificationHook
             if (count($signups) > 0) {
                 if (NotificationHook::TYPE_DISCORD === $this->type || NotificationHook::TYPE_SLACK === $this->type) {
                     $m = '```';
+                } else {
+                    $m = '';
                 }
 
                 $m .= 'CONFIRMED:'.PHP_EOL;
@@ -66,6 +66,8 @@ class ReminderNotification extends NotificationHook
             if (count($signups) > 0) {
                 if (NotificationHook::TYPE_DISCORD === $this->type || NotificationHook::TYPE_SLACK === $this->type) {
                     $m = '```';
+                } else {
+                    $m = '';
                 }
 
                 $m .= 'BACKUP:'.PHP_EOL;
