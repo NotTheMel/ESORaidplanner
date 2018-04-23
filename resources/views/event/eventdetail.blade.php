@@ -28,6 +28,14 @@
                                     <a href="{{ '/g/' . $guild->slug . '/events/delete/' . $event->id }}">
                                         <button type="button" class="btn btn-danger">Delete event</button>
                                     </a>
+                                    @if($guild->hasConfirmedSignupsHooks())
+                                        <br>
+                                        <div class="pull-right">
+                                            <a href="{{ '/g/' . $guild->slug . '/event/' . $event->id . '/postsignups'}}">
+                                                <button type="button" class="btn btn-success">Post signups</button>
+                                            </a>
+                                        </div>
+                                    @endif
                                 </div>
                             @endif
 
@@ -106,7 +114,8 @@
                                 @else
                                     @if (count(Auth::user()->getCharacters(true)) === 0)
                                         <br>You do not have any character presets. Did you know you can create character
-                                        presets in your <a href="/profile/characters">user profile</a> and use these to sign
+                                        presets in your <a href="/profile/characters">user profile</a> and use these to
+                                        sign
                                         up
                                         faster?<br><br>
                                     @else
@@ -144,7 +153,8 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             Supportive sets<br>
-                                            {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!} &nbsp; {!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
+                                            {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!}
+                                            &nbsp; {!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
                                         </div>
                                     </div>
 
@@ -154,9 +164,11 @@
                             @else
                                 <div class="row">
                                     <div class="col-md-12">
-                                    <div class="alert alert-warning" role="alert">
-                                        This event has been locked by an administrator of {{ $guild->name }}. Signing up, editing signups or signing off is not possible until an administrator unlocks this event.
-                                    </div>
+                                        <div class="alert alert-warning" role="alert">
+                                            This event has been locked by an administrator of {{ $guild->name }}.
+                                            Signing up, editing signups or signing off is not possible until an
+                                            administrator unlocks this event.
+                                        </div>
                                     </div>
                                 </div>
                             @endif
@@ -397,11 +409,12 @@
                         @if($guild->isAdmin(Auth::user()))
                             <div class="content">
                                 <div class="pull-right">
-                            {!! Form::submit('Confirm selected', ['class' => 'btn btn-success', 'name' => 'action', 'value' => 'confirm']) !!}
-                            {!! Form::submit('Backup selected', ['class' => 'btn btn-warning', 'name' => 'action', 'value' => 'backup']) !!}
-                            {!! Form::submit('Reset selected', ['class' => 'btn btn-info', 'name' => 'action', 'value' => 'reset']) !!}
-                            {!! Form::submit('Delete selected', ['class' => 'btn btn-danger', 'name' => 'action', 'value' => 'delete']) !!}
-                                </div></div>
+                                    {!! Form::submit('Confirm selected', ['class' => 'btn btn-success', 'name' => 'action', 'value' => 'confirm']) !!}
+                                    {!! Form::submit('Backup selected', ['class' => 'btn btn-warning', 'name' => 'action', 'value' => 'backup']) !!}
+                                    {!! Form::submit('Reset selected', ['class' => 'btn btn-info', 'name' => 'action', 'value' => 'reset']) !!}
+                                    {!! Form::submit('Delete selected', ['class' => 'btn btn-danger', 'name' => 'action', 'value' => 'delete']) !!}
+                                </div>
+                            </div>
 
                             {{ Form::close() }}
                             <br><br>

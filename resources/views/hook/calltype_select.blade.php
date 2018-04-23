@@ -26,6 +26,13 @@
                             </a>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <a href="/hooks/typeselect/{{ \App\Singleton\HookTypes::CONFIRMED_SIGNUPS }}">
+                                <h5>Create a notification to post confirmed signups (this will add a button to events that you can click in order to trigger this notification)</h5>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 

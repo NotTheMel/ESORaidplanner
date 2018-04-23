@@ -15,6 +15,7 @@
 
 namespace App;
 
+use App\Hook\ConfirmedSignupsNotification;
 use App\Hook\GuildApplicationNotification;
 use App\Singleton\HookTypes;
 use DateTime;
@@ -299,5 +300,14 @@ class Guild extends Model
 
         $log = new LogEntry();
         $log->create($this->id, $admin->name.' removed '.$user->name.' from the guild.');
+    }
+
+    public function hasConfirmedSignupsHooks(): bool
+    {
+        $hooks = ConfirmedSignupsNotification::query()->where('call_type', '=', HookTypes::CONFIRMED_SIGNUPS)
+            ->where('guild_id', '=', $this->id)
+            ->count();
+
+        return $hooks > 0;
     }
 }

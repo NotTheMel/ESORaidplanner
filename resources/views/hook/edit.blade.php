@@ -47,7 +47,7 @@
                                 the message):
                                 {!! Form::number('if_less_signups', $hook->if_less_signups, array('class' => 'form-control')) !!}<br>
                             @endif
-                            @if($hook->call_type === \App\Singleton\HookTypes::ON_TIME || $hook->call_type === \App\Singleton\HookTypes::ON_EVENT_CREATE)
+                            @if($hook->call_type === \App\Singleton\HookTypes::ON_TIME || $hook->call_type === \App\Singleton\HookTypes::ON_EVENT_CREATE || $hook->call_type === \App\Singleton\HookTypes::CONFIRMED_SIGNUPS)
                                 Notification tags (separate each tag with a comma, using tags will make sure this
                                 notification is only sent for events that contain a matching tag):
                                 {!! Form::text('tags', $hook->tags, ['class' => 'form-control']) !!}<br>
@@ -68,7 +68,7 @@
                                     <th width="50%">Description</th>
                                     </thead>
                                     <tbody>
-                                    @if($hook->call_type === \App\Singleton\HookTypes::ON_TIME || $hook->call_type === \App\Singleton\HookTypes::ON_EVENT_CREATE)
+                                    @if($hook->call_type === \App\Singleton\HookTypes::ON_TIME || $hook->call_type === \App\Singleton\HookTypes::ON_EVENT_CREATE || $hook->call_type === \App\Singleton\HookTypes::CONFIRMED_SIGNUPS)
                                         <tr>
                                             <td>{EVENT_NAME}</td>
                                             <td>Will be replaced by the name of the event.</td>
@@ -83,7 +83,7 @@
                                             </td>
                                         </tr>
                                     @endif
-                                    @if($hook->call_type === \App\Singleton\HookTypes::ON_TIME)
+                                    @if($hook->call_type === \App\Singleton\HookTypes::ON_TIME || $hook->call_type === \App\Singleton\HookTypes::CONFIRMED_SIGNUPS)
                                         <tr>
                                             <td>{EVENT_NUM_SIGNUPS}</td>
                                             <td>Will be replaced by the total number of members that have signed up for
@@ -175,7 +175,7 @@
                                 number of people signed up.
                                 <hr>
                             @endif
-                            @if($hook->call_type === \App\Singleton\HookTypes::ON_TIME || $hook->call_type === \App\Singleton\HookTypes::ON_EVENT_CREATE)
+                            @if($hook->call_type === \App\Singleton\HookTypes::ON_TIME || $hook->call_type === \App\Singleton\HookTypes::ON_EVENT_CREATE || $hook->call_type === \App\Singleton\HookTypes::CONFIRMED_SIGNUPS)
                                 <b>Notification tags:</b> Tags can be used to make sure certain notifications only
                                 trigger for certain events. You can fill in a comma separated list of tags here. If one
                                 of the tags matches one of the tags of an event, the notification will be sent.

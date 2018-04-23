@@ -470,6 +470,26 @@ class EventsController extends Controller
 
     /**
      * @param string $slug
+     * @param int $event_id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function postSignupsHooks(string $slug, int $event_id)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        if (!$guild->isAdmin(Auth::user())) {
+            return redirect('/g/'.$slug.'/event/'.$event_id);
+        }
+
+        /** @var Event $event */
+        $event         = Event::query()->find($event_id);
+        $event->callPostSignupsHooks();
+
+        return redirect('/g/'.$slug.'/event/'.$event_id);
+    }
+
+    /**
+     * @param string $slug
      * @param int    $event_id
      *
      * @return bool

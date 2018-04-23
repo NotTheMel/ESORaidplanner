@@ -20,10 +20,12 @@ class HookTypes
     const ON_TIME                   = 2;
     const ON_EVENT_CREATE           = 1;
     const ON_GUIDMEMBER_APPLICATION = 3;
+    const CONFIRMED_SIGNUPS = 4;
 
     const ON_TIME_DESCRIPTION                    = 'Event start reminder notification';
     const ON_EVENT_CREATE_DESCRIPTION            = 'Event creation notification';
     const ON_GUILDMEMBER_APPLICATION_DESCRIPTION = 'Guild application notification';
+    const CONFIRMED_SIGNUPS_DESCRIPTION = 'Post confirmed signups';
 
     public static function getTypeDescription(int $type): string
     {
@@ -36,6 +38,9 @@ class HookTypes
                 break;
             case self::ON_GUIDMEMBER_APPLICATION:
                 $description = 'Guild application notification';
+                break;
+            case self::CONFIRMED_SIGNUPS:
+                $description = self::CONFIRMED_SIGNUPS_DESCRIPTION;
                 break;
             default:
                 $description = '';

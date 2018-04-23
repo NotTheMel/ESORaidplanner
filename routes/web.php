@@ -95,6 +95,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/g/{slug}/logs', 'GuildController@logs');
 
+    Route::get('/g/{slug}/event/{id}/postsignups', 'EventsController@postSignupsHooks');
+
 
     // Repeatables //
     Route::get('/g/{slug}/repeatable/create', 'RepeatableController@new');

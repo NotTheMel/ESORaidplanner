@@ -15,7 +15,9 @@
 
 namespace App;
 
+use App\Hook\ConfirmedSignupsNotification;
 use App\Hook\EventCreationNotification;
+use App\Singleton\HookTypes;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Database\Eloquent\Model;
@@ -378,6 +380,20 @@ class Event extends Model
     {
         $this->locked = self::STATUS_UNLOCKED;
         $this->save();
+    }
+
+    public function callPostSignupsHooks()
+    {
+        $hooks = ConfirmedSignupsNotification::query()->where('call_type', '=', HookTypes::CONFIRMED_SIGNUPS)
+            ->where('guild_id', '=', $this->guild_id)
+            ->get()->all();
+
+        /** @var ConfirmedSignupsNotification $hook */
+        foreach ($hooks as $hook){
+            if ($hook->matchesEventTags($this)) {
+                $hook->call($this);
+            }
+        }
     }
 
     /**
