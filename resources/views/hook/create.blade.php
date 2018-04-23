@@ -99,6 +99,11 @@
                                             <td>Will be replaced by a list of all confirmed signups (name, role, class).
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td>{BACKUP_SIGNUPS}</td>
+                                            <td>Will be replaced by a list of all backup signups (name, role, class).
+                                            </td>
+                                        </tr>
                                     @endif
                                     @if($call_type === \App\Singleton\HookTypes::ON_GUIDMEMBER_APPLICATION)
                                         <tr>
