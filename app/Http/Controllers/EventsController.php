@@ -470,7 +470,8 @@ class EventsController extends Controller
 
     /**
      * @param string $slug
-     * @param int $event_id
+     * @param int    $event_id
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function postSignupsHooks(string $slug, int $event_id)

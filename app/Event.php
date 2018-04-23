@@ -389,7 +389,7 @@ class Event extends Model
             ->get()->all();
 
         /** @var ConfirmedSignupsNotification $hook */
-        foreach ($hooks as $hook){
+        foreach ($hooks as $hook) {
             if ($hook->matchesEventTags($this)) {
                 $hook->call($this);
             }

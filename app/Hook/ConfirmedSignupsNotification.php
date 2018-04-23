@@ -3,11 +3,10 @@
  * Created by PhpStorm.
  * User: woeler
  * Date: 23.04.18
- * Time: 09:31
+ * Time: 09:31.
  */
 
 namespace App\Hook;
-
 
 use App\Event;
 use App\Singleton\ClassTypes;
