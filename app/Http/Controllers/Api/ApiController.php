@@ -25,28 +25,6 @@ use Illuminate\Support\Facades\Auth;
 class ApiController extends Controller
 {
     /**
-     * Checks the credentials of a request coming in over the API.
-     *
-     * @param Request $request
-     *
-     * @return bool|mixed
-     */
-    protected function login(Request $request)
-    {
-        $header = str_replace('Basic ', '', $request->header('Authorization'));
-
-        $header = explode(':', base64_decode($header), 2);
-
-        $valid = Auth::validate(['email' => $header[0], 'password' => $header[1]]);
-
-        if ($valid) {
-            return User::query()->where('email', '=', $header[0])->first();
-        }
-
-        return false;
-    }
-
-    /**
      * Simple true/false login check.
      *
      * @param Request $request
@@ -68,5 +46,27 @@ class ApiController extends Controller
         $u['layout'] = $user->layout;
 
         return response($u, Response::HTTP_OK);
+    }
+
+    /**
+     * Checks the credentials of a request coming in over the API.
+     *
+     * @param Request $request
+     *
+     * @return bool|mixed
+     */
+    protected function login(Request $request)
+    {
+        $header = str_replace('Basic ', '', $request->header('Authorization'));
+
+        $header = explode(':', base64_decode($header), 2);
+
+        $valid = Auth::validate(['email' => $header[0], 'password' => $header[1]]);
+
+        if ($valid) {
+            return User::query()->where('email', '=', $header[0])->first();
+        }
+
+        return false;
     }
 }

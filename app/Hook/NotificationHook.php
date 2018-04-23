@@ -34,70 +34,6 @@ class NotificationHook extends Model
         'name', 'type', 'token', 'chat_id', 'url', 'call_time_diff', 'active', 'guild_id', 'if_less_signups', 'call_type', 'tags', 'message',
     ];
 
-    protected function discord(string $message)
-    {
-        $ch = curl_init($this->url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(
-            [
-                'content'    => $message,
-                'username'   => 'ESO Raidplanner',
-                'avatar_url' => env('APP_URL').self::AVATAR_URL,
-            ]
-        ));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_exec($ch);
-        curl_close($ch);
-    }
-
-    protected function telegram(string $message)
-    {
-        $params = [
-            'chat_id' => $this->chat_id,
-            'text'    => $message,
-        ];
-
-        $ch = curl_init('https://api.telegram.org/bot'.$this->token.'/sendMessage');
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, ($params));
-        curl_exec($ch);
-        curl_close($ch);
-    }
-
-    protected function slack(string $message)
-    {
-        $params = 'payload='.json_encode(['text' => $message]);
-
-        $ch = curl_init($this->url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_exec($ch);
-        curl_close($ch);
-    }
-
-    protected function wasCalled(Event $event)
-    {
-        Hookcall::query()->insert([
-            'hook_id'    => $this->id,
-            'event_id'   => $event->id,
-            'created_at' => date('Y-m-d H:i:s'),
-        ]);
-    }
-
-    protected function send(string $message)
-    {
-        if (self::TYPE_DISCORD === $this->type) {
-            $this->discord($message);
-        } elseif (self::TYPE_TELEGRAM === $this->type) {
-            $this->telegram($message);
-        } elseif (self::TYPE_SLACK === $this->type) {
-            $this->slack($message);
-        }
-    }
-
     /**
      * @return string
      */
@@ -193,6 +129,70 @@ class NotificationHook extends Model
                 break;
             default:
                 return '';
+        }
+    }
+
+    protected function discord(string $message)
+    {
+        $ch = curl_init($this->url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(
+            [
+                'content'    => $message,
+                'username'   => 'ESO Raidplanner',
+                'avatar_url' => env('APP_URL').self::AVATAR_URL,
+            ]
+        ));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($ch);
+        curl_close($ch);
+    }
+
+    protected function telegram(string $message)
+    {
+        $params = [
+            'chat_id' => $this->chat_id,
+            'text'    => $message,
+        ];
+
+        $ch = curl_init('https://api.telegram.org/bot'.$this->token.'/sendMessage');
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, ($params));
+        curl_exec($ch);
+        curl_close($ch);
+    }
+
+    protected function slack(string $message)
+    {
+        $params = 'payload='.json_encode(['text' => $message]);
+
+        $ch = curl_init($this->url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($ch);
+        curl_close($ch);
+    }
+
+    protected function wasCalled(Event $event)
+    {
+        Hookcall::query()->insert([
+            'hook_id'    => $this->id,
+            'event_id'   => $event->id,
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    protected function send(string $message)
+    {
+        if (self::TYPE_DISCORD === $this->type) {
+            $this->discord($message);
+        } elseif (self::TYPE_TELEGRAM === $this->type) {
+            $this->telegram($message);
+        } elseif (self::TYPE_SLACK === $this->type) {
+            $this->slack($message);
         }
     }
 }

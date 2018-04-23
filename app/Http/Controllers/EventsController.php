@@ -386,23 +386,6 @@ class EventsController extends Controller
     }
 
     /**
-     * @param string $slug
-     *
-     * @return bool
-     */
-    private function isGuildMember(string $slug): bool
-    {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        $count = DB::table('user_guilds')->where('guild_id', '=', $guild->id)
-            ->where('user_id', '=', Auth::id())
-            ->where('status', '>=', 1)
-            ->count();
-
-        return $count > 0;
-    }
-
-    /**
      * @param Request $request
      * @param string  $slug
      * @param int     $event_id
@@ -487,6 +470,23 @@ class EventsController extends Controller
         $event->callPostSignupsHooks();
 
         return redirect('/g/'.$slug.'/event/'.$event_id);
+    }
+
+    /**
+     * @param string $slug
+     *
+     * @return bool
+     */
+    private function isGuildMember(string $slug): bool
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        $count = DB::table('user_guilds')->where('guild_id', '=', $guild->id)
+            ->where('user_id', '=', Auth::id())
+            ->where('status', '>=', 1)
+            ->count();
+
+        return $count > 0;
     }
 
     /**

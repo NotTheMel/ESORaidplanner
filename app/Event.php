@@ -399,19 +399,19 @@ class Event extends Model
     /**
      * @return string
      */
-    private function getGuildSlug(): string
-    {
-        return Guild::query()->find($this->guild_id)->slug;
-    }
-
-    /**
-     * @return string
-     */
     public function getUtcTime(): string
     {
         $dt = new DateTime($this->start_date);
         $dt->setTimezone(new DateTimeZone('UTC'));
 
         return $dt->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * @return string
+     */
+    private function getGuildSlug(): string
+    {
+        return Guild::query()->find($this->guild_id)->slug;
     }
 }
