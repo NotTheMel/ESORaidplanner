@@ -323,7 +323,7 @@
 
 <script src="{{ asset('js/all.js') }}"></script>
 <script src="{{ asset('js/chosen.jquery.min.js') }}"></script>
-<script src="https://www.elderscrollsbote.de/esodb/tooltips.js"></script>
+<script async src="https://www.eso-sets.com/js/tooltips.js"></script>
 
 <script>
     $(document).ready(function (e) {
