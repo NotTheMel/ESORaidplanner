@@ -43,6 +43,7 @@
     <link href="{{ asset('css/pe-icon-7-stroke.css') }}" rel="stylesheet"/>
 
     <link href="{{ asset('css/buttons.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/sets.css') }}" rel="stylesheet">
 
     @if(env('APP_ENV') === 'production')
     <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -324,7 +325,7 @@
 <script src="{{ asset('js/all.js') }}"></script>
 <script src="{{ asset('js/chosen.jquery.min.js') }}"></script>
 <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
-<script async src="https://www.eso-sets.com/js/tooltips.js"></script>
+<script src="https://www.eso-sets.com/js/tooltips.js"></script>
 
 <script>
     $(document).ready(function (e) {
