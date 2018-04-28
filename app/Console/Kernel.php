@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\HooksCall::class,
         Commands\RenewPatreon::class,
         Commands\RepeatableEventsCommand::class,
+        Commands\FetchSetsCommand::class,
     ];
 
     /**
