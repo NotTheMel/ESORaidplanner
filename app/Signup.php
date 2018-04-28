@@ -104,7 +104,7 @@ class Signup extends Model
         }
 
         foreach ($setsFound as $set) {
-            $string .= '<a href="http://www.elderscrollsbote.de/set='.$set->id.'" target="_blank">'.$set->name.'</a>, ';
+            $string .= '<a href="https://www.eso-sets.com/set/'.$set->id.'" target="_blank">'.$set->name.'</a>, ';
         }
 
         $string .= implode(', ', $setsNotFound);
