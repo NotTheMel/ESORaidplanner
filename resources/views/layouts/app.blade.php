@@ -323,6 +323,7 @@
 
 <script src="{{ asset('js/all.js') }}"></script>
 <script src="{{ asset('js/chosen.jquery.min.js') }}"></script>
+<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
 <script async src="https://www.eso-sets.com/js/tooltips.js"></script>
 
 <script>
