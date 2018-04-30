@@ -106,6 +106,8 @@ class RenewPatreon extends Command
                 }
 
                 $u->save();
+            } else {
+                DB::table('user_patreon')->where('id', '=', $patron->id)->delete();
             }
         }
 
