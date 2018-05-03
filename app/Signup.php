@@ -104,12 +104,12 @@ class Signup extends Model
         }
 
         foreach ($setsFound as $set) {
-            $string .= '<a href="https://www.eso-sets.com/set/'.$set->id.'" target="_blank" data-toggle="tooltip" data-html="true" title="">'.$set->name.'</a>, ';
+            $string .= '<a href="https://www.eso-sets.com/set/'.$set->id.'" target="_blank" data-toggle="tooltip" data-html="true" title="'.$set->tooltip.'">'.$set->name.'</a>, ';
         }
 
         $string .= implode(', ', $setsNotFound);
 
-        if (', ' == substr($string, -2, 2)) {
+        if (', ' === substr($string, -2, 2)) {
             $string = substr($string, 0, -2);
         }
 

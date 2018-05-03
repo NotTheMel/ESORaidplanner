@@ -34,9 +34,6 @@
 
     <link href="{{ asset('css/chosen.min.css') }}" rel="stylesheet"/>
 
-    <link href="https://github.com/pidennis/eso-widgets/blob/master/eso-widgets.min.css" rel="stylesheet">
-
-
     <!--     Fonts and icons     -->
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
@@ -56,6 +53,8 @@
         gtag('config', '{{ env('GOOGLE_ANALYTICS_ID') }}');
     </script>
     @endif
+
+    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
 
 
 
@@ -324,8 +323,12 @@
 
 <script src="{{ asset('js/all.js') }}"></script>
 <script src="{{ asset('js/chosen.jquery.min.js') }}"></script>
-<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
-<script src="https://www.eso-sets.com/js/tooltips.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('a[data-toggle=tooltip]').tooltip();
+    });
+</script>
 
 <script>
     $(document).ready(function (e) {
