@@ -23,8 +23,6 @@ class FetchSetsCommand extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -39,10 +37,10 @@ class FetchSetsCommand extends Command
     public function handle()
     {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://eso-sets.com/api/esoraidplanner");
-        $headers = array(
+        curl_setopt($ch, CURLOPT_URL, 'https://eso-sets.com/api/esoraidplanner');
+        $headers = [
             'Content-Type:application/json',
-            'Authorization: Basic '. base64_encode(env('ESOSETS_API_KEY')));
+            'Authorization: Basic '.base64_encode(env('ESOSETS_API_KEY')), ];
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -51,20 +49,19 @@ class FetchSetsCommand extends Command
 
         $version = Set::query()->orderBy('version', 'desc')->first()->version;
 
-        foreach (json_decode($output, true) as $key => $data)
-        {
+        foreach (json_decode($output, true) as $key => $data) {
             $db = Set::query()->find($key);
 
-            if (empty($db)){
-                $set = new Set();
-                $set->id = $key;
-                $set->name = $data['name'];
-                $set->tooltip = str_replace('"',"'", $data['tooltip']);
+            if (empty($db)) {
+                $set          = new Set();
+                $set->id      = $key;
+                $set->name    = $data['name'];
+                $set->tooltip = str_replace('"', "'", $data['tooltip']);
                 $set->version = $version + 1;
                 $set->save();
             } else {
-                $db->name = $data['name'];
-                $db->tooltip = str_replace('"',"'", $data['tooltip']);
+                $db->name    = $data['name'];
+                $db->tooltip = str_replace('"', "'", $data['tooltip']);
                 $db->save();
             }
         }
