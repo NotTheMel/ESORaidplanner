@@ -76,7 +76,7 @@ class RenewPatreon extends Command
             try {
                 $api_client      = new API($tokens['access_token']);
                 $patron_response = $api_client->fetch_user();
-                $patron_1 = $patron_response->get('data');
+                $patron_1        = $patron_response->get('data');
             } catch (\Exception $e) {
                 continue;
             }
