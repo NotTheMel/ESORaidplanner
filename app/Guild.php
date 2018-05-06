@@ -200,6 +200,7 @@ class Guild extends Model
         }
 
         $this->removeAdmin($user);
+        $this->removeFromAllTeams($user);
 
         DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $this->id)->delete();
 
@@ -295,6 +296,7 @@ class Guild extends Model
         DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $this->id)->delete();
 
         $this->removeAdmin($user);
+        $this->removeFromAllTeams($user);
 
         $admin = $admin ?? Auth::user();
 
@@ -317,5 +319,14 @@ class Guild extends Model
                 ->where('guild_id', '=', $this->id)
                 ->orderBy('name')
                 ->get()->all() ?? [];
+    }
+
+    private function removeFromAllTeams(User $user)
+    {
+        $teams = Team::query()->where('guild_id', '=', $this->id)->get()->all() ?? [];
+
+        foreach ($teams as $team) {
+            $team->removeMember($user->id);
+        }
     }
 }

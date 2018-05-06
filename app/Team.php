@@ -27,4 +27,45 @@ class Team extends Model
 
         return $members ?? [];
     }
+
+    public function addMember(int $user_id, int $class_id, int $role_id, array $sets = [])
+    {
+        $count = DB::table('teams_users')
+            ->where('team_id', '=', $this->id)
+            ->where('user_id', '=', $user_id)
+            ->count();
+
+        if (count($sets) > 0) {
+            $sets_s = implode(', ', $sets);
+        } else {
+            $sets_s = '';
+        }
+
+        if ($count === 0) {
+            DB::table('teams_users')->insert([
+                'user_id' => $user_id,
+                'class_id' => $class_id,
+                'role_id' => $role_id,
+                'sets' => $sets_s,
+            ]);
+        } else {
+            DB::table('teams_users')
+                ->where('team_id', '=', $this->id)
+                ->where('user_id', '=', $user_id)
+                ->update([
+                'user_id' => $user_id,
+                'class_id' => $class_id,
+                'role_id' => $role_id,
+                'sets' => $sets_s,
+            ]);
+        }
+    }
+
+    public function removeMember(int $user_id)
+    {
+        DB::table('teams_users')
+            ->where('team_id', '=', $this->id)
+            ->where('user_id', '=', $user_id)
+            ->delete();
+    }
 }
