@@ -15,6 +15,12 @@ use Illuminate\Support\Facades\Auth;
 
 class TeamController extends Controller
 {
+    /**
+     * @param Request $request
+     * @param string  $slug
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function create(Request $request, string $slug)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
@@ -29,6 +35,12 @@ class TeamController extends Controller
         return redirect('/g/'.$slug.'/teams');
     }
 
+    /**
+     * @param string $slug
+     * @param int    $team_id
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function delete(string $slug, int $team_id)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
@@ -43,6 +55,13 @@ class TeamController extends Controller
         return redirect('/g/'.$slug.'/teams');
     }
 
+    /**
+     * @param Request $request
+     * @param string  $slug
+     * @param int     $team_id
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function addMember(Request $request, string $slug, int $team_id)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
@@ -58,6 +77,13 @@ class TeamController extends Controller
         return redirect('/g/'.$slug.'/team/'.$team->id);
     }
 
+    /**
+     * @param string $slug
+     * @param int    $team_id
+     * @param int    $user_id
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function removeMember(string $slug, int $team_id, int $user_id)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
