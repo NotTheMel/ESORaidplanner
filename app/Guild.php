@@ -310,4 +310,12 @@ class Guild extends Model
 
         return $hooks > 0;
     }
+
+    public function getTeams(): array
+    {
+        return Team::query()
+                ->where('guild_id', '=', $this->id)
+                ->orderBy('name')
+                ->get()->all() ?? [];
+    }
 }
