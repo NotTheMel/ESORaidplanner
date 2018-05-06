@@ -251,6 +251,29 @@ class Event extends Model
         $log->create($this->guild_id, $user->name.' signed up for <a href="/g/'.$this->getGuildSlug().'/event/'.$this->id.'">'.$this->name.'</a>.');
     }
 
+    /**
+     * @param Team $team
+     */
+    public function signupTeam(Team $team)
+    {
+        foreach ($team->getMembers() as $member) {
+            $count = Signup::query()->where('user_id', '=', $member->user_id)
+                ->where('event_id', '=', $this->id)
+                ->count();
+
+            if (0 === $count) {
+                $sign = new Signup([
+                    'user_id'  => $member->user_id,
+                    'event_id' => $this->id,
+                    'class_id' => $member->class_id,
+                    'role_id'  => $member->role_id,
+                    'sets'     => $member->sets,
+                ]);
+                $sign->save();
+            }
+        }
+    }
+
     public function signupOther(User $user, User $admin = null, int $role_id = null, int $class_id = null, array $sets = [], Character $character = null)
     {
         $admin = $admin ?? Auth::user();
