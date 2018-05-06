@@ -3,11 +3,10 @@
  * Created by PhpStorm.
  * User: woeler
  * Date: 06.05.18
- * Time: 15:30
+ * Time: 15:30.
  */
 
 namespace App;
-
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -41,22 +40,22 @@ class Team extends Model
             $sets_s = '';
         }
 
-        if ($count === 0) {
+        if (0 === $count) {
             DB::table('teams_users')->insert([
-                'user_id' => $user_id,
+                'user_id'  => $user_id,
                 'class_id' => $class_id,
-                'role_id' => $role_id,
-                'sets' => $sets_s,
+                'role_id'  => $role_id,
+                'sets'     => $sets_s,
             ]);
         } else {
             DB::table('teams_users')
                 ->where('team_id', '=', $this->id)
                 ->where('user_id', '=', $user_id)
                 ->update([
-                'user_id' => $user_id,
+                'user_id'  => $user_id,
                 'class_id' => $class_id,
-                'role_id' => $role_id,
-                'sets' => $sets_s,
+                'role_id'  => $role_id,
+                'sets'     => $sets_s,
             ]);
         }
     }

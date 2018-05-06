@@ -3,11 +3,10 @@
  * Created by PhpStorm.
  * User: woeler
  * Date: 06.05.18
- * Time: 15:49
+ * Time: 15:49.
  */
 
 namespace App\Http\Controllers;
-
 
 use App\Guild;
 use App\Team;
@@ -18,7 +17,7 @@ class TeamController extends Controller
 {
     public function create(Request $request, string $slug)
     {
-        $guild = Guild::query()->where('slug','=', $slug)->first();
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
 
         if (!$guild->isAdmin(Auth::user())) {
             return redirect('/g/'.$guild->slug);
@@ -32,7 +31,7 @@ class TeamController extends Controller
 
     public function delete(string $slug, int $team_id)
     {
-        $guild = Guild::query()->where('slug','=', $slug)->first();
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
 
         if (!$guild->isAdmin(Auth::user())) {
             return redirect('/g/'.$guild->slug);
@@ -46,7 +45,7 @@ class TeamController extends Controller
 
     public function addMember(Request $request, string $slug, int $team_id)
     {
-        $guild = Guild::query()->where('slug','=', $slug)->first();
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
 
         if (!$guild->isAdmin(Auth::user())) {
             return redirect('/g/'.$guild->slug);
@@ -61,7 +60,7 @@ class TeamController extends Controller
 
     public function removeMember(string $slug, int $team_id, int $user_id)
     {
-        $guild = Guild::query()->where('slug','=', $slug)->first();
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
 
         if (!$guild->isAdmin(Auth::user())) {
             return redirect('/g/'.$guild->slug);
