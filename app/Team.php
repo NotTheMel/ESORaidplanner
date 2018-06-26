@@ -90,4 +90,17 @@ class Team extends Model
             ->where('user_id', '=', $user_id)
             ->delete();
     }
+
+    public static function formatForForms(int $guild_id)
+    {
+        $return = [];
+        $return[''] = 'None';
+        $teams = Team::query()->where('guild_id', '=', $guild_id)
+            ->orderBy('name')->get()->all() ?? [];
+        foreach ($teams as $team) {
+            $return[$team->id] = $team->name;
+        }
+
+        return $return;
+    }
 }

@@ -22,6 +22,7 @@ use App\LogEntry;
 use App\Set;
 use App\Signup;
 use App\Singleton\RoleTypes;
+use App\Team;
 use App\User;
 use DateTime;
 use DateTimeZone;
@@ -306,6 +307,11 @@ class EventsController extends Controller
         $event->tags        = Input::get('tags') ?? '';
 
         $event->save();
+
+        if (!empty($request->input('team_id'))) {
+            $team = Team::query()->find($request->input('team_id'));
+            $event->signupTeam($team);
+        }
 
         $log = new LogEntry();
         $log->create($guild->id, Auth::user()->name.' created the event '.$event->name.'.');

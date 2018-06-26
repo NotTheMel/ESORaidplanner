@@ -256,20 +256,22 @@ class Event extends Model
      */
     public function signupTeam(Team $team)
     {
-        foreach ($team->getMembers() as $member) {
-            $count = Signup::query()->where('user_id', '=', $member->user_id)
-                ->where('event_id', '=', $this->id)
-                ->count();
+        if ($team->guild_id === $this->guild_id) {
+            foreach ($team->getMembers() as $member) {
+                $count = Signup::query()->where('user_id', '=', $member->user_id)
+                    ->where('event_id', '=', $this->id)
+                    ->count();
 
-            if (0 === $count) {
-                $sign = new Signup([
-                    'user_id'  => $member->user_id,
-                    'event_id' => $this->id,
-                    'class_id' => $member->class_id,
-                    'role_id'  => $member->role_id,
-                    'sets'     => $member->sets,
-                ]);
-                $sign->save();
+                if (0 === $count) {
+                    $sign = new Signup([
+                        'user_id' => $member->user_id,
+                        'event_id' => $this->id,
+                        'class_id' => $member->class_id,
+                        'role_id' => $member->role_id,
+                        'sets' => $member->sets,
+                    ]);
+                    $sign->save();
+                }
             }
         }
     }

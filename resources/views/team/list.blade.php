@@ -7,6 +7,9 @@
                 <div class="card">
                     <div class="header">
                         <div class="pull-right">
+                            <a href="{{ '/g/' . $guild->slug . '/team/create' }}">
+                                <button type="button" class="btn btn-success">Create a team</button>
+                            </a>
                             <a href="{{ '/g/' . $guild->slug }}">
                                 <button type="button" class="btn btn-info">Back to {{ $guild->name }}</button>
                             </a>
