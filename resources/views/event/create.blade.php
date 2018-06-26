@@ -27,6 +27,12 @@
                             type:{!! Form::select('type', array('1' => 'Trials', '2' => 'Dungeons', '3' => 'PvP', '4' => 'Guild Meeting', '6' => 'Other'), null, array('class' => 'form-control')) !!}
                             <br>
 
+                            @if(count($guild->getTeams()) > 0)
+                                Sign up
+                                team:{!! Form::select('team_id', \App\Team::formatForForms($guild->id), '', array('class' => 'form-control')) !!}
+                                <br>
+                            @endif
+
                             <div class="col-md-4">
                                 <div class="form-group">
                                     Day:{!! Form::number('day', date('j'), array('min' => '1', 'max' => '31', 'class' => 'form-control')) !!}
@@ -77,7 +83,8 @@
                                     </div>
                                 </div>
                             @endif
-                            Event tags (separate each tag with a comma, using tags will make sure this event will only trigger notifications that have a matching tag):
+                            Event tags (separate each tag with a comma, using tags will make sure this event will only
+                            trigger notifications that have a matching tag):
                             {!! Form::text('tags', '', ['class' => 'form-control']) !!}<br><br>
                             Description:{!! Form::textarea('description', '', array('class' => 'form-control')) !!}<br>
 

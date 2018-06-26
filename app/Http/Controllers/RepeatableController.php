@@ -12,6 +12,7 @@ use App\Event;
 use App\Guild;
 use App\LogEntry;
 use App\RepeatableEvent;
+use App\Team;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
@@ -82,6 +83,7 @@ class RepeatableController extends Controller
         $repeatable->tags            = Input::get('tags') ?? '';
         $repeatable->interval        = Input::get('interval');
         $repeatable->create_interval = ((int) Input::get('create_interval') * 86400);
+        $repeatable->default_team_id = Input::get('default_team_id') ?? null;
         $repeatable->save();
 
         $event                    = new Event();
@@ -92,6 +94,11 @@ class RepeatableController extends Controller
         $event->description       = Input::get('description') ?? '';
         $event->tags              = Input::get('tags') ?? '';
         $event->parent_repeatable = $repeatable->id;
+
+        if (!empty($repeatable->default_team_id)) {
+            $team = Team::query()->find($repeatable->default_team_id);
+            $event->signupTeam($team);
+        }
 
         $event->save();
 
@@ -124,6 +131,7 @@ class RepeatableController extends Controller
         $repeatable->tags            = Input::get('tags') ?? '';
         $repeatable->interval        = Input::get('interval');
         $repeatable->create_interval = ((int) Input::get('create_interval') * 86400);
+        $repeatable->default_team_id = Input::get('default_team_id') ?? null;
         $repeatable->save();
 
         $events = Event::query()->where('parent_repeatable', '=', $repeatable->id)

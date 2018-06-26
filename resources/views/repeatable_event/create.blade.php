@@ -27,6 +27,12 @@
                             type:{!! Form::select('type', array('1' => 'Trials', '2' => 'Dungeons', '3' => 'PvP', '4' => 'Guild Meeting', '6' => 'Other'), null, array('class' => 'form-control')) !!}
                             <br>
 
+                            @if(count($guild->getTeams()) > 0)
+                                Sign up
+                                team by default:{!! Form::select('default_team_id', \App\Team::formatForForms($guild->id), '', array('class' => 'form-control')) !!}
+                                <br>
+                            @endif
+
                             <h5>Starting date and time</h5>
                             <div class="col-md-4">
                                 <div class="form-group">

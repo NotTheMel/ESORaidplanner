@@ -114,6 +114,9 @@ class Guild extends Model
         return $events;
     }
 
+    /**
+     * @return array
+     */
     public function getPastEvents()
     {
         $events = Event::query()
@@ -193,6 +196,9 @@ class Guild extends Model
         return false;
     }
 
+    /**
+     * @param User $user
+     */
     public function leave(User $user)
     {
         if ($this->isOwner($user)) {
@@ -200,6 +206,7 @@ class Guild extends Model
         }
 
         $this->removeAdmin($user);
+        $this->removeFromAllTeams($user);
 
         DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $this->id)->delete();
 
@@ -231,6 +238,9 @@ class Guild extends Model
         }
     }
 
+    /**
+     * @return array
+     */
     public function getMembers()
     {
         return User::query()
@@ -241,6 +251,9 @@ class Guild extends Model
             ->get(['users.*'])->all();
     }
 
+    /**
+     * @return array
+     */
     public function getPendingMembers()
     {
         return User::query()
@@ -251,6 +264,9 @@ class Guild extends Model
             ->get(['users.*'])->all();
     }
 
+    /**
+     * @param User $user
+     */
     public function requestMembership(User $user)
     {
         $count = DB::table('user_guilds')
@@ -280,6 +296,10 @@ class Guild extends Model
         }
     }
 
+    /**
+     * @param User      $user
+     * @param User|null $admin
+     */
     public function approveMembership(User $user, User $admin = null)
     {
         DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $this->id)->update(['status' => 1]);
@@ -290,11 +310,16 @@ class Guild extends Model
         $log->create($this->id, $admin->name.' approved the membership request of '.$user->name.'.');
     }
 
+    /**
+     * @param User      $user
+     * @param User|null $admin
+     */
     public function removeMembership(User $user, User $admin = null)
     {
         DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $this->id)->delete();
 
         $this->removeAdmin($user);
+        $this->removeFromAllTeams($user);
 
         $admin = $admin ?? Auth::user();
 
@@ -302,6 +327,9 @@ class Guild extends Model
         $log->create($this->id, $admin->name.' removed '.$user->name.' from the guild.');
     }
 
+    /**
+     * @return bool
+     */
     public function hasConfirmedSignupsHooks(): bool
     {
         $hooks = ConfirmedSignupsNotification::query()->where('call_type', '=', HookTypes::CONFIRMED_SIGNUPS)
@@ -309,5 +337,28 @@ class Guild extends Model
             ->count();
 
         return $hooks > 0;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTeams(): array
+    {
+        return Team::query()
+                ->where('guild_id', '=', $this->id)
+                ->orderBy('name')
+                ->get()->all() ?? [];
+    }
+
+    /**
+     * @param User $user
+     */
+    private function removeFromAllTeams(User $user)
+    {
+        $teams = Team::query()->where('guild_id', '=', $this->id)->get()->all() ?? [];
+
+        foreach ($teams as $team) {
+            $team->removeMember($user->id);
+        }
     }
 }
