@@ -33,7 +33,7 @@
                                     </td>
                                     <td>{{ $team->getMemberCount() }}</td>
                                     <td>
-                                        <a href="#">
+                                        <a href="/g/{{ $guild->slug }}/team/{{ $team->id }}/remove">
                                             <button type="button" class="btn btn-danger">Delete</button>
                                         </a>
                                     </td>
