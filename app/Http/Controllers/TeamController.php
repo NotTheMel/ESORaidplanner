@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Guild;
+use App\RepeatableEvent;
 use App\Set;
 use App\Team;
 use Illuminate\Http\Request;
@@ -105,6 +106,10 @@ class TeamController extends Controller
         if ($team->guild_id !== $guild->id) {
             return redirect('/g/'.$guild->slug);
         }
+        RepeatableEvent::query()
+            ->where('default_team_id', '=', $team->id)
+            ->update(['default_team_id' => null]);
+
         $team->delete();
 
         return redirect('/g/'.$slug.'/teams');

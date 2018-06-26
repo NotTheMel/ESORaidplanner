@@ -28,7 +28,7 @@
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="/g/{{ $guild->slug }}/team/{{ $team->id }}/removemember/{{ $member->id }}">
+                                        <a href="/g/{{ $guild->slug }}/team/{{ $team->id }}/removemember/{{ $member->user_id }}">
                                             <button type="button" class="btn btn-danger">Remove</button>
                                         </a>
                                     </td>

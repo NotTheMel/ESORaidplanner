@@ -177,7 +177,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/g/{slug}/team/{team_id}', 'TeamController@view');
 
     Route::post('/g/{slug}/team/{team_id}/addmember', 'TeamController@addMember');
-    Route::get('/g/{slug}/team/{team_id}/removemember/{member_id}', 'TeamController@removeMember');
+    Route::get('/g/{slug}/team/{team_id}/removemember/{user_id}', 'TeamController@removeMember');
+    Route::get('/g/{slug}/team/{team_id}/remove', 'TeamController@delete');
 
 
 
