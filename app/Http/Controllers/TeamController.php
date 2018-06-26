@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Guild;
+use App\Set;
 use App\Team;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,6 +36,57 @@ class TeamController extends Controller
         return redirect('/g/'.$slug.'/teams');
     }
 
+    public function new(string $slug)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        if (!$guild->isAdmin(Auth::user())) {
+            return redirect('/g/'.$guild->slug);
+        }
+
+        return view('team.create', compact('guild'));
+    }
+
+    public function view(string $slug, int $team_id)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        if (!$guild->isAdmin(Auth::user())) {
+            return redirect('/g/'.$guild->slug);
+        }
+        $team = Team::query()->find($team_id);
+        if ($team->guild_id !== $guild->id) {
+            return redirect('/g/'.$guild->slug);
+        }
+        $members = [];
+        foreach ($guild->getMembers() as $mem) {
+            $members[$mem->id] = $mem->name;
+        }
+        $sets_q = Set::query()
+            ->orderBy('name', 'asc')
+            ->get();
+        $sets = [];
+
+        foreach ($sets_q as $set) {
+            $sets[$set->name] = $set->name;
+        }
+
+        return view('team.view', compact('guild', 'team', 'members', 'sets'));
+    }
+
+    public function list(string $slug)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        if (!$guild->isAdmin(Auth::user())) {
+            return redirect('/g/'.$guild->slug);
+        }
+        $teams = Team::query()->where('guild_id', '=', $guild->id)
+            ->get()->all() ?? [];
+
+        return view('team.list', compact('guild', 'teams'));
+    }
+
     /**
      * @param string $slug
      * @param int    $team_id
@@ -50,6 +102,9 @@ class TeamController extends Controller
         }
 
         $team = Team::query()->find($team_id);
+        if ($team->guild_id !== $guild->id) {
+            return redirect('/g/'.$guild->slug);
+        }
         $team->delete();
 
         return redirect('/g/'.$slug.'/teams');
@@ -72,7 +127,10 @@ class TeamController extends Controller
 
         /** @var Team $team */
         $team = Team::query()->find($team_id);
-        $team->addMember($request->input('user_id'), $request->input('class_id'), $request->input('role_id'), $request->input('sets'));
+        if ($team->guild_id !== $guild->id) {
+            return redirect('/g/'.$guild->slug);
+        }
+        $team->addMember($request->input('user_id'), $request->input('class_id'), $request->input('role_id'), $request->input('sets') ?? []);
 
         return redirect('/g/'.$slug.'/team/'.$team->id);
     }
@@ -94,6 +152,9 @@ class TeamController extends Controller
 
         /** @var Team $team */
         $team = Team::query()->find($team_id);
+        if ($team->guild_id !== $guild->id) {
+            return redirect('/g/'.$guild->slug);
+        }
         $team->removeMember($user_id);
 
         return redirect('/g/'.$slug.'/team/'.$team->id);

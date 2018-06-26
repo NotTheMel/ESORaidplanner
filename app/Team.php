@@ -31,6 +31,16 @@ class Team extends Model
     }
 
     /**
+     * @return int
+     */
+    public function getMemberCount(): int
+    {
+        return DB::table('teams_users')
+            ->where('team_id', '=', $this->id)
+            ->count() ?? 0;
+    }
+
+    /**
      * @param int   $user_id
      * @param int   $class_id
      * @param int   $role_id
@@ -51,6 +61,7 @@ class Team extends Model
 
         if (0 === $count) {
             DB::table('teams_users')->insert([
+                'team_id' => $this->id,
                 'user_id'  => $user_id,
                 'class_id' => $class_id,
                 'role_id'  => $role_id,
