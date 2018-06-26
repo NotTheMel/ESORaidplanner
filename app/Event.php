@@ -264,11 +264,11 @@ class Event extends Model
 
                 if (0 === $count) {
                     $sign = new Signup([
-                        'user_id' => $member->user_id,
+                        'user_id'  => $member->user_id,
                         'event_id' => $this->id,
                         'class_id' => $member->class_id,
-                        'role_id' => $member->role_id,
-                        'sets' => $member->sets,
+                        'role_id'  => $member->role_id,
+                        'sets'     => $member->sets,
                     ]);
                     $sign->save();
                 }

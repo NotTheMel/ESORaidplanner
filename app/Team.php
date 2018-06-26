@@ -61,7 +61,7 @@ class Team extends Model
 
         if (0 === $count) {
             DB::table('teams_users')->insert([
-                'team_id' => $this->id,
+                'team_id'  => $this->id,
                 'user_id'  => $user_id,
                 'class_id' => $class_id,
                 'role_id'  => $role_id,
@@ -93,9 +93,9 @@ class Team extends Model
 
     public static function formatForForms(int $guild_id)
     {
-        $return = [];
+        $return     = [];
         $return[''] = 'None';
-        $teams = Team::query()->where('guild_id', '=', $guild_id)
+        $teams      = Team::query()->where('guild_id', '=', $guild_id)
             ->orderBy('name')->get()->all() ?? [];
         foreach ($teams as $team) {
             $return[$team->id] = $team->name;
