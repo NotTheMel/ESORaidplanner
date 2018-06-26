@@ -74,11 +74,11 @@ class HooksCall extends Command
                                 if ($hook->matchesEventTags($event)) {
                                     $hook->call($event);
                                 }
-                            } elseif ($hook->if_less_signups !== 0 && $hook->if_less_signups > $event->getTotalSignups()) {
+                            } elseif (0 !== $hook->if_less_signups && $hook->if_less_signups > $event->getTotalSignups()) {
                                 if ($hook->matchesEventTags($event)) {
                                     $hook->call($event);
                                 }
-                            } elseif ($hook->if_more_signups !== 0 && $hook->if_more_signups <= $event->getTotalSignups()) {
+                            } elseif (0 !== $hook->if_more_signups && $hook->if_more_signups <= $event->getTotalSignups()) {
                                 if ($hook->matchesEventTags($event)) {
                                     $hook->call($event);
                                 }

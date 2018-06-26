@@ -31,7 +31,7 @@ class NotificationHook extends Model
     protected $table = 'hooks';
 
     protected $fillable = [
-        'name', 'type', 'token', 'chat_id', 'url', 'call_time_diff', 'active', 'guild_id', 'if_less_signups', 'if_more_signups','call_type', 'tags', 'message',
+        'name', 'type', 'token', 'chat_id', 'url', 'call_time_diff', 'active', 'guild_id', 'if_less_signups', 'if_more_signups', 'call_type', 'tags', 'message',
     ];
 
     /**
