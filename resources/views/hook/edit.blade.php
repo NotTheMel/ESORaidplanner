@@ -46,6 +46,10 @@
                                 send
                                 the message):
                                 {!! Form::number('if_less_signups', $hook->if_less_signups, array('class' => 'form-control')) !!}<br>
+                                Only send this message if the event has this many signups or more (leave blank or 0 to always
+                                send
+                                the message):
+                                {!! Form::number('if_more_signups', $hook->if_more_signups, array('class' => 'form-control')) !!}<br>
                             @endif
                             @if($hook->call_type === \App\Singleton\HookTypes::ON_TIME || $hook->call_type === \App\Singleton\HookTypes::ON_EVENT_CREATE || $hook->call_type === \App\Singleton\HookTypes::CONFIRMED_SIGNUPS)
                                 Notification tags (separate each tag with a comma, using tags will make sure this
