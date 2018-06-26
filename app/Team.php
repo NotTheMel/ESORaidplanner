@@ -95,7 +95,7 @@ class Team extends Model
     {
         $return     = [];
         $return[''] = 'None';
-        $teams      = Team::query()->where('guild_id', '=', $guild_id)
+        $teams      = self::query()->where('guild_id', '=', $guild_id)
             ->orderBy('name')->get()->all() ?? [];
         foreach ($teams as $team) {
             $return[$team->id] = $team->name;
