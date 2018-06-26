@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Event;
 use App\LogEntry;
 use App\RepeatableEvent;
+use App\Team;
 use DateTime;
 use Illuminate\Console\Command;
 
@@ -58,6 +59,11 @@ class RepeatableEventsCommand extends Command
                 $event->guild_id          = $repeatable->guild_id;
                 $event->parent_repeatable = $repeatable->id;
                 $event->save();
+
+                if (!empty($repeatable->default_team_id)) {
+                    $team = Team::query()->find($repeatable->default_team_id);
+                    $event->signupTeam($team);
+                }
 
                 $event->callEventCreationHooks();
 

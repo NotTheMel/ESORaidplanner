@@ -25,6 +25,12 @@
 
                             Event
                             type:{!! Form::select('type', array('1' => 'Trials', '2' => 'Dungeons', '3' => 'PvP', '4' => 'Guild Meeting', '6' => 'Other'), $repeatable->type, array('class' => 'form-control')) !!}
+
+                            @if(count($guild->getTeams()) > 0)
+                                Sign up
+                                team by default:{!! Form::select('default_team_id', \App\Team::formatForForms($guild->id), $repeatable->default_team_id ?? '', array('class' => 'form-control')) !!}
+                                <br>
+                            @endif
                             <br>
 
                             Event tags (separate each tag with a comma, using tags will make sure this event will onlt trigger notifications that have a matching tag):
