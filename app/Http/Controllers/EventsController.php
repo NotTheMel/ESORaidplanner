@@ -38,7 +38,7 @@ class EventsController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        //$this->middleware('auth');
     }
 
     /**
@@ -122,10 +122,6 @@ class EventsController extends Controller
         $guild = Guild::query()
             ->where('slug', '=', $slug)
         ->first();
-
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('g/'.$slug);
-        }
 
         return view('event.create', compact('guild'));
     }
