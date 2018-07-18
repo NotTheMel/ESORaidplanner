@@ -60,19 +60,72 @@ Route::get('/termsofuse', function () {
  */
 
 Route::group(['middleware' => ['auth', 'guild.member']], function () {
+    /* EVENTS */
     Route::get('/g/{slug}/event/{id}', 'EventsController@detail');
-
     Route::post('/g/{slug}/sign/up/{id}', 'EventsController@signUpUser');
-
     Route::post('/g/{slug}/sign/off/{id}', 'EventsController@signOffUser');
-
     Route::post('/g/{slug}/sign/modify/{id}', 'EventsController@modifySignup');
-
     Route::get('/g/{slug}/pastevents', 'GuildController@pastEvents');
+
+    /* GUILDS */
+    Route::get('/g/{slug}/member/leave', 'GuildController@leave');
+    Route::get('/g/{slug}/members', 'GuildController@members');
+
+    /* COMMENTS */
+    Route::post('/g/{slug}/event/{event_id}/comment/create', 'CommentController@create');
+    Route::post('/g/{slug}/event/{event_id}/comment/modify/{comment_id}', 'CommentController@edit');
+    Route::get('/g/{slug}/event/{event_id}/comment/delete/{comment_id}', 'CommentController@delete');
 });
+
+Route::group(['middleware' => ['auth', 'guild.admin']], function () {
+    /* EVENTS */
+    Route::post('/g/{slug}/sign/other/{id}', 'EventsController@signUpOther');
+    Route::get('/g/{slug}/events/create', 'EventsController@new');
+    Route::post('/g/{slug}/events/create', 'EventsController@create');
+    Route::get('/g/{slug}/events/edit/{id}', 'EventsController@show');
+    Route::post('/g/{slug}/events/edit/{id}', 'EventsController@edit');
+    Route::get('/g/{slug}/events/delete/{id}', 'EventsController@delete');
+    Route::get('/g/{slug}/events/lock/{event_id}/{lockstatus}', 'EventsController@changeLockStatus');
+    Route::get('/g/{slug}/logs', 'GuildController@logs');
+    Route::get('/g/{slug}/event/{id}/postsignups', 'EventsController@postSignupsHooks');
+
+    /* REPEATABLES */
+    Route::get('/g/{slug}/repeatable/create', 'RepeatableController@new');
+    Route::post('/g/{slug}/repeatable/create', 'RepeatableController@create');
+    Route::get('/g/{slug}/repeatable/edit/{repeatable_id}', 'RepeatableController@view');
+    Route::post('/g/{slug}/repeatable/edit/{repeatable_id}', 'RepeatableController@edit');
+    Route::get('/g/{slug}/repeatable/delete/{repeatable_id}', 'RepeatableController@delete');
+
+    /* GUILDS */
+    Route::post('/g/{slug}/member/approve/{guild_id}/{user_id}', 'GuildController@approveMembership');
+    Route::get('/g/{slug}/member/remove/{guild_id}/{user_id}', 'GuildController@removeMembership');
+    Route::get('/g/{slug}/settings', 'GuildController@settings');
+    Route::post('/g/{slug}/settings', 'GuildController@saveSettings');
+    Route::get('/g/{slug}/teams', 'TeamController@list');
+    Route::get('/g/{slug}/team/create', 'TeamController@new');
+    Route::post('/g/{slug}/team/create', 'TeamController@create');
+    Route::get('/g/{slug}/team/{team_id}', 'TeamController@view');
+    Route::post('/g/{slug}/team/{team_id}/addmember', 'TeamController@addMember');
+    Route::get('/g/{slug}/team/{team_id}/removemember/{user_id}', 'TeamController@removeMember');
+    Route::get('/g/{slug}/team/{team_id}/remove', 'TeamController@delete');
+
+    /* SIGNUPS */
+    Route::post('/g/{slug}/event/{event_id}/signup/status', 'EventsController@setSignupStatus');
+    Route::get('/signup/delete/{slug}/{event_id}/{id}', 'EventsController@deleteSignup');
+
+});
+
+Route::group(['middleware' => ['auth', 'guild.owner']], function () {
+    Route::get('/guild/delete/{id}', 'GuildController@deleteConfirm');
+    Route::get('/guild/delete/{id}/confirm', 'GuildController@delete');
+    Route::get('/g/{slug}/member/makeadmin/{user_id}', 'GuildController@makeAdmin');
+    Route::get('/g/{slug}/member/removeadmin/{user_id}', 'GuildController@removeAdmin');
+});
+
 
 Route::group(['middleware' => 'auth'], function () {
 
+    Route::get('/g/{slug}', 'GuildController@detail');
     /*
      *
      * ROUTES FOR EVENTS
@@ -81,56 +134,20 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/events', 'EventsController@index')->name('events');
 
-    Route::post('/g/{slug}/sign/other/{id}', 'EventsController@signUpOther');
-
-    Route::get('/g/{slug}/events/create', 'EventsController@new');
-
-    Route::post('/g/{slug}/events/create', 'EventsController@create');
-
-    Route::get('/g/{slug}/events/edit/{id}', 'EventsController@show');
-
-    Route::post('/g/{slug}/events/edit/{id}', 'EventsController@edit');
-
-    Route::get('/g/{slug}/events/delete/{id}', 'EventsController@delete');
-
-    Route::get('/g/{slug}/events/lock/{event_id}/{lockstatus}', 'EventsController@changeLockStatus');
-
-    Route::get('/g/{slug}/logs', 'GuildController@logs');
-
-    Route::get('/g/{slug}/event/{id}/postsignups', 'EventsController@postSignupsHooks');
-
-
     // Repeatables //
-    Route::get('/g/{slug}/repeatable/create', 'RepeatableController@new');
-
-    Route::post('/g/{slug}/repeatable/create', 'RepeatableController@create');
-
-    Route::get('/g/{slug}/repeatable/edit/{repeatable_id}', 'RepeatableController@view');
-
-    Route::post('/g/{slug}/repeatable/edit/{repeatable_id}', 'RepeatableController@edit');
-
-    Route::get('/g/{slug}/repeatable/delete/{repeatable_id}', 'RepeatableController@delete');
 
     /*
      *
      * ROUTES FOR WEBHOOKS
      *
      */
-
     Route::get('/hooks', 'HookController@all');
-
     Route::get('/hooks/calltypeselect', 'HookController@callTypeSelectForm');
-
     Route::get('/hooks/typeselect/{call_type}', 'HookController@typeSelectForm');
-
     Route::get('/hooks/create/{call_type}/{type}', 'HookController@new');
-
     Route::post('/hooks/create/{call_type}/{type}', 'HookController@create');
-
     Route::get('/hooks/modify/{hook_id}', 'HookController@show');
-
     Route::post('/hooks/modify/{hook_id}', 'HookController@edit');
-
     Route::post('/hooks/delete/{id}', 'HookController@delete');
 
     /*
@@ -138,8 +155,6 @@ Route::group(['middleware' => 'auth'], function () {
      * ROUTES FOR GUILDS
      *
      */
-
-    Route::get('/g/{slug}', 'GuildController@detail');
 
     Route::get('/guild/create', function () {
         return view('guild.create');
@@ -149,52 +164,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('/guild/create', 'GuildController@create');
 
-    Route::get('/guild/delete/{id}', 'GuildController@deleteConfirm');
-
-    Route::get('/guild/delete/{id}/confirm', 'GuildController@delete');
-
     Route::post('/g/{slug}/member/request/{id}', 'GuildController@requestMembership');
-
-    Route::post('/g/{slug}/member/approve/{guild_id}/{user_id}', 'GuildController@approveMembership');
-
-    Route::get('/g/{slug}/member/remove/{guild_id}/{user_id}', 'GuildController@removeMembership');
-
-    Route::get('/g/{slug}/member/makeadmin/{user_id}', 'GuildController@makeAdmin');
-
-    Route::get('/g/{slug}/member/removeadmin/{user_id}', 'GuildController@removeAdmin');
-
-    Route::get('/g/{slug}/member/leave', 'GuildController@leave');
-
-    Route::get('/g/{slug}/settings', 'GuildController@settings');
-
-    Route::post('/g/{slug}/settings', 'GuildController@saveSettings');
-
-    Route::get('/g/{slug}/members', 'GuildController@members');
-
-    Route::get('/g/{slug}/teams', 'TeamController@list');
-
-    Route::get('/g/{slug}/team/create', 'TeamController@new');
-    Route::post('/g/{slug}/team/create', 'TeamController@create');
-
-    Route::get('/g/{slug}/team/{team_id}', 'TeamController@view');
-
-    Route::post('/g/{slug}/team/{team_id}/addmember', 'TeamController@addMember');
-    Route::get('/g/{slug}/team/{team_id}/removemember/{user_id}', 'TeamController@removeMember');
-    Route::get('/g/{slug}/team/{team_id}/remove', 'TeamController@delete');
-
-
-
-    /*
-     *
-     * ROUTES FOR COMMENTS
-     *
-     */
-
-    Route::post('/g/{slug}/event/{event_id}/comment/create', 'CommentController@create');
-
-    Route::post('/g/{slug}/event/{event_id}/comment/modify/{comment_id}', 'CommentController@edit');
-
-    Route::get('/g/{slug}/event/{event_id}/comment/delete/{comment_id}', 'CommentController@delete');
 
     /*
      *
@@ -235,16 +205,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/profile/character/modify/{id}', 'CharacterController@edit');
 
     Route::post('/profile/character/delete/{id}', 'CharacterController@delete');
-
-    /*
-     *
-     * ROUTES FOR SIGNUPS
-     *
-     */
-
-    Route::post('/g/{slug}/event/{event_id}signup/status', 'EventsController@setSignupStatus');
-
-    Route::get('/signup/delete/{slug}/{event_id}/{id}', 'EventsController@deleteSignup');
 
     /*
      *
