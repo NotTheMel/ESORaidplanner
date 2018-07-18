@@ -203,7 +203,9 @@ class UserController extends Controller
      */
     public function editAvatar()
     {
-        User::query()->where('id', '=', Auth::id())->update(['avatar' => Input::get('avatar')]);
+        if (!empty(Input::get('avatar'))) {
+            User::query()->where('id', '=', Auth::id())->update(['avatar' => Input::get('avatar')]);
+        }
 
         return redirect('/profile/edit/avatar');
     }
