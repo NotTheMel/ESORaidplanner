@@ -59,6 +59,18 @@ Route::get('/termsofuse', function () {
  *
  */
 
+Route::group(['middleware' => ['auth', 'guild.member']], function () {
+    Route::get('/g/{slug}/event/{id}', 'EventsController@detail');
+
+    Route::post('/g/{slug}/sign/up/{id}', 'EventsController@signUpUser');
+
+    Route::post('/g/{slug}/sign/off/{id}', 'EventsController@signOffUser');
+
+    Route::post('/g/{slug}/sign/modify/{id}', 'EventsController@modifySignup');
+
+    Route::get('/g/{slug}/pastevents', 'GuildController@pastEvents');
+});
+
 Route::group(['middleware' => 'auth'], function () {
 
     /*
@@ -69,15 +81,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/events', 'EventsController@index')->name('events');
 
-    Route::get('/g/{slug}/event/{id}', 'EventsController@detail');
-
-    Route::post('/g/{slug}/sign/up/{id}', 'EventsController@signUpUser');
-
     Route::post('/g/{slug}/sign/other/{id}', 'EventsController@signUpOther');
-
-    Route::post('/g/{slug}/sign/off/{id}', 'EventsController@signOffUser');
-
-    Route::post('/g/{slug}/sign/modify/{id}', 'EventsController@modifySignup');
 
     Route::get('/g/{slug}/events/create', 'EventsController@new');
 
@@ -90,8 +94,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/g/{slug}/events/delete/{id}', 'EventsController@delete');
 
     Route::get('/g/{slug}/events/lock/{event_id}/{lockstatus}', 'EventsController@changeLockStatus');
-
-    Route::get('/g/{slug}/pastevents', 'GuildController@pastEvents');
 
     Route::get('/g/{slug}/logs', 'GuildController@logs');
 
