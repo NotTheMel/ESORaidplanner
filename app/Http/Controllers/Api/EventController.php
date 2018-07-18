@@ -227,7 +227,7 @@ class EventController extends ApiController
             $character = Character::query()->find(Input::get('character'));
             $event->signup($user, null, null, [], $character);
         } else {
-            $event->signup($user, $request->input('role'), $request->input('class'), Set::Array($request->input('sets') ?? []));
+            $event->signup($user, $request->input('role'), $request->input('class'), Set::Array($request->input('sets')) ?? []);
         }
 
         return response(null, Response::HTTP_OK);
