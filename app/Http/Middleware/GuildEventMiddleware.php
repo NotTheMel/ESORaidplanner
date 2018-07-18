@@ -28,6 +28,7 @@ class GuildEventMiddleware
         if (null === $guild || $guild->id !== $event->guild_id) {
             return redirect('/');
         }
+
         return $next($request);
     }
 }
