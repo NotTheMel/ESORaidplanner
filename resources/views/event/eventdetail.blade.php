@@ -175,7 +175,7 @@
                         </div>
 
                         @if($guild->isAdmin(Auth::user()))
-                            {{ Form::open(array('url' => '/g/'.$guild->slug.'/event/'.$event->id.'signup/status')) }}
+                            {{ Form::open(array('url' => '/g/'.$guild->slug.'/event/'.$event->id.'/signup/status')) }}
                         @endif
 
                         <div class="content table-responsive table-full-width" style="z-index: 9999">
