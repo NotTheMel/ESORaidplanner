@@ -213,6 +213,10 @@ class GuildController extends Controller
         /** @var Guild $guild */
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
+        if (null === $guild) {
+            return redirect('/');
+        }
+
         if (0 === $guild->userStatus(Auth::user())) {
             return view('guild.guild_awaiting_confirmation', compact('guild'));
         }
