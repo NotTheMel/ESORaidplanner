@@ -58,6 +58,7 @@ class Kernel extends HttpKernel
         'guild.member' => \App\Http\Middleware\GuildMemberMiddleware::class,
         'guild.admin'  => \App\Http\Middleware\GuildAdminMiddleware::class,
         'guild.owner'  => \App\Http\Middleware\GuildOwnerMiddleware::class,
+        'guild.event'  => \App\Http\Middleware\GuildEventMiddleware::class,
         'throttle'     => \Illuminate\Routing\Middleware\ThrottleRequests::class,
     ];
 }
