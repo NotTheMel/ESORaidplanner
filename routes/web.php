@@ -69,10 +69,10 @@ Route::group(['middleware' => ['auth', 'guild.member']], function () {
 });
 
 Route::group(['middleware' => ['auth', 'guild.member', 'guild.event']], function () {
-    Route::get('/g/{slug}/event/{event_id}', 'EventsController@detail');
-    Route::post('/g/{slug}/sign/up/{event_id}', 'EventsController@signUpUser');
-    Route::post('/g/{slug}/sign/off/{event_id}', 'EventsController@signOffUser');
-    Route::post('/g/{slug}/sign/modify/{event_id}', 'EventsController@modifySignup');
+    Route::get('/g/{slug}/event/{event_id}', 'EventController@detail');
+    Route::post('/g/{slug}/sign/up/{event_id}', 'EventController@signUpUser');
+    Route::post('/g/{slug}/sign/off/{event_id}', 'EventController@signOffUser');
+    Route::post('/g/{slug}/sign/modify/{event_id}', 'EventController@modifySignup');
 
     /* COMMENTS */
     Route::post('/g/{slug}/event/{event_id}/comment/create', 'CommentController@create');
@@ -82,9 +82,9 @@ Route::group(['middleware' => ['auth', 'guild.member', 'guild.event']], function
 
 Route::group(['middleware' => ['auth', 'guild.admin']], function () {
     /* EVENTS */
-    Route::post('/g/{slug}/sign/other/{event_id}', 'EventsController@signUpOther');
-    Route::get('/g/{slug}/events/create', 'EventsController@new');
-    Route::post('/g/{slug}/events/create', 'EventsController@create');
+    Route::post('/g/{slug}/sign/other/{event_id}', 'EventController@signUpOther');
+    Route::get('/g/{slug}/events/create', 'EventController@new');
+    Route::post('/g/{slug}/events/create', 'EventController@create');
     Route::get('/g/{slug}/logs', 'GuildController@logs');
 
     /* REPEATABLES */
@@ -108,17 +108,17 @@ Route::group(['middleware' => ['auth', 'guild.admin']], function () {
     Route::get('/g/{slug}/team/{team_id}/remove', 'TeamController@delete');
 
     /* SIGNUPS */
-    Route::post('/g/{slug}/event/{event_id}/signup/status', 'EventsController@setSignupStatus');
-    Route::get('/signup/delete/{slug}/{event_id}/{id}', 'EventsController@deleteSignup');
+    Route::post('/g/{slug}/event/{event_id}/signup/status', 'EventController@setSignupStatus');
+    Route::get('/signup/delete/{slug}/{event_id}/{id}', 'EventController@deleteSignup');
 
 });
 
 Route::group(['middleware' => ['auth', 'guild.admin', 'guild.event']], function () {
-    Route::get('/g/{slug}/events/edit/{event_id}', 'EventsController@show');
-    Route::post('/g/{slug}/events/edit/{event_id}', 'EventsController@edit');
-    Route::get('/g/{slug}/events/delete/{event_id}', 'EventsController@delete');
-    Route::get('/g/{slug}/events/lock/{event_id}/{lockstatus}', 'EventsController@changeLockStatus');
-    Route::get('/g/{slug}/event/{event_id}/postsignups', 'EventsController@postSignupsHooks');
+    Route::get('/g/{slug}/events/edit/{event_id}', 'EventController@show');
+    Route::post('/g/{slug}/events/edit/{event_id}', 'EventController@edit');
+    Route::get('/g/{slug}/events/delete/{event_id}', 'EventController@delete');
+    Route::get('/g/{slug}/events/lock/{event_id}/{lockstatus}', 'EventController@changeLockStatus');
+    Route::get('/g/{slug}/event/{event_id}/postsignups', 'EventController@postSignupsHooks');
 
 });
 
@@ -139,7 +139,7 @@ Route::group(['middleware' => 'auth'], function () {
      *
      */
 
-    Route::get('/events', 'EventsController@index')->name('events');
+    Route::get('/events', 'EventController@index')->name('events');
 
     // Repeatables //
 

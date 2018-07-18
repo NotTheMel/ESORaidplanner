@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
-class EventsController extends Controller
+class EventController extends Controller
 {
     /**
      * Create a new controller instance.
