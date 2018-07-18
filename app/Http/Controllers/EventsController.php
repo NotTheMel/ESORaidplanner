@@ -74,7 +74,7 @@ class EventsController extends Controller
             ->where('slug', '=', $slug)
             ->first();
 
-        if (empty($guild) || empty($event) || $guild->id !== $event->guild_id) {
+        if (empty($guild) || empty($event)) {
             return redirect('g/'.$slug);
         }
 
@@ -132,10 +132,6 @@ class EventsController extends Controller
 
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('g/'.$slug);
-        }
-
         $start_date = new DateTime($event->start_date);
 
         $start_date->setTimezone(new DateTimeZone(Auth::user()->timezone));
@@ -154,7 +150,7 @@ class EventsController extends Controller
         /** @var Event $event */
         $event = Event::query()->find($id);
 
-        if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id) || 1 === $event->locked) {
+        if (1 === $event->locked) {
             return redirect('g/'.$slug);
         }
 
@@ -179,7 +175,7 @@ class EventsController extends Controller
         /** @var Event $event */
         $event = Event::query()->find($id);
 
-        if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id) || 1 === $event->locked) {
+        if (1 === $event->locked) {
             return redirect('g/'.$slug);
         }
 
@@ -207,7 +203,7 @@ class EventsController extends Controller
         /** @var Event $event */
         $event = Event::query()->find($id);
 
-        if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id) || 1 === $event->locked) {
+        if (1 === $event->locked) {
             return redirect('g/'.$slug);
         }
 
@@ -235,7 +231,7 @@ class EventsController extends Controller
         $signup = Signup::query()->find($id);
         $guild  = Guild::query()->find($event->guild_id);
 
-        if (isset($signup->user_id) && $guild->isAdmin(Auth::user())) {
+        if (isset($signup->user_id)) {
             $event->signoffOther(User::query()->find($signup->user_id));
         }
 
@@ -253,7 +249,7 @@ class EventsController extends Controller
         /** @var Event $event */
         $event = Event::query()->find($id);
 
-        if (!$this->isGuildMember($slug) || !$this->eventBelongsToGuild($slug, $id) || 1 === $event->locked) {
+        if (1 === $event->locked) {
             return redirect('g/'.$slug);
         }
 
@@ -289,10 +285,6 @@ class EventsController extends Controller
         $guild = Guild::query()
             ->where('slug', '=', $slug)
             ->first();
-
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('g/'.$slug);
-        }
 
         $event              = new Event();
         $event->name        = Input::get('name');
@@ -346,10 +338,6 @@ class EventsController extends Controller
             ->where('slug', '=', $slug)
             ->first();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('g/'.$slug);
-        }
-
         $event              = Event::query()->find($id);
         $event->name        = Input::get('name');
         $event->type        = Input::get('type');
@@ -371,10 +359,6 @@ class EventsController extends Controller
     public function delete(string $slug, int $id)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('g/'.$slug);
-        }
 
         $event = Event::query()->find($id);
 
@@ -411,10 +395,6 @@ class EventsController extends Controller
         $event = Event::query()->find($event_id);
         $guild = Guild::query()->find($event->guild_id);
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$slug.'/event/'.$event_id);
-        }
-
         foreach ($request->all() as $signup) {
             if (is_numeric($signup) && is_numeric($status)) {
                 $event->setSignupStatus($signup, $status);
@@ -436,10 +416,6 @@ class EventsController extends Controller
     public function changeLockStatus(string $slug, int $event_id, int $lockstatus)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$slug.'/event/'.$event_id);
-        }
 
         /** @var Event $event */
         $event         = Event::query()->find($event_id);
@@ -463,50 +439,10 @@ class EventsController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$slug.'/event/'.$event_id);
-        }
-
         /** @var Event $event */
         $event         = Event::query()->find($event_id);
         $event->callPostSignupsHooks();
 
         return redirect('/g/'.$slug.'/event/'.$event_id);
-    }
-
-    /**
-     * @param string $slug
-     *
-     * @return bool
-     */
-    private function isGuildMember(string $slug): bool
-    {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        $count = DB::table('user_guilds')->where('guild_id', '=', $guild->id)
-            ->where('user_id', '=', Auth::id())
-            ->where('status', '>=', 1)
-            ->count();
-
-        return $count > 0;
-    }
-
-    /**
-     * @param string $slug
-     * @param int    $event_id
-     *
-     * @return bool
-     */
-    private function eventBelongsToGuild(string $slug, int $event_id): bool
-    {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        $event = Event::query()->find($event_id);
-
-        if ($guild->id === $event->guild_id) {
-            return true;
-        }
-
-        return false;
     }
 }

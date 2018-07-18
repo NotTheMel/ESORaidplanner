@@ -61,15 +61,18 @@ Route::get('/termsofuse', function () {
 
 Route::group(['middleware' => ['auth', 'guild.member']], function () {
     /* EVENTS */
-    Route::get('/g/{slug}/event/{id}', 'EventsController@detail');
-    Route::post('/g/{slug}/sign/up/{id}', 'EventsController@signUpUser');
-    Route::post('/g/{slug}/sign/off/{id}', 'EventsController@signOffUser');
-    Route::post('/g/{slug}/sign/modify/{id}', 'EventsController@modifySignup');
     Route::get('/g/{slug}/pastevents', 'GuildController@pastEvents');
 
     /* GUILDS */
     Route::get('/g/{slug}/member/leave', 'GuildController@leave');
     Route::get('/g/{slug}/members', 'GuildController@members');
+});
+
+Route::group(['middleware' => ['auth', 'guild.member', 'guild.event']], function () {
+    Route::get('/g/{slug}/event/{event_id}', 'EventsController@detail');
+    Route::post('/g/{slug}/sign/up/{event_id}', 'EventsController@signUpUser');
+    Route::post('/g/{slug}/sign/off/{event_id}', 'EventsController@signOffUser');
+    Route::post('/g/{slug}/sign/modify/{event_id}', 'EventsController@modifySignup');
 
     /* COMMENTS */
     Route::post('/g/{slug}/event/{event_id}/comment/create', 'CommentController@create');
