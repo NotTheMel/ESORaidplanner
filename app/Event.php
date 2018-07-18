@@ -221,6 +221,10 @@ class Event extends Model
      */
     public function signup(User $user, int $role_id = null, int $class_id = null, array $sets = [], Character $character = null)
     {
+        if ($this->isLocked()) {
+            return;
+        }
+
         Signup::query()->where('event_id', '=', $this->id)
             ->where('user_id', '=', $user->id)
             ->delete();
@@ -316,6 +320,10 @@ class Event extends Model
      */
     public function signoff(User $user)
     {
+        if ($this->isLocked()) {
+            return;
+        }
+
         Signup::query()->where('event_id', '=', $this->id)
             ->where('user_id', '=', $user->id)
             ->delete();
@@ -349,6 +357,10 @@ class Event extends Model
      */
     public function editSignup(User $user, int $role_id = null, int $class_id = null, array $sets = [], Character $character = null)
     {
+        if ($this->isLocked()) {
+            return;
+        }
+
         $sign = Signup::query()->where('event_id', '=', $this->id)
             ->where('user_id', '=', $user->id)
             ->first();
@@ -405,6 +417,11 @@ class Event extends Model
     {
         $this->locked = self::STATUS_UNLOCKED;
         $this->save();
+    }
+
+    public function isLocked(): bool
+    {
+        return 1 === $this->locked;
     }
 
     public function callPostSignupsHooks()

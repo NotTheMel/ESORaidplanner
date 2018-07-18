@@ -150,10 +150,6 @@ class EventsController extends Controller
         /** @var Event $event */
         $event = Event::query()->find($id);
 
-        if (1 === $event->locked) {
-            return redirect('g/'.$slug);
-        }
-
         if (!empty(Input::get('character'))) {
             $character = Character::query()->find(Input::get('character'));
             $event->signup(Auth::user(), null, null, [], $character);
@@ -174,10 +170,6 @@ class EventsController extends Controller
     {
         /** @var Event $event */
         $event = Event::query()->find($id);
-
-        if (1 === $event->locked) {
-            return redirect('g/'.$slug);
-        }
 
         /** @var User $user */
         $user = User::query()->find(Input::get('user'));
@@ -202,10 +194,6 @@ class EventsController extends Controller
     {
         /** @var Event $event */
         $event = Event::query()->find($id);
-
-        if (1 === $event->locked) {
-            return redirect('g/'.$slug);
-        }
 
         if (!empty(Input::get('character'))) {
             $character = Character::query()->find(Input::get('character'));
@@ -248,10 +236,6 @@ class EventsController extends Controller
     {
         /** @var Event $event */
         $event = Event::query()->find($id);
-
-        if (1 === $event->locked) {
-            return redirect('g/'.$slug);
-        }
 
         $event->signoff(Auth::user());
 
