@@ -65,14 +65,14 @@ class GuildLogger
     {
         $guild = $this->getGuild($event->guild_id);
         $log   = new LogEntry();
-        $log->create($guild->id, $creator->name.' created the event '.$this->event->name.'.');
+        $log->create($guild->id, $creator->name.' created the event '.$event->name.'.');
     }
 
     public function eventSignup(Event $event, User $user)
     {
         $guild = $this->getGuild($event->guild_id);
         $log   = new LogEntry();
-        $log->create($guild->id, $user->name.' signed up for <a href="/g/'.$guild->slug.'/event/'.$this->event->id.'">'.$this->event->name.'</a>.');
+        $log->create($guild->id, $user->name.' signed up for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
     }
 
     public function eventSignupOther(Event $event, User $admin, User $user)
@@ -80,21 +80,21 @@ class GuildLogger
         $guild = $this->getGuild($event->guild_id);
         $log   = new LogEntry();
         $log->create($guild->id,
-            $admin->name.' signed up '.$user->name.' for <a href="/g/'.$guild->slug.'/event/'.$this->event->id.'">'.$this->event->name.'</a>.');
+            $admin->name.' signed up '.$user->name.' for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
     }
 
     public function eventSignoff(Event $event, User $user)
     {
         $guild = $this->getGuild($event->guild_id);
         $log   = new LogEntry();
-        $log->create($guild->id, $user->name.' signed off for <a href="/g/'.$guild->slug.'/event/'.$this->event->id.'">'.$this->event->name.'</a>.');
+        $log->create($guild->id, $user->name.' signed off for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
     }
 
     public function eventSignoffOther(Event $event, User $admin, User $user)
     {
         $guild = $this->getGuild($event->guild_id);
         $log   = new LogEntry();
-        $log->create($guild->id, $admin->name.' signed off '.$user->name.' for <a href="/g/'.$guild->slug.'/event/'.$this->event->id.'">'.$this->event->name.'</a>.');
+        $log->create($guild->id, $admin->name.' signed off '.$user->name.' for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
     }
 
     private function getGuild(int $guild_id)
