@@ -263,16 +263,13 @@ class EsoRaidPlannerAPI
 
         $user = User::query()->where('telegram_username', '=', $username)->first();
 
-        $guild = Guild::query()->find($guildId);
+        if (false === strpos($supportSets, ',')) {
+            $sets = [$supportSets] ?? [];
+        } else {
+            $sets = explode(', ', $supportSets);
+        }
 
-        Signup::query()->insert([
-            'event_id'   => $event->id,
-            'user_id'    => $user->id,
-            'class_id'   => $class,
-            'role_id'    => $role,
-            'sets'       => $supportSets ?? '',
-            'created_at' => date('Y-m-d H:i:s'),
-        ]);
+        $event->signup($user, $role, $class, $sets);
 
         if (!empty($comments)) {
             Comment::query()->insert([
@@ -282,8 +279,6 @@ class EsoRaidPlannerAPI
                 'created_at' => date('Y-m-d H:i:s'),
             ]);
         }
-
-        $event->logger->eventSignup($event, $user);
     }
 
     /**
@@ -296,16 +291,11 @@ class EsoRaidPlannerAPI
         if (!self::isMemberOfGuild($username, $guildId)) {
             return;
         }
-        $user = User::query()->where('telegram_username', '=', $username)->first();
 
+        $user = User::query()->where('telegram_username', '=', $username)->first();
         /** @var Event $event */
         $event = Event::query()->find($eventId);
-
-        $guild = Guild::query()->find($guildId);
-
-        Signup::query()->where('event_id', '=', $eventId)->where('user_id', '=', $user->id)->delete();
-
-        $event->logger->eventSignoff($event, $user);
+        $event->signoff($user);
     }
 
     /**
