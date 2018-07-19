@@ -45,6 +45,8 @@ class DataMapper
     /**
      * @param int $id
      *
+     * @deprecated
+     *
      * @return string
      */
     public static function getMegaserverName(int $id): string

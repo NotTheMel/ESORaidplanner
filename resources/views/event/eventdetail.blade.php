@@ -93,7 +93,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             Supportive sets<br>
-                                            {!! Form::select('sets[]', $sets, explode(', ', $event->getUserSignup('sets')), array('class' => 'chosen-select', 'multiple')) !!}
+                                            {!! Form::select('sets[]', \App\Set::formatForDropdown(), explode(', ', $event->getUserSignup('sets')), array('class' => 'chosen-select', 'multiple')) !!}
                                         </div>
                                         <div class="col-md-2">
                                             <br>{!! Form::submit('Save changes', ['class' => 'btn btn-info']) !!}
@@ -153,7 +153,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             Supportive sets<br>
-                                            {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!}
+                                            {!! Form::select('sets[]', \App\Set::formatForDropdown(), null, array('class' => 'chosen-select', 'multiple')) !!}
                                             &nbsp; {!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
                                         </div>
                                     </div>
@@ -199,7 +199,7 @@
                                 @endif
                                 </thead>
                                 <tbody>
-                                @foreach ($tanks as $signup)
+                                @foreach ($event->getSignupsByRole(\App\Singleton\RoleTypes::ROLE_TANK) as $signup)
                                     @if ($signup->status === 1)
                                         <tr style="background-color: rgba(50, 205, 50, 0.5);">
                                     @elseif ($signup->status === 2)
@@ -208,7 +208,7 @@
                                         <tr>
                                             @endif
                                             <td>{{ $signup->getUser()->name }}</td>
-                                            <td>{{ $signup->getClassName() }}</td>
+                                            <td><img width="30px" src="/img/classes/{{ $signup->getClassIcon() }}" alt="{{ $signup->getClassName() }}" title="{{ $signup->getClassName() }}"></td>
                                             <td>{{ $signup->getRoleName() }}</td>
                                             <td>{!! $signup->getSetsFormatted() !!}</td>
                                             <td><i class="fa fa-clock-o"
@@ -244,7 +244,7 @@
                                 @endif
                                 </thead>
                                 <tbody>
-                                @foreach ($healers as $signup)
+                                @foreach ($event->getSignupsByRole(\App\Singleton\RoleTypes::ROLE_HEALER) as $signup)
                                     @if ($signup->status === 1)
                                         <tr style="background-color: rgba(50, 205, 50, 0.5);">
                                     @elseif ($signup->status === 2)
@@ -253,7 +253,7 @@
                                         <tr>
                                             @endif
                                             <td>{{ $signup->getUser()->name }}</td>
-                                            <td>{{ $signup->getClassName() }}</td>
+                                            <td><img width="30px" src="/img/classes/{{ $signup->getClassIcon() }}" alt="{{ $signup->getClassName() }}" title="{{ $signup->getClassName() }}"></td>
                                             <td>{{ $signup->getRoleName() }}</td>
                                             <td>{!! $signup->getSetsFormatted() !!}</td>
                                             <td><i class="fa fa-clock-o"
@@ -289,7 +289,7 @@
                                 @endif
                                 </thead>
                                 <tbody>
-                                @foreach ($magickas as $signup)
+                                @foreach ($event->getSignupsByRole(\App\Singleton\RoleTypes::ROLE_MAGICKA_DD) as $signup)
                                     @if ($signup->status === 1)
                                         <tr style="background-color: rgba(50, 205, 50, 0.5);">
                                     @elseif ($signup->status === 2)
@@ -334,7 +334,7 @@
                                 @endif
                                 </thead>
                                 <tbody>
-                                @foreach ($staminas as $signup)
+                                @foreach ($event->getSignupsByRole(\App\Singleton\RoleTypes::ROLE_STAMINA_DD) as $signup)
                                     @if ($signup->status === 1)
                                         <tr style="background-color: rgba(50, 205, 50, 0.5);">
                                     @elseif ($signup->status === 2)
@@ -359,7 +359,7 @@
                             </table>
                         </div>
 
-                        @if(count($others) > 0)
+                        @if(count($event->getSignupsByRole(\App\Singleton\RoleTypes::ROLE_OTHER)) > 0)
                             <div class="content table-responsive table-full-width" style="z-index: 9999">
                                 <h3 align="center">Others</h3>
                                 <table class="table  table-striped">
@@ -380,7 +380,7 @@
                                     @endif
                                     </thead>
                                     <tbody>
-                                    @foreach ($others as $signup)
+                                    @foreach ($event->getSignupsByRole(\App\Singleton\RoleTypes::ROLE_OTHER) as $signup)
                                         @if ($signup->status === 1)
                                             <tr style="background-color: rgba(50, 205, 50, 0.5);">
                                         @elseif ($signup->status === 2)
@@ -420,14 +420,14 @@
                             <br><br>
                         @endif
 
-                        @if($guild->isAdmin(Auth::user()) && count($members) > 0)
+                        @if($guild->isAdmin(Auth::user()) && count($guild->getMembersIdArray()) > 0)
                             <div class="content">
                                 <strong>You are an admin.</strong> Here you can sign up someone else for this event.
                                 {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/other/'.$event->id)) }}
                                 {!! Form::open([]) !!}
                                 <div id="row">
                                     <div class="col-md-12">
-                                        {!! Form::select('user', $members, null, array('class' => 'form-control')) !!}
+                                        {!! Form::select('user', $guild->getMembersIdArray(), null, array('class' => 'form-control')) !!}
                                     </div>
                                 </div>
                                 <div class="row">
@@ -441,7 +441,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         Supportive sets<br>
-                                        {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!}
+                                        {!! Form::select('sets[]', \App\Set::formatForDropdown(), null, array('class' => 'chosen-select', 'multiple')) !!}
                                     </div>
                                     <div class="col-md-2">
                                         <br>{!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
@@ -462,7 +462,7 @@
                             <h4 class="title">Comments</h4>
                         </div>
                         <div class="content">
-                            @foreach($comments as $comment)
+                            @foreach($event->getComments() as $comment)
                                 <div class="row">
                                     <div class="col-sm-2">
                                         <div class="thumbnail">

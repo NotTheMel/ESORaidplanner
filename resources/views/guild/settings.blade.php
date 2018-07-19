@@ -44,7 +44,7 @@
                                 <th>Interval</th>
                                 </thead>
                                 <tbody>
-                                @foreach($repeatables as $repeatable)
+                                @foreach($guild->getRepeatableEvents() as $repeatable)
                                     <tr>
                                         <td>{{ $repeatable->name }}</td>
                                         <td>{{ $repeatable->getRepetitionString() }}</td>
@@ -83,7 +83,7 @@
                                     <th>Role</th>
                                     </thead>
                                     <tbody>
-                                    @foreach ($pending as $member)
+                                    @foreach ($guild->getPendingMembers() as $member)
                                         <tr>
                                             <td>{{ $guild->getMemberName($member->id) }}</td>
                                             <td>Membership pending</td>

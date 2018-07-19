@@ -32,4 +32,16 @@ class Set extends Model
 
         return [$sets];
     }
+
+    public static function formatForDropdown(): array
+    {
+        $sets      = self::all() ?? [];
+        $formatted = [];
+
+        foreach ($sets as $set) {
+            $formatted[$set->name] = $set->name;
+        }
+
+        return $formatted;
+    }
 }

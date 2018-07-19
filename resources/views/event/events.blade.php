@@ -18,7 +18,7 @@
                             <th>Date and Time</th>
                             <th>Event</th>
                             <th>Signups</th>
-                            @foreach ($events as $event)
+                            @foreach ($guild->getPastEvents() as $event)
                                 <tr>
                                     <td>
                                         <a href="{{ '/g/' . $guild->slug . '/event/' . $event->id }}">{{ $event->name }}</a>

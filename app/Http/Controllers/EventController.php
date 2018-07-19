@@ -18,9 +18,7 @@ namespace App\Http\Controllers;
 use App\Character;
 use App\Event;
 use App\Guild;
-use App\Set;
 use App\Signup;
-use App\Singleton\RoleTypes;
 use App\Team;
 use App\User;
 use DateTime;
@@ -61,37 +59,7 @@ class EventController extends Controller
             ->where('slug', '=', $slug)
             ->first();
 
-        $tanks = $event->getSignupsByRole(RoleTypes::ROLE_TANK);
-
-        $healers = $event->getSignupsByRole(RoleTypes::ROLE_HEALER);
-
-        $magickas = $event->getSignupsByRole(RoleTypes::ROLE_MAGICKA_DD);
-
-        $staminas = $event->getSignupsByRole(RoleTypes::ROLE_STAMINA_DD);
-
-        $others = $event->getSignupsByRole(RoleTypes::ROLE_OTHER);
-
-        $comments = $event->getComments();
-
-        $sets_q = Set::query()
-            ->orderBy('name', 'asc')
-            ->get();
-
-        $mem = $guild->getMembers();
-
-        $members = [];
-
-        foreach ($mem as $member) {
-            $members[$member->id] = $member->name;
-        }
-
-        $sets = [];
-
-        foreach ($sets_q as $set) {
-            $sets[$set->name] = $set->name;
-        }
-
-        return view('event.eventdetail', compact('tanks', 'event', 'guild', 'comments', 'sets', 'healers', 'staminas', 'magickas', 'others', 'members'));
+        return view('event.eventdetail', compact('event', 'guild'));
     }
 
     /**
@@ -121,11 +89,7 @@ class EventController extends Controller
 
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        $start_date = new DateTime($event->start_date);
-
-        $start_date->setTimezone(new DateTimeZone(Auth::user()->timezone));
-
-        return view('event.edit', compact('event', 'start_date', 'guild'));
+        return view('event.edit', compact('event', 'guild'));
     }
 
     /**

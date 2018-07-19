@@ -279,6 +279,19 @@ class Guild extends Model
     /**
      * @return array
      */
+    public function getMembersIdArray(): array
+    {
+        $members =[];
+        foreach ($this->getMembers() as $member) {
+            $members[$member->id] = $member->name;
+        }
+
+        return $members;
+    }
+
+    /**
+     * @return array
+     */
     public function getPendingMembers()
     {
         return User::query()
@@ -370,6 +383,14 @@ class Guild extends Model
                 ->where('guild_id', '=', $this->id)
                 ->orderBy('name')
                 ->get()->all() ?? [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getRepeatableEvents(): array
+    {
+        return RepeatableEvent::query()->where('guild_id', '=', $this->id)->get()->all() ?? [];
     }
 
     /**

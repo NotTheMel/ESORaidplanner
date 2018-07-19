@@ -71,6 +71,11 @@ class Signup extends Model
         return ClassTypes::getClassName($this->class_id);
     }
 
+    public function getClassIcon(): string
+    {
+        return ClassTypes::getClassIcon($this->class_id);
+    }
+
     /**
      * @return string
      */

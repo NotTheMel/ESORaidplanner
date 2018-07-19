@@ -3,7 +3,7 @@
 @section('content')
     <div class="content">
 
-        @if (($guild->isAdmin(Auth::user()) || Auth::user()->global_admin === 1) && count($pending ) > 0)
+        @if (($guild->isAdmin(Auth::user()) || Auth::user()->global_admin === 1) && count($guild->getPendingMembers() ) > 0)
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
@@ -23,7 +23,7 @@
                                 <th>Role</th>
                                 </thead>
                                 <tbody>
-                                @foreach ($pending as $member)
+                                @foreach ($guild->getPendingMembers() as $member)
                                     <tr>
                                         <td>{{ $member->name }}</td>
                                         <td>Membership pending</td>
@@ -72,7 +72,7 @@
                             <th></th>
                             </thead>
                             <tbody>
-                            @foreach ($members as $member)
+                            @foreach ($guild->getMembers() as $member)
                                 <tr>
                                     <td>{{ $member->name }}</td>
                                     @if ($guild->isOwner($member))
