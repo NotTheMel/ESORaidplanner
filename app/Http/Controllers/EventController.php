@@ -28,19 +28,9 @@ use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Input;
 
-class EventsController extends Controller
+class EventController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     */
-    public function __construct()
-    {
-        //$this->middleware('auth');
-    }
-
     /**
      * Show the application dashboard.
      *
@@ -48,8 +38,6 @@ class EventsController extends Controller
      */
     public function index()
     {
-        //$events = DB::table('events')->where('start_date', '>=', date('Y-m-d H:i:s'))->get();
-
         $events = Event::query()
             ->where('start_date', '>=', date('Y-m-d H:i:s'))
             ->orderBy('start_date', 'asc')
@@ -73,10 +61,6 @@ class EventsController extends Controller
         $guild = Guild::query()
             ->where('slug', '=', $slug)
             ->first();
-
-        if (empty($guild) || empty($event)) {
-            return redirect('g/'.$slug);
-        }
 
         $tanks = $event->getSignupsByRole(RoleTypes::ROLE_TANK);
 
@@ -126,6 +110,12 @@ class EventsController extends Controller
         return view('event.create', compact('guild'));
     }
 
+    /**
+     * @param string $slug
+     * @param int    $id
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function show(string $slug, int $id)
     {
         $event = Event::query()->find($id);
@@ -140,66 +130,69 @@ class EventsController extends Controller
     }
 
     /**
-     * @param string $slug
-     * @param int    $id
+     * @param Request $request
+     * @param string  $slug
+     * @param int     $id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function signUpUser(string $slug, int $id)
+    public function signUpUser(Request $request, string $slug, int $id)
     {
         /** @var Event $event */
         $event = Event::query()->find($id);
 
-        if (!empty(Input::get('character'))) {
-            $character = Character::query()->find(Input::get('character'));
+        if (!empty($request->input('character'))) {
+            $character = Character::query()->find($request->input('character'));
             $event->signup(Auth::user(), null, null, [], $character);
         } else {
-            $event->signup(Auth::user(), Input::get('role'), Input::get('class'), Input::get('sets') ?? []);
+            $event->signup(Auth::user(), $request->input('role'), $request->input('class'), $request->input('sets') ?? []);
         }
 
         return redirect('g/'.$slug.'/event/'.$id);
     }
 
     /**
-     * @param string $slug
-     * @param int    $id
+     * @param Request $request
+     * @param string  $slug
+     * @param int     $id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function signUpOther(string $slug, int $id)
+    public function signUpOther(Request $request, string $slug, int $id)
     {
         /** @var Event $event */
         $event = Event::query()->find($id);
 
         /** @var User $user */
-        $user = User::query()->find(Input::get('user'));
+        $user = User::query()->find($request->input('user'));
 
-        if (!empty(Input::get('character'))) {
-            $character = Character::query()->find(Input::get('character'));
+        if (!empty($request->input('character'))) {
+            $character = Character::query()->find($request->input('character'));
             $event->signupOther($user, Auth::user(), null, null, [], $character);
         } else {
-            $event->signupOther($user, Auth::user(), Input::get('role'), Input::get('class'), Input::get('sets') ?? []);
+            $event->signupOther($user, Auth::user(), $request->input('role'), $request->input('class'), $request->input('sets') ?? []);
         }
 
         return redirect('g/'.$slug.'/event/'.$id);
     }
 
     /**
-     * @param string $slug
-     * @param int    $id
+     * @param Request $request
+     * @param string  $slug
+     * @param int     $id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function modifySignUp(string $slug, int $id)
+    public function modifySignUp(Request $request, string $slug, int $id)
     {
         /** @var Event $event */
         $event = Event::query()->find($id);
 
-        if (!empty(Input::get('character'))) {
-            $character = Character::query()->find(Input::get('character'));
+        if (!empty($request->input('character'))) {
+            $character = Character::query()->find($request->input('character'));
             $event->editSignup(Auth::user(), null, null, [], $character);
         } else {
-            $event->editSignup(Auth::user(), Input::get('role'), Input::get('class'), Input::get('sets') ?? []);
+            $event->editSignup(Auth::user(), $request->input('role'), $request->input('class'), $request->input('sets') ?? []);
         }
 
         return redirect('g/'.$slug.'/event/'.$id);
@@ -243,7 +236,8 @@ class EventsController extends Controller
     }
 
     /**
-     * @param string $slug
+     * @param Request $request
+     * @param string  $slug
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
@@ -259,9 +253,9 @@ class EventsController extends Controller
         ]);
 
         if (12 === Auth::user()->clock) {
-            $date = new DateTime(Input::get('year').'-'.Input::get('month').'-'.Input::get('day').' '.Input::get('hour').':'.Input::get('minute').' '.Input::get('meridiem'), new DateTimeZone(Auth::user()->timezone));
+            $date = new DateTime($request->input('year').'-'.$request->input('month').'-'.$request->input('day').' '.$request->input('hour').':'.$request->input('minute').' '.$request->input('meridiem'), new DateTimeZone(Auth::user()->timezone));
         } else {
-            $date = new DateTime(Input::get('year').'-'.Input::get('month').'-'.Input::get('day').' '.Input::get('hour').':'.Input::get('minute'), new DateTimeZone(Auth::user()->timezone));
+            $date = new DateTime($request->input('year').'-'.$request->input('month').'-'.$request->input('day').' '.$request->input('hour').':'.$request->input('minute'), new DateTimeZone(Auth::user()->timezone));
         }
 
         $date->setTimezone(new DateTimeZone(env('DEFAULT_TIMEZONE')));
@@ -271,12 +265,12 @@ class EventsController extends Controller
             ->first();
 
         $event              = new Event();
-        $event->name        = Input::get('name');
-        $event->type        = Input::get('type');
+        $event->name        = $request->input('name');
+        $event->type        = $request->input('type');
         $event->start_date  = $date->format('Y-m-d H:i:s');
         $event->guild_id    = $guild->id;
-        $event->description = Input::get('description') ?? '';
-        $event->tags        = Input::get('tags') ?? '';
+        $event->description = $request->input('description') ?? '';
+        $event->tags        = $request->input('tags') ?? '';
 
         $event->save();
 
@@ -285,8 +279,7 @@ class EventsController extends Controller
             $event->signupTeam($team);
         }
 
-        $log = new LogEntry();
-        $log->create($guild->id, Auth::user()->name.' created the event '.$event->name.'.');
+        $event->logger->eventCreate(Auth::user());
 
         $event->callEventCreationHooks();
 
@@ -294,8 +287,9 @@ class EventsController extends Controller
     }
 
     /**
-     * @param string $slug
-     * @param int    $id
+     * @param Request $request
+     * @param string  $slug
+     * @param int     $id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
@@ -311,9 +305,9 @@ class EventsController extends Controller
         ]);
 
         if (12 === Auth::user()->clock) {
-            $date = new DateTime(Input::get('year').'-'.Input::get('month').'-'.Input::get('day').' '.Input::get('hour').':'.Input::get('minute').' '.Input::get('meridiem'), new DateTimeZone(Auth::user()->timezone));
+            $date = new DateTime($request->input('year').'-'.$request->input('month').'-'.$request->input('day').' '.$request->input('hour').':'.$request->input('minute').' '.$request->input('meridiem'), new DateTimeZone(Auth::user()->timezone));
         } else {
-            $date = new DateTime(Input::get('year').'-'.Input::get('month').'-'.Input::get('day').' '.Input::get('hour').':'.Input::get('minute'), new DateTimeZone(Auth::user()->timezone));
+            $date = new DateTime($request->input('year').'-'.$request->input('month').'-'.$request->input('day').' '.$request->input('hour').':'.$request->input('minute'), new DateTimeZone(Auth::user()->timezone));
         }
 
         $date->setTimezone(new DateTimeZone(env('DEFAULT_TIMEZONE')));
@@ -323,11 +317,11 @@ class EventsController extends Controller
             ->first();
 
         $event              = Event::query()->find($id);
-        $event->name        = Input::get('name');
-        $event->type        = Input::get('type');
+        $event->name        = $request->input('name');
+        $event->type        = $request->input('type');
         $event->start_date  = $date->format('Y-m-d H:i:s');
-        $event->description = Input::get('description') ?? '';
-        $event->tags        = Input::get('tags') ?? '';
+        $event->description = $request->input('description') ?? '';
+        $event->tags        = $request->input('tags') ?? '';
 
         $event->save();
 

@@ -32,6 +32,8 @@ class Event extends Model
     const STATUS_LOCKED   = 1;
     const STATUS_UNLOCKED = 0;
 
+    public $logger;
+
     protected $fillable = [
         'name',
         'description',
@@ -41,6 +43,12 @@ class Event extends Model
         'locked',
         'tags',
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->logger = new GuildLogger(Guild::query()->find($this->guild_id), $this);
+    }
 
     /**
      * @return int
@@ -251,8 +259,7 @@ class Event extends Model
 
         $sign->save();
 
-        $log = new LogEntry();
-        $log->create($this->guild_id, $user->name.' signed up for <a href="/g/'.$this->getGuildSlug().'/event/'.$this->id.'">'.$this->name.'</a>.');
+        $this->logger->eventSignup($user);
     }
 
     /**
@@ -310,9 +317,7 @@ class Event extends Model
 
         $sign->save();
 
-        $log = new LogEntry();
-        $log->create($this->guild_id,
-            $admin->name.' signed up '.$user->name.' for <a href="/g/'.$this->getGuildSlug().'/event/'.$this->id.'">'.$this->name.'</a>.');
+        $this->logger->eventSignupOther($admin, $user);
     }
 
     /**
@@ -328,8 +333,7 @@ class Event extends Model
             ->where('user_id', '=', $user->id)
             ->delete();
 
-        $log = new LogEntry();
-        $log->create($this->guild_id, $user->name.' signed off for <a href="/g/'.$this->getGuildSlug().'/event/'.$this->id.'">'.$this->name.'</a>.');
+        $this->logger->eventSignoff($user);
     }
 
     /**
@@ -344,8 +348,7 @@ class Event extends Model
             ->where('user_id', '=', $user->id)
             ->delete();
 
-        $log = new LogEntry();
-        $log->create($this->guild_id, $admin->name.' signed off '.$user->name.' for <a href="/g/'.$this->getGuildSlug().'/event/'.$this->id.'">'.$this->name.'</a>.');
+        $this->logger->eventSignoffOther($admin, $user);
     }
 
     /**
@@ -447,13 +450,5 @@ class Event extends Model
         $dt->setTimezone(new DateTimeZone('UTC'));
 
         return $dt->format('Y-m-d H:i:s');
-    }
-
-    /**
-     * @return string
-     */
-    private function getGuildSlug(): string
-    {
-        return Guild::query()->find($this->guild_id)->slug;
     }
 }
