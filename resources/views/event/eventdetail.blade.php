@@ -93,7 +93,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             Supportive sets<br>
-                                            {!! Form::select('sets[]', $sets, explode(', ', $event->getUserSignup('sets')), array('class' => 'chosen-select', 'multiple')) !!}
+                                            {!! Form::select('sets[]', \App\Set::formatForDropdown(), explode(', ', $event->getUserSignup('sets')), array('class' => 'chosen-select', 'multiple')) !!}
                                         </div>
                                         <div class="col-md-2">
                                             <br>{!! Form::submit('Save changes', ['class' => 'btn btn-info']) !!}
@@ -153,7 +153,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             Supportive sets<br>
-                                            {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!}
+                                            {!! Form::select('sets[]', \App\Set::formatForDropdown(), null, array('class' => 'chosen-select', 'multiple')) !!}
                                             &nbsp; {!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
                                         </div>
                                     </div>
@@ -420,14 +420,14 @@
                             <br><br>
                         @endif
 
-                        @if($guild->isAdmin(Auth::user()) && count($members) > 0)
+                        @if($guild->isAdmin(Auth::user()) && count($guild->getMembersIdArray()) > 0)
                             <div class="content">
                                 <strong>You are an admin.</strong> Here you can sign up someone else for this event.
                                 {{ Form::open(array('url' => 'g/' . $guild->slug . '/sign/other/'.$event->id)) }}
                                 {!! Form::open([]) !!}
                                 <div id="row">
                                     <div class="col-md-12">
-                                        {!! Form::select('user', $members, null, array('class' => 'form-control')) !!}
+                                        {!! Form::select('user', $guild->getMembersIdArray(), null, array('class' => 'form-control')) !!}
                                     </div>
                                 </div>
                                 <div class="row">
@@ -441,7 +441,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         Supportive sets<br>
-                                        {!! Form::select('sets[]', $sets, null, array('class' => 'chosen-select', 'multiple')) !!}
+                                        {!! Form::select('sets[]', \App\Set::formatForDropdown(), null, array('class' => 'chosen-select', 'multiple')) !!}
                                     </div>
                                     <div class="col-md-2">
                                         <br>{!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
@@ -462,7 +462,7 @@
                             <h4 class="title">Comments</h4>
                         </div>
                         <div class="content">
-                            @foreach($comments as $comment)
+                            @foreach($event->getComments() as $comment)
                                 <div class="row">
                                     <div class="col-sm-2">
                                         <div class="thumbnail">

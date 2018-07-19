@@ -18,7 +18,6 @@ namespace App\Http\Controllers;
 use App\Character;
 use App\Event;
 use App\Guild;
-use App\Set;
 use App\Signup;
 use App\Team;
 use App\User;
@@ -60,27 +59,7 @@ class EventController extends Controller
             ->where('slug', '=', $slug)
             ->first();
 
-        $comments = $event->getComments();
-
-        $sets_q = Set::query()
-            ->orderBy('name', 'asc')
-            ->get();
-
-        $mem = $guild->getMembers();
-
-        $members = [];
-
-        foreach ($mem as $member) {
-            $members[$member->id] = $member->name;
-        }
-
-        $sets = [];
-
-        foreach ($sets_q as $set) {
-            $sets[$set->name] = $set->name;
-        }
-
-        return view('event.eventdetail', compact('event', 'guild', 'comments', 'sets', 'members'));
+        return view('event.eventdetail', compact('event', 'guild'));
     }
 
     /**
