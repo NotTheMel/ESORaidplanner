@@ -60,13 +60,9 @@ class Guild extends Model
 
         Event::query()->where('guild_id', '=', $this->id)->delete();
         DB::table('user_guilds')->where('guild_id', '=', $this->id)->delete();
-        Guild::query()->where('id', '=', $this->id)->delete();
         LogEntry::query()->where('guild_id', '=', $this->id)->delete();
 
-        try {
-            parent::delete();
-        } catch (\Exception $e) {
-        }
+        parent::delete();
     }
 
     /**

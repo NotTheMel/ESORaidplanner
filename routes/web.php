@@ -129,6 +129,11 @@ Route::group(['middleware' => ['auth', 'guild.owner']], function () {
     Route::get('/g/{slug}/member/removeadmin/{user_id}', 'GuildController@removeAdmin');
 });
 
+Route::group(['middleware' => ['auth', 'hook.owner']], function () {
+    Route::get('/hooks/modify/{hook_id}', 'HookController@show');
+    Route::post('/hooks/modify/{hook_id}', 'HookController@edit');
+    Route::post('/hooks/delete/{hook_id}', 'HookController@delete');
+});
 
 Route::group(['middleware' => 'auth'], function () {
 
@@ -153,9 +158,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/hooks/typeselect/{call_type}', 'HookController@typeSelectForm');
     Route::get('/hooks/create/{call_type}/{type}', 'HookController@new');
     Route::post('/hooks/create/{call_type}/{type}', 'HookController@create');
-    Route::get('/hooks/modify/{hook_id}', 'HookController@show');
-    Route::post('/hooks/modify/{hook_id}', 'HookController@edit');
-    Route::post('/hooks/delete/{id}', 'HookController@delete');
 
     /*
      *

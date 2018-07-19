@@ -18,7 +18,6 @@ namespace App\Http\Controllers;
 use App\NewsArticle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
@@ -41,8 +40,8 @@ class NewsController extends Controller
         ]);
 
         $article            = new NewsArticle();
-        $article->title     = Input::get('title');
-        $article->content   = Input::get('content');
+        $article->title     = $request->input('title');
+        $article->content   = $request->input('content');
         $article->author_id = Auth::id();
 
         $request->file('image')->store('public/news');
@@ -73,8 +72,8 @@ class NewsController extends Controller
         ]);
 
         $article          = NewsArticle::query()->find($article_id);
-        $article->title   = Input::get('title');
-        $article->content = Input::get('content');
+        $article->title   = $request->input('title');
+        $article->content = $request->input('content');
 
         if ($request->hasFile('image')) {
             $request->file('image')->store('public/news');

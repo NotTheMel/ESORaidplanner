@@ -50,6 +50,13 @@ class Event extends Model
         $this->logger = new GuildLogger();
     }
 
+    public function delete()
+    {
+        Signup::query()->where('event_id', '=', $this->id)->delete();
+
+        return parent::delete();
+    }
+
     /**
      * @return int
      */

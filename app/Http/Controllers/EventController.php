@@ -18,7 +18,6 @@ namespace App\Http\Controllers;
 use App\Character;
 use App\Event;
 use App\Guild;
-use App\LogEntry;
 use App\Set;
 use App\Signup;
 use App\Singleton\RoleTypes;
@@ -312,10 +311,6 @@ class EventController extends Controller
 
         $date->setTimezone(new DateTimeZone(env('DEFAULT_TIMEZONE')));
 
-        $guild = Guild::query()
-            ->where('slug', '=', $slug)
-            ->first();
-
         $event              = Event::query()->find($id);
         $event->name        = $request->input('name');
         $event->type        = $request->input('type');
@@ -336,15 +331,9 @@ class EventController extends Controller
      */
     public function delete(string $slug, int $id)
     {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
         $event = Event::query()->find($id);
-
-        Signup::query()->where('event_id', '=', $id)->delete();
-        Event::query()->where('id', '=', $id)->delete();
-
-        $log = new LogEntry();
-        $log->create($guild->id, Auth::user()->name.' deleted the event '.$event->name.'.');
+        $event->logger->eventDelete($event, Auth::user());
+        $event->delete();
 
         return redirect('g/'.$slug);
     }
@@ -393,10 +382,7 @@ class EventController extends Controller
      */
     public function changeLockStatus(string $slug, int $event_id, int $lockstatus)
     {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        /** @var Event $event */
-        $event         = Event::query()->find($event_id);
+        $event = Event::query()->find($event_id);
 
         if (Event::STATUS_LOCKED === $lockstatus) {
             $event->lock();
@@ -415,9 +401,6 @@ class EventController extends Controller
      */
     public function postSignupsHooks(string $slug, int $event_id)
     {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        /** @var Event $event */
         $event         = Event::query()->find($event_id);
         $event->callPostSignupsHooks();
 

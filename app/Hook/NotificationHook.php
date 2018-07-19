@@ -18,7 +18,6 @@ namespace App\Hook;
 use App\Event;
 use App\Guild;
 use App\Hookcall;
-use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class NotificationHook extends Model
@@ -48,22 +47,6 @@ class NotificationHook extends Model
         } else {
             return 'Unknown';
         }
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return bool
-     */
-    public function isOwner(User $user): bool
-    {
-        $guild = Guild::query()->find($this->guild_id);
-
-        if (in_array($user->id, json_decode($guild->admins, true))) {
-            return true;
-        }
-
-        return false;
     }
 
     /**

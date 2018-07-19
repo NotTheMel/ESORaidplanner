@@ -13,7 +13,6 @@ use App\RepeatableEvent;
 use App\Set;
 use App\Team;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class TeamController extends Controller
 {
@@ -27,10 +26,6 @@ class TeamController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$guild->slug);
-        }
-
         $team = new Team(['name' => $request->input('name'), 'guild_id' => $guild->id]);
         $team->save();
 
@@ -41,10 +36,6 @@ class TeamController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$guild->slug);
-        }
-
         return view('team.create', compact('guild'));
     }
 
@@ -52,9 +43,6 @@ class TeamController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$guild->slug);
-        }
         $team = Team::query()->find($team_id);
         if ($team->guild_id !== $guild->id) {
             return redirect('/g/'.$guild->slug);
@@ -79,9 +67,6 @@ class TeamController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$guild->slug);
-        }
         $teams = Team::query()->where('guild_id', '=', $guild->id)
             ->get()->all() ?? [];
 
@@ -97,10 +82,6 @@ class TeamController extends Controller
     public function delete(string $slug, int $team_id)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$guild->slug);
-        }
 
         $team = Team::query()->find($team_id);
         if ($team->guild_id !== $guild->id) {
@@ -126,10 +107,6 @@ class TeamController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$guild->slug);
-        }
-
         /** @var Team $team */
         $team = Team::query()->find($team_id);
         if ($team->guild_id !== $guild->id) {
@@ -150,10 +127,6 @@ class TeamController extends Controller
     public function removeMember(string $slug, int $team_id, int $user_id)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$guild->slug);
-        }
 
         /** @var Team $team */
         $team = Team::query()->find($team_id);
