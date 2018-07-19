@@ -47,7 +47,7 @@ class Event extends Model
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->logger = new GuildLogger(Guild::query()->find($attributes['guild_id']), $this);
+        $this->logger = new GuildLogger();
     }
 
     /**
@@ -259,7 +259,7 @@ class Event extends Model
 
         $sign->save();
 
-        $this->logger->eventSignup($user);
+        $this->logger->eventSignup($this, $user);
     }
 
     /**
@@ -317,7 +317,7 @@ class Event extends Model
 
         $sign->save();
 
-        $this->logger->eventSignupOther($admin, $user);
+        $this->logger->eventSignupOther($this, $admin, $user);
     }
 
     /**
@@ -333,7 +333,7 @@ class Event extends Model
             ->where('user_id', '=', $user->id)
             ->delete();
 
-        $this->logger->eventSignoff($user);
+        $this->logger->eventSignoff($this, $user);
     }
 
     /**
@@ -348,7 +348,7 @@ class Event extends Model
             ->where('user_id', '=', $user->id)
             ->delete();
 
-        $this->logger->eventSignoffOther($admin, $user);
+        $this->logger->eventSignoffOther($this, $admin, $user);
     }
 
     /**

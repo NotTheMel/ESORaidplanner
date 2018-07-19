@@ -279,7 +279,7 @@ class EventController extends Controller
             $event->signupTeam($team);
         }
 
-        $event->logger->eventCreate(Auth::user());
+        $event->logger->eventCreate($event, Auth::user());
 
         $event->callEventCreationHooks();
 
