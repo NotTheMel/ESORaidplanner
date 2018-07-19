@@ -47,7 +47,7 @@ class Event extends Model
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->logger = new GuildLogger(Guild::query()->find($this->guild_id), $this);
+        $this->logger = new GuildLogger(Guild::query()->find($attributes['guild_id']), $this);
     }
 
     /**
