@@ -19,85 +19,86 @@ namespace App;
 
 class GuildLogger
 {
-    private $guild;
-    private $event;
-
-    public function __construct(Guild $guild, Event $event = null)
-    {
-        $this->guild = $guild;
-        $this->event = $event;
-    }
-
-    public function guildCreate(User $creator)
+    public function guildCreate(Guild $guild, User $creator)
     {
         $log = new LogEntry();
-        $log->create($this->guild->id, $creator->name.' created the guild '.$guild->name.'.');
+        $log->create($guild->id, $creator->name.' created the guild '.$guild->name.'.');
     }
 
-    public function guildMakeAdmin(User $admin, User $user)
+    public function guildMakeAdmin(Guild $guild, User $admin, User $user)
     {
         $log      = new LogEntry();
-        $log->create($this->guild->id, $admin->name.' promoted '.$user->name.' to admin.');
+        $log->create($guild->id, $admin->name.' promoted '.$user->name.' to admin.');
     }
 
-    public function guildRemoveAdmin(User $admin, User $user)
+    public function guildRemoveAdmin(Guild $guild, User $admin, User $user)
     {
         $log = new LogEntry();
-        $log->create($this->guild->id, $admin->name.' demoted '.$user->name.' to member.');
+        $log->create($guild->id, $admin->name.' demoted '.$user->name.' to member.');
     }
 
-    public function guildLeave(User $user)
+    public function guildLeave(Guild $guild, User $user)
     {
         $log = new LogEntry();
-        $log->create($this->guild->id, $user->name.' left the guild.');
+        $log->create($guild->id, $user->name.' left the guild.');
     }
 
-    public function guildRequestMembership(User $user)
+    public function guildRequestMembership(Guild $guild, User $user)
     {
         $log = new LogEntry();
-        $log->create($this->guild->id, $user->name.' requested membership.');
+        $log->create($guild->id, $user->name.' requested membership.');
     }
 
-    public function guildApproveMembership(User $admin, User $user)
+    public function guildApproveMembership(Guild $guild, User $admin, User $user)
     {
         $log = new LogEntry();
-        $log->create($this->guild->id, $admin->name.' approved the membership request of '.$user->name.'.');
+        $log->create($guild->id, $admin->name.' approved the membership request of '.$user->name.'.');
     }
 
-    public function guildRemoveMembership(User $admin, User $user)
+    public function guildRemoveMembership(Guild $guild, User $admin, User $user)
     {
         $log = new LogEntry();
-        $log->create($this->guild->id, $admin->name.' removed '.$user->name.' from the guild.');
+        $log->create($guild->id, $admin->name.' removed '.$user->name.' from the guild.');
     }
 
-    public function eventCreate(User $creator)
+    public function eventCreate(Event $event, User $creator)
     {
-        $log = new LogEntry();
-        $log->create($this->guild->id, $creator->name.' created the event '.$this->event->name.'.');
+        $guild = $this->getGuild($event->guild_id);
+        $log   = new LogEntry();
+        $log->create($guild->id, $creator->name.' created the event '.$event->name.'.');
     }
 
-    public function eventSignup(User $user)
+    public function eventSignup(Event $event, User $user)
     {
-        $log = new LogEntry();
-        $log->create($this->guild->id, $user->name.' signed up for <a href="/g/'.$this->guild->slug.'/event/'.$this->event->id.'">'.$this->event->name.'</a>.');
+        $guild = $this->getGuild($event->guild_id);
+        $log   = new LogEntry();
+        $log->create($guild->id, $user->name.' signed up for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
     }
 
-    public function eventSignupOther(User $admin, User $user)
+    public function eventSignupOther(Event $event, User $admin, User $user)
     {
-        $log = new LogEntry();
-        $log->create($this->guild->id,
-            $admin->name.' signed up '.$user->name.' for <a href="/g/'.$this->guild->slug.'/event/'.$this->event->id.'">'.$this->event->name.'</a>.');
+        $guild = $this->getGuild($event->guild_id);
+        $log   = new LogEntry();
+        $log->create($guild->id,
+            $admin->name.' signed up '.$user->name.' for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
     }
 
-    public function eventSignoff(User $user)
+    public function eventSignoff(Event $event, User $user)
     {
-        $log = new LogEntry();
-        $log->create($this->guild->id, $user->name.' signed off for <a href="/g/'.$this->guild->slug.'/event/'.$this->event->id.'">'.$this->event->name.'</a>.');
+        $guild = $this->getGuild($event->guild_id);
+        $log   = new LogEntry();
+        $log->create($guild->id, $user->name.' signed off for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
     }
 
-    public function eventSignoffOther(User $admin, User $user)
+    public function eventSignoffOther(Event $event, User $admin, User $user)
     {
-        $log = new LogEntry();
-        $log->create($this->guild->id, $admin->name.' signed off '.$user->name.' for <a href="/g/'.$this->guild->slug.'/event/'.$this->event->id.'">'.$this->event->name.'</a>.');
+        $guild = $this->getGuild($event->guild_id);
+        $log   = new LogEntry();
+        $log->create($guild->id, $admin->name.' signed off '.$user->name.' for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
+    }
+
+    private function getGuild(int $guild_id)
+    {
+        return Guild::query()->find($guild_id);
     }
 }

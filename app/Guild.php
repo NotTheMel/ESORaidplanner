@@ -43,7 +43,7 @@ class Guild extends Model
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->logger = new GuildLogger($this);
+        $this->logger = new GuildLogger();
     }
 
     /**
@@ -174,7 +174,7 @@ class Guild extends Model
 
         if (!in_array($user->id, $admins)) {
             $admins[] = $user->id;
-            $this->logger->guildMakeAdmin($admin, $user);
+            $this->logger->guildMakeAdmin($this, $admin, $user);
         }
 
         self::query()
@@ -241,7 +241,7 @@ class Guild extends Model
 
         DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $this->id)->delete();
 
-        $this->logger->guildLeave($user);
+        $this->logger->guildLeave($this, $user);
     }
 
     /**
@@ -263,7 +263,7 @@ class Guild extends Model
                 ->where('id', '=', $this->id)
                 ->update(['admins' => json_encode($arr)]);
 
-            $this->logger->guildRemoveAdmin($admin, $user);
+            $this->logger->guildRemoveAdmin($this, $admin, $user);
         }
     }
 
@@ -313,7 +313,7 @@ class Guild extends Model
             'status'   => 0,
         ]);
 
-        $this->logger->guildRequestMembership($user);
+        $this->logger->guildRequestMembership($this, $user);
 
         $hooks = GuildApplicationNotification::query()->where('guild_id', '=', $this->id)
             ->where('call_type', '=', HookTypes::ON_GUIDMEMBER_APPLICATION)
@@ -334,7 +334,7 @@ class Guild extends Model
 
         $admin = $admin ?? Auth::user();
 
-        $this->logger->guildApproveMembership($admin, $user);
+        $this->logger->guildApproveMembership($this, $admin, $user);
     }
 
     /**
@@ -350,7 +350,7 @@ class Guild extends Model
 
         $admin = $admin ?? Auth::user();
 
-        $this->logger->guildRemoveMembership($admin, $user);
+        $this->logger->guildRemoveMembership($this, $admin, $user);
     }
 
     /**

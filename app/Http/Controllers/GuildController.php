@@ -57,7 +57,7 @@ class GuildController extends Controller
                 'status'   => 1,
             ]);
 
-            $guild->logger->guildCreate(Auth::user());
+            $guild->logger->guildCreate($guild, Auth::user());
 
             return redirect('g/'.$guild->slug);
         }
