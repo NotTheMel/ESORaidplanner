@@ -20,7 +20,6 @@ use App\Telegram\Api\EsoRaidPlannerAPI;
 use App\Telegram\Api\TelegramAPI;
 use App\Telegram\Button\Button;
 use App\Telegram\Button\GoBackButton;
-use Illuminate\Support\Facades\Log;
 
 class SelectOperationMenu extends Menu
 {
@@ -34,12 +33,6 @@ class SelectOperationMenu extends Menu
     public function __construct($message = [])
     {
         $guild = EsoRaidPlannerAPI::getGuild(TelegramAPI::$username, TelegramAPI::getGuildId());
-
-        Log::info(print_r(TelegramAPI::$username, true));
-
-        Log::info(print_r(TelegramAPI::getGuildId(), true));
-
-        Log::info(print_r($guild, true));
 
         $this->message[] = 'Welcome to '.$guild->name.' - '.DataMapper::getPlatformName($guild->platform).' '.DataMapper::getMegaserverName($guild->megaserver).PHP_EOL.PHP_EOL.'What would you like to do?';
 
