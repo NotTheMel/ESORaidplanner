@@ -89,11 +89,7 @@ class EventController extends Controller
 
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        $start_date = new DateTime($event->start_date);
-
-        $start_date->setTimezone(new DateTimeZone(Auth::user()->timezone));
-
-        return view('event.edit', compact('event', 'start_date', 'guild'));
+        return view('event.edit', compact('event', 'guild'));
     }
 
     /**

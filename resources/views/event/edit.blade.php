@@ -29,19 +29,19 @@
 
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    Day:{!! Form::number('day', $start_date->format('j'), array('min' => '1', 'max' => '31', 'class' => 'form-control')) !!}
+                                    Day:{!! Form::number('day', $event->getUserStartDate()->format('j'), array('min' => '1', 'max' => '31', 'class' => 'form-control')) !!}
                                     <br>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    Month:{!! Form::select('month', ['1' => 'January', '2' => 'February', '3' => 'March', '4' => 'April', '5' => 'May', '6' => 'June', '7' => 'July', '8' => 'August', '9' => 'September', '10' => 'October', '11' => 'November', '12' => 'December'], $start_date->format('n'), array('class' => 'form-control')) !!}
+                                    Month:{!! Form::select('month', ['1' => 'January', '2' => 'February', '3' => 'March', '4' => 'April', '5' => 'May', '6' => 'June', '7' => 'July', '8' => 'August', '9' => 'September', '10' => 'October', '11' => 'November', '12' => 'December'], $event->getUserStartDate()->format('n'), array('class' => 'form-control')) !!}
                                     <br>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    Year:{!! Form::select('year', [date('Y') => date('Y'), date('Y') + 1 => date('Y') + 1], $start_date->format('Y'), array('class' => 'form-control')) !!}
+                                    Year:{!! Form::select('year', [date('Y') => date('Y'), date('Y') + 1 => date('Y') + 1], $event->getUserStartDate()->format('Y'), array('class' => 'form-control')) !!}
                                     <br>
                                 </div>
                             </div>
@@ -49,30 +49,30 @@
                             @if (Auth::user()->clock === 12)
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        Hour:{!! Form::number('hour', $start_date->format('g'), array('min' => '1', 'max' => '12', 'class' => 'form-control')) !!}
+                                        Hour:{!! Form::number('hour', $event->getUserStartDate()->format('g'), array('min' => '1', 'max' => '12', 'class' => 'form-control')) !!}
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        Minute:{!! Form::number('minute', $start_date->format('i'), array('min' => '0', 'max' => '59', 'class' => 'form-control')) !!}
+                                        Minute:{!! Form::number('minute', $event->getUserStartDate()->format('i'), array('min' => '0', 'max' => '59', 'class' => 'form-control')) !!}
                                         <br>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        Meridiem:{!! Form::select('meridiem', ['am' => 'am', 'pm' => 'pm'], $start_date->format('a'), array('class' => 'form-control')) !!}
+                                        Meridiem:{!! Form::select('meridiem', ['am' => 'am', 'pm' => 'pm'], $event->getUserStartDate()->format('a'), array('class' => 'form-control')) !!}
                                         <br>
                                     </div>
                                 </div>
                             @else
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        Hour:{!! Form::number('hour', $start_date->format('H'), array('min' => '0', 'max' => '23', 'class' => 'form-control')) !!}
+                                        Hour:{!! Form::number('hour', $event->getUserStartDate()->format('H'), array('min' => '0', 'max' => '23', 'class' => 'form-control')) !!}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        Minute:{!! Form::number('minute', $start_date->format('i'), array('min' => '0', 'max' => '59', 'class' => 'form-control')) !!}
+                                        Minute:{!! Form::number('minute', $event->getUserStartDate()->format('i'), array('min' => '0', 'max' => '59', 'class' => 'form-control')) !!}
                                         <br>
                                     </div>
                                 </div>

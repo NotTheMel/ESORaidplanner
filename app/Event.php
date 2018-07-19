@@ -458,4 +458,12 @@ class Event extends Model
 
         return $dt->format('Y-m-d H:i:s');
     }
+
+    public function getUserStartDate(): DateTime
+    {
+        $start_date = new DateTime($this->start_date);
+        $start_date->setTimezone(new DateTimeZone(Auth::user()->timezone));
+
+        return $start_date;
+    }
 }
