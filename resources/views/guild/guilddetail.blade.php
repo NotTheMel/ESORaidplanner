@@ -42,8 +42,8 @@
                                                 class="fa fa-group fa-3x"></i></div>
                                 </div>
                                 <div class="col-xs-7">
-                                    <div class="numbers"><p>Members</p><!-- react-text: 243 -->{{ count($members) }}
-                                        ({{ count($pending) }} pending)
+                                    <div class="numbers"><p>Members</p><!-- react-text: 243 -->{{ count($guild->getMembers()) }}
+                                        ({{ count($guild->getPendingMembers()) }} pending)
                                         <!-- /react-text --></div>
                                 </div>
                             </div>
@@ -70,7 +70,7 @@
                                 </div>
                                 <div class="col-xs-7">
                                     <div class="numbers"><p>Total Events</p><!-- react-text: 260 -->{{ $count }}
-                                        ({{ count($events) }} upcoming)<!-- /react-text -->
+                                        ({{ count($guild->getEvents()) }} upcoming)<!-- /react-text -->
                                     </div>
                                 </div>
                             </div>
@@ -146,7 +146,7 @@
                                             <th>Signups</th>
                                             </thead>
                                             <tbody>
-                                            @foreach ($events as $event)
+                                            @foreach ($guild->getEvents() as $event)
                                                 <tr>
                                                     <td>
                                                         <a href="{{ url('g/'.$guild->slug.'/event/'.$event->id) }}">{{ $event->name }}</a>

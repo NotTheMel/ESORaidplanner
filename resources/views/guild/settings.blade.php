@@ -83,7 +83,7 @@
                                     <th>Role</th>
                                     </thead>
                                     <tbody>
-                                    @foreach ($pending as $member)
+                                    @foreach ($guild->getPendingMembers() as $member)
                                         <tr>
                                             <td>{{ $guild->getMemberName($member->id) }}</td>
                                             <td>Membership pending</td>

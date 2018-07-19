@@ -184,38 +184,17 @@ class GuildController extends Controller
     public function detail($slug)
     {
         /** @var Guild $guild */
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
+        $guild    = Guild::query()->where('slug', '=', $slug)->first();
+        $count    = Event::query()->where('guild_id', '=', $guild->id)->count();
+        $logcount = LogEntry::query()->where('guild_id', '=', $guild->id)->count();
 
-        if (null === $guild) {
-            return redirect('/');
-        }
-
-        if (0 === $guild->userStatus(Auth::user())) {
-            return view('guild.guild_awaiting_confirmation', compact('guild'));
-        }
-
-        if ($guild->isMember(Auth::user())) {
-            $members = $guild->getMembers();
-
-            $pending = $guild->getPendingMembers();
-
-            $events = $guild->getEvents();
-
-            $count = Event::query()->where('guild_id', '=', $guild->id)->count();
-
-            $logcount = LogEntry::query()->where('guild_id', '=', $guild->id)->count();
-
-            return view('guild.guilddetail', compact('guild', 'members', 'events', 'pending', 'count', 'logcount'));
-        }
-
-        return view('guild.guild_apply', compact('guild'));
+        return view('guild.guilddetail', compact('guild', 'count', 'logcount'));
     }
 
     public function logs(string $slug)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        $logs = LogEntry::query()->where('guild_id', '=', $guild->id)->orderBy('created_at', 'desc')->paginate(50);
+        $logs  = LogEntry::query()->where('guild_id', '=', $guild->id)->orderBy('created_at', 'desc')->paginate(50);
 
         return view('guild.logs', compact('guild', 'logs'));
     }
@@ -237,13 +216,10 @@ class GuildController extends Controller
      */
     public function settings(string $slug)
     {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        $pending = $guild->getPendingMembers();
-
+        $guild       = Guild::query()->where('slug', '=', $slug)->first();
         $repeatables = RepeatableEvent::query()->where('guild_id', '=', $guild->id)->get()->all() ?? [];
 
-        return view('guild.settings', compact('guild', 'pending', 'repeatables'));
+        return view('guild.settings', compact('guild', 'repeatables'));
     }
 
     /**
@@ -268,11 +244,7 @@ class GuildController extends Controller
         /** @var Guild $guild */
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        $members = $guild->getMembers();
-
-        $pending = $guild->getPendingMembers();
-
-        return view('guild.members', compact('guild', 'members', 'pending'));
+        return view('guild.members', compact('guild'));
     }
 
     /**
@@ -309,8 +281,6 @@ class GuildController extends Controller
         /** @var Guild $guild */
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        $events = $guild->getPastEvents();
-
-        return view('event.events', compact('events', 'guild'));
+        return view('event.events', compact('guild'));
     }
 }

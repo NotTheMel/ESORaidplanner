@@ -22,8 +22,14 @@ class GuildMemberMiddleware
         /** @var Guild $guild */
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (null === $guild || !$guild->isMember(Auth::user())) {
+        if (null === $guild) {
             return redirect('/');
+        }
+        if (0 === $guild->userStatus(Auth::user())) {
+            return view('guild.guild_awaiting_confirmation', compact('guild'));
+        }
+        if (!$guild->isMember(Auth::user())) {
+            return view('guild.guild_apply', compact('guild'));
         }
 
         return $next($request);
