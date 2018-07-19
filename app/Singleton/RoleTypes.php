@@ -44,6 +44,22 @@ class RoleTypes
         }
     }
 
+    public static function getRoleImage(int $role_id): string
+    {
+        switch ($role_id) {
+            case self::ROLE_TANK:
+                return 'tank.png';
+            case self::ROLE_STAMINA_DD:
+                return 'dd.png';
+            case self::ROLE_MAGICKA_DD:
+                return 'dd.png';
+            case self::ROLE_HEALER:
+                return 'healer.png';
+            default:
+                return '';
+        }
+    }
+
     /**
      * @param int $role_id
      *
