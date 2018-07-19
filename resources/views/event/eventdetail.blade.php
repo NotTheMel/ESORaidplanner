@@ -298,7 +298,7 @@
                                         <tr>
                                             @endif
                                             <td>{{ $signup->getUser()->name }}</td>
-                                            <td>{{ $signup->getClassName() }}</td>
+                                            <td><img width="30px" src="/img/classes/{{ $signup->getClassIcon() }}" alt="{{ $signup->getClassName() }}" title="{{ $signup->getClassName() }}"></td>
                                             <td>{{ $signup->getRoleName() }}</td>
                                             <td>{!! $signup->getSetsFormatted() !!}</td>
                                             <td><i class="fa fa-clock-o"
@@ -343,7 +343,7 @@
                                         <tr>
                                             @endif
                                             <td>{{ $signup->getUser()->name }}</td>
-                                            <td>{{ $signup->getClassName() }}</td>
+                                            <td><img width="30px" src="/img/classes/{{ $signup->getClassIcon() }}" alt="{{ $signup->getClassName() }}" title="{{ $signup->getClassName() }}"></td>
                                             <td>{{ $signup->getRoleName() }}</td>
                                             <td>{!! $signup->getSetsFormatted() !!}</td>
                                             <td><i class="fa fa-clock-o"
@@ -389,7 +389,7 @@
                                             <tr>
                                                 @endif
                                                 <td>{{ $signup->getUser()->name }}</td>
-                                                <td>{{ $signup->getClassName() }}</td>
+                                                <td><img width="30px" src="/img/classes/{{ $signup->getClassIcon() }}" alt="{{ $signup->getClassName() }}" title="{{ $signup->getClassName() }}"></td>
                                                 <td>{{ $signup->getRoleName() }}</td>
                                                 <td>{!! $signup->getSetsFormatted() !!}</td>
                                                 <td><i class="fa fa-clock-o"
