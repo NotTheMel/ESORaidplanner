@@ -17,10 +17,8 @@ namespace App\Http\Controllers;
 
 use App\Event;
 use App\Guild;
-use App\Hook\NotificationHook;
 use App\LogEntry;
 use App\RepeatableEvent;
-use App\Signup;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,6 +28,8 @@ use Illuminate\Support\Facades\Input;
 class GuildController extends Controller
 {
     /**
+     * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function create(Request $request)
@@ -57,8 +57,7 @@ class GuildController extends Controller
                 'status'   => 1,
             ]);
 
-            $log = new LogEntry();
-            $log->create($guild->id, Auth::user()->name.' created the guild '.$guild->name.'.');
+            $guild->logger->guildCreate(Auth::user());
 
             return redirect('g/'.$guild->slug);
         }
@@ -74,25 +73,7 @@ class GuildController extends Controller
     public function delete(int $id)
     {
         $guild = Guild::query()->where('id', '=', $id)->first();
-
-        if ($guild->owner_id !== Auth::id()) {
-            return redirect('/g/'.$guild->slug);
-        }
-
-        NotificationHook::query()->where('guild_id', '=', $id)->delete();
-        $events = Event::query()->where('guild_id', '=', $id)->get();
-
-        foreach ($events as $event) {
-            Signup::query()->where('event_id', '=', $event->id)->delete();
-        }
-
-        Event::query()->where('guild_id', '=', $id)->delete();
-
-        DB::table('user_guilds')->where('guild_id', '=', $id)->delete();
-
-        Guild::query()->where('id', '=', $id)->delete();
-
-        LogEntry::query()->where('guild_id', '=', $id)->delete();
+        $guild->delete();
 
         return redirect('/');
     }
@@ -122,10 +103,6 @@ class GuildController extends Controller
     public function approveMembership(string $slug, int $guild_id, int $user_id)
     {
         $guild = Guild::query()->find($guild_id);
-
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$guild->slug);
-        }
 
         $user = User::query()->find($user_id);
 
@@ -179,9 +156,7 @@ class GuildController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if ($guild->owner_id === Auth::id()) {
-            $guild->makeAdmin(User::query()->find($user_id));
-        }
+        $guild->makeAdmin(User::query()->find($user_id));
 
         return redirect('/g/'.$slug.'/members');
     }
@@ -196,9 +171,7 @@ class GuildController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if ($guild->owner_id === Auth::id()) {
-            $guild->removeAdmin(User::query()->find($user_id));
-        }
+        $guild->removeAdmin(User::query()->find($user_id));
 
         return redirect('/g/'.$slug.'/members');
     }
@@ -242,10 +215,6 @@ class GuildController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$guild->slug);
-        }
-
         $logs = LogEntry::query()->where('guild_id', '=', $guild->id)->orderBy('created_at', 'desc')->paginate(50);
 
         return view('guild.logs', compact('guild', 'logs'));
@@ -261,13 +230,14 @@ class GuildController extends Controller
         return view('guilds', compact('guilds'));
     }
 
+    /**
+     * @param string $slug
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function settings(string $slug)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$slug);
-        }
 
         $pending = $guild->getPendingMembers();
 
@@ -276,25 +246,27 @@ class GuildController extends Controller
         return view('guild.settings', compact('guild', 'pending', 'repeatables'));
     }
 
+    /**
+     * @param int $id
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function deleteConfirm(int $id)
     {
         $guild = Guild::query()->find($id);
 
-        if (!$guild->isOwner(Auth::user())) {
-            return redirect('/g/'.$guild->slug);
-        }
-
         return view('guild.delete_confirm', compact('guild'));
     }
 
+    /**
+     * @param string $slug
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function members(String $slug)
     {
         /** @var Guild $guild */
         $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        if (!$guild->isMember(Auth::user())) {
-            return redirect('/g/'.$slug);
-        }
 
         $members = $guild->getMembers();
 
@@ -303,13 +275,14 @@ class GuildController extends Controller
         return view('guild.members', compact('guild', 'members', 'pending'));
     }
 
+    /**
+     * @param string $slug
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function saveSettings(string $slug)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$slug);
-        }
 
         $guild->discord_widget = Input::get('discord_widget') ?? null;
 

@@ -17,6 +17,7 @@ namespace App;
 
 use App\Hook\ConfirmedSignupsNotification;
 use App\Hook\GuildApplicationNotification;
+use App\Hook\NotificationHook;
 use App\Singleton\HookTypes;
 use DateTime;
 use DateTimeZone;
@@ -26,6 +27,8 @@ use Illuminate\Support\Facades\DB;
 
 class Guild extends Model
 {
+    public $logger;
+
     protected $fillable = [
         'name',
         'slug',
@@ -36,6 +39,35 @@ class Guild extends Model
         'image',
         'discord_widget',
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->logger = new GuildLogger($this);
+    }
+
+    /**
+     * @return bool|null|void
+     */
+    public function delete()
+    {
+        NotificationHook::query()->where('guild_id', '=', $this->id)->delete();
+        $events = Event::query()->where('guild_id', '=', $this->id)->get();
+
+        foreach ($events as $event) {
+            Signup::query()->where('event_id', '=', $event->id)->delete();
+        }
+
+        Event::query()->where('guild_id', '=', $this->id)->delete();
+        DB::table('user_guilds')->where('guild_id', '=', $this->id)->delete();
+        Guild::query()->where('id', '=', $this->id)->delete();
+        LogEntry::query()->where('guild_id', '=', $this->id)->delete();
+
+        try {
+            parent::delete();
+        } catch (\Exception $e) {
+        }
+    }
 
     /**
      * @return string
@@ -142,8 +174,7 @@ class Guild extends Model
 
         if (!in_array($user->id, $admins)) {
             $admins[] = $user->id;
-            $log      = new LogEntry();
-            $log->create($this->id, $admin->name.' promoted '.$user->name.' to admin.');
+            $this->logger->guildMakeAdmin($admin, $user);
         }
 
         self::query()
@@ -210,8 +241,7 @@ class Guild extends Model
 
         DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $this->id)->delete();
 
-        $log = new LogEntry();
-        $log->create($this->id, $user->name.' left the guild.');
+        $this->logger->guildLeave($user);
     }
 
     /**
@@ -233,8 +263,7 @@ class Guild extends Model
                 ->where('id', '=', $this->id)
                 ->update(['admins' => json_encode($arr)]);
 
-            $log = new LogEntry();
-            $log->create($this->id, $admin->name.' demoted '.$user->name.' to member.');
+            $this->logger->guildRemoveAdmin($admin, $user);
         }
     }
 
@@ -284,8 +313,7 @@ class Guild extends Model
             'status'   => 0,
         ]);
 
-        $log = new LogEntry();
-        $log->create($this->id, $user->name.' requested membership.');
+        $this->logger->guildRequestMembership($user);
 
         $hooks = GuildApplicationNotification::query()->where('guild_id', '=', $this->id)
             ->where('call_type', '=', HookTypes::ON_GUIDMEMBER_APPLICATION)
@@ -306,8 +334,7 @@ class Guild extends Model
 
         $admin = $admin ?? Auth::user();
 
-        $log = new LogEntry();
-        $log->create($this->id, $admin->name.' approved the membership request of '.$user->name.'.');
+        $this->logger->guildApproveMembership($admin, $user);
     }
 
     /**
@@ -323,8 +350,7 @@ class Guild extends Model
 
         $admin = $admin ?? Auth::user();
 
-        $log = new LogEntry();
-        $log->create($this->id, $admin->name.' removed '.$user->name.' from the guild.');
+        $this->logger->guildRemoveMembership($admin, $user);
     }
 
     /**
