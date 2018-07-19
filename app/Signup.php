@@ -84,6 +84,11 @@ class Signup extends Model
         return RoleTypes::getRoleName($this->role_id);
     }
 
+    public function getRoleIcon(): string
+    {
+        return RoleTypes::getRoleImage($this->role_id);
+    }
+
     /**
      * @return string
      */
