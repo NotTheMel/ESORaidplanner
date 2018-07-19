@@ -33,6 +33,15 @@ class Character extends Model
         'public',
     ];
 
+    public function delete()
+    {
+        Signup::query()
+            ->where('character_id', '=', $this->id)
+            ->update(['character_id' => null]);
+
+        return parent::delete();
+    }
+
     /**
      * @return string
      */

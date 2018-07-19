@@ -16,7 +16,7 @@
 namespace App\Http\Controllers;
 
 use App\Character;
-use App\Signup;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 
@@ -25,21 +25,18 @@ class CharacterController extends Controller
     /**
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function create()
+    public function create(Request $request)
     {
-        $character          = new Character();
-        $character->name    = Input::get('name');
-        $character->class   = Input::get('class');
-        $character->role    = Input::get('role');
-        $character->user_id = Auth::id();
-        $character->public  = Input::get('public') ?? 0;
+        $data            = $request->all();
+        $data['user_id'] = Auth::id();
 
         if (!empty(Input::get('sets'))) {
-            $character->sets = implode(', ', Input::get('sets'));
+            $data['sets'] = implode(', ', $request->input('sets'));
         } else {
-            $character->sets = '';
+            $data['sets'] = '';
         }
 
+        $character = new Character($data);
         $character->save();
 
         return redirect('/profile/characters');
@@ -50,7 +47,7 @@ class CharacterController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function edit(int $id)
+    public function edit(Request $request, int $id)
     {
         $character = Character::query()
             ->where('id', '=', $id)
@@ -61,18 +58,15 @@ class CharacterController extends Controller
             return redirect('/profile/character');
         }
 
-        $character->name  = Input::get('name');
-        $character->role  = Input::get('role');
-        $character->class = Input::get('class');
+        $data = $request->all();
+
         if (!empty(Input::get('sets'))) {
-            $character->sets = implode(', ', Input::get('sets'));
+            $data['sets'] = implode(', ', $request->input('sets'));
         } else {
-            $character->sets = '';
+            $data['sets'] = '';
         }
 
-        $character->public = Input::get('public') ?? 0;
-
-        $character->save();
+        $character->update($data);
 
         return redirect('/profile/character');
     }
@@ -94,10 +88,6 @@ class CharacterController extends Controller
         }
 
         $character->delete();
-
-        Signup::query()
-            ->where('character_id', '=', $id)
-            ->update(['character_id' => null]);
 
         return redirect('/profile/characters');
     }

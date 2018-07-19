@@ -50,15 +50,16 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'auth'         => \Illuminate\Auth\Middleware\Authenticate::class,
-        'auth.basic'   => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'bindings'     => \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        'can'          => \Illuminate\Auth\Middleware\Authorize::class,
-        'guest'        => \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'guild.member' => \App\Http\Middleware\GuildMemberMiddleware::class,
-        'guild.admin'  => \App\Http\Middleware\GuildAdminMiddleware::class,
-        'guild.owner'  => \App\Http\Middleware\GuildOwnerMiddleware::class,
-        'guild.event'  => \App\Http\Middleware\GuildEventMiddleware::class,
-        'throttle'     => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'auth'             => \Illuminate\Auth\Middleware\Authenticate::class,
+        'auth.basic'       => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'bindings'         => \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        'can'              => \Illuminate\Auth\Middleware\Authorize::class,
+        'guest'            => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'guild.member'     => \App\Http\Middleware\GuildMemberMiddleware::class,
+        'guild.admin'      => \App\Http\Middleware\GuildAdminMiddleware::class,
+        'guild.owner'      => \App\Http\Middleware\GuildOwnerMiddleware::class,
+        'guild.event'      => \App\Http\Middleware\GuildEventMiddleware::class,
+        'hook.owner'       => \App\Http\Middleware\HookOwnerMiddleware::class,
+            'throttle'     => \Illuminate\Routing\Middleware\ThrottleRequests::class,
     ];
 }

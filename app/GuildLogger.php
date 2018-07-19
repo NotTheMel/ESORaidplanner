@@ -97,6 +97,13 @@ class GuildLogger
         $log->create($guild->id, $admin->name.' signed off '.$user->name.' for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>.');
     }
 
+    public function eventDelete(Event $event, User $admin)
+    {
+        $guild = $this->getGuild($event->guild_id);
+        $log   = new LogEntry();
+        $log->create($guild->id, $admin->name.' deleted the event '.$event->name.'.');
+    }
+
     private function getGuild(int $guild_id)
     {
         return Guild::query()->find($guild_id);

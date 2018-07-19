@@ -59,10 +59,6 @@ class HookController extends Controller
     {
         $hook = NotificationHook::query()->find($hook_id);
 
-        if (!$hook->isOwner(Auth::user())) {
-            return redirect('/hooks');
-        }
-
         return view('hook.edit', compact('hook'));
     }
 
@@ -149,10 +145,6 @@ class HookController extends Controller
             ]);
         }
 
-        if (!$hook->isOwner(Auth::user())) {
-            return redirect('/hooks');
-        }
-
         $all = $request->all();
         if (!empty($all['call_time_diff'])) {
             $all['call_time_diff'] = 60 * $all['call_time_diff'];
@@ -172,10 +164,7 @@ class HookController extends Controller
     {
         /** @var NotificationHook $hook */
         $hook = NotificationHook::query()->find($id);
-
-        if ($hook->isOwner(Auth::user())) {
-            NotificationHook::query()->where('id', '=', $id)->delete();
-        }
+        $hook->delete();
 
         return redirect('/hooks');
     }

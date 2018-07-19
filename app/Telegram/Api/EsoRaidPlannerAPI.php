@@ -6,7 +6,6 @@ use App\Character;
 use App\Comment;
 use App\Event;
 use App\Guild;
-use App\LogEntry;
 use App\Signup;
 use App\User;
 use Illuminate\Support\Facades\DB;
@@ -259,6 +258,7 @@ class EsoRaidPlannerAPI
             return;
         }
 
+        /** @var Event $event */
         $event = Event::query()->find($eventId);
 
         $user = User::query()->where('telegram_username', '=', $username)->first();
@@ -283,17 +283,7 @@ class EsoRaidPlannerAPI
             ]);
         }
 
-//        DB::table('telegram')->where('username', '=', $username)->update(
-//            [
-//                'comment' => null,
-//                'support_sets' => null,
-//                'role' => null,
-//                'class' => null,
-//            ]
-//        );
-
-        $log = new LogEntry();
-        $log->create($guildId, $user->name.' signed up for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>. (Via Telegram)');
+        $event->logger->eventSignup($event, $user);
     }
 
     /**
@@ -308,14 +298,14 @@ class EsoRaidPlannerAPI
         }
         $user = User::query()->where('telegram_username', '=', $username)->first();
 
+        /** @var Event $event */
         $event = Event::query()->find($eventId);
 
         $guild = Guild::query()->find($guildId);
 
         Signup::query()->where('event_id', '=', $eventId)->where('user_id', '=', $user->id)->delete();
 
-        $log = new LogEntry();
-        $log->create($guildId, $user->name.' signed off for <a href="/g/'.$guild->slug.'/event/'.$event->id.'">'.$event->name.'</a>. (Via Telegram)');
+        $event->logger->eventSignoff($event, $user);
     }
 
     /**

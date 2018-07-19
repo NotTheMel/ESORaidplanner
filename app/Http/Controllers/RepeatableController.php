@@ -10,14 +10,12 @@ namespace App\Http\Controllers;
 
 use App\Event;
 use App\Guild;
-use App\LogEntry;
 use App\RepeatableEvent;
 use App\Team;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
 
 class RepeatableController extends Controller
 {
@@ -25,20 +23,12 @@ class RepeatableController extends Controller
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('g/'.$slug);
-        }
-
         return view('repeatable_event.create', compact('guild'));
     }
 
     public function view(string $slug, string $repeatable_id)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('g/'.$slug);
-        }
 
         $repeatable = RepeatableEvent::query()->find($repeatable_id);
 
@@ -59,9 +49,9 @@ class RepeatableController extends Controller
         ]);
 
         if (12 === Auth::user()->clock) {
-            $date = new DateTime(Input::get('year').'-'.Input::get('month').'-'.Input::get('day').' '.Input::get('hour').':'.Input::get('minute').' '.Input::get('meridiem'), new DateTimeZone(Auth::user()->timezone));
+            $date = new DateTime($request->input('year').'-'.$request->input('month').'-'.$request->input('day').' '.$request->input('hour').':'.$request->input('minute').' '.$request->input('meridiem'), new DateTimeZone(Auth::user()->timezone));
         } else {
-            $date = new DateTime(Input::get('year').'-'.Input::get('month').'-'.Input::get('day').' '.Input::get('hour').':'.Input::get('minute'), new DateTimeZone(Auth::user()->timezone));
+            $date = new DateTime($request->input('year').'-'.$request->input('month').'-'.$request->input('day').' '.$request->input('hour').':'.$request->input('minute'), new DateTimeZone(Auth::user()->timezone));
         }
 
         $date->setTimezone(new DateTimeZone(env('DEFAULT_TIMEZONE')));
@@ -70,29 +60,25 @@ class RepeatableController extends Controller
             ->where('slug', '=', $slug)
             ->first();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('g/'.$slug);
-        }
-
         $repeatable                  = new RepeatableEvent();
-        $repeatable->name            = Input::get('name');
-        $repeatable->type            = Input::get('type');
+        $repeatable->name            = $request->input('name');
+        $repeatable->type            = $request->input('type');
         $repeatable->latest_event    = $date->format('Y-m-d H:i:s');
         $repeatable->guild_id        = $guild->id;
-        $repeatable->description     = Input::get('description') ?? '';
-        $repeatable->tags            = Input::get('tags') ?? '';
-        $repeatable->interval        = Input::get('interval');
-        $repeatable->create_interval = ((int) Input::get('create_interval') * 86400);
-        $repeatable->default_team_id = Input::get('default_team_id') ?? null;
+        $repeatable->description     = $request->input('description') ?? '';
+        $repeatable->tags            = $request->input('tags') ?? '';
+        $repeatable->interval        = $request->input('interval');
+        $repeatable->create_interval = ((int) $request->input('create_interval') * 86400);
+        $repeatable->default_team_id = $request->input('default_team_id') ?? null;
         $repeatable->save();
 
         $event                    = new Event();
-        $event->name              = Input::get('name');
-        $event->type              = Input::get('type');
+        $event->name              = $request->input('name');
+        $event->type              = $request->input('type');
         $event->start_date        = $date->format('Y-m-d H:i:s');
         $event->guild_id          = $guild->id;
-        $event->description       = Input::get('description') ?? '';
-        $event->tags              = Input::get('tags') ?? '';
+        $event->description       = $request->input('description') ?? '';
+        $event->tags              = $request->input('tags') ?? '';
         $event->parent_repeatable = $repeatable->id;
 
         if (!empty($repeatable->default_team_id)) {
@@ -101,10 +87,7 @@ class RepeatableController extends Controller
         }
 
         $event->save();
-
-        $log = new LogEntry();
-        $log->create($guild->id, Auth::user()->name.' created the event '.$event->name.'.');
-
+        $event->logger->eventCreate($event, Auth::user());
         $event->callEventCreationHooks();
 
         return redirect('g/'.$slug.'/event/'.$event->id);
@@ -121,17 +104,13 @@ class RepeatableController extends Controller
         $repeatable                  = RepeatableEvent::query()->find($repeatable_id);
         $guild                       = Guild::query()->find($repeatable->guild_id);
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('g/'.$slug);
-        }
-
-        $repeatable->name            = Input::get('name');
-        $repeatable->type            = Input::get('type');
-        $repeatable->description     = Input::get('description') ?? '';
-        $repeatable->tags            = Input::get('tags') ?? '';
-        $repeatable->interval        = Input::get('interval');
-        $repeatable->create_interval = ((int) Input::get('create_interval') * 86400);
-        $repeatable->default_team_id = Input::get('default_team_id') ?? null;
+        $repeatable->name            = $request->input('name');
+        $repeatable->type            = $request->input('type');
+        $repeatable->description     = $request->input('description') ?? '';
+        $repeatable->tags            = $request->input('tags') ?? '';
+        $repeatable->interval        = $request->input('interval');
+        $repeatable->create_interval = ((int) $request->input('create_interval') * 86400);
+        $repeatable->default_team_id = $request->input('default_team_id') ?? null;
         $repeatable->save();
 
         $events = Event::query()->where('parent_repeatable', '=', $repeatable->id)
@@ -152,16 +131,11 @@ class RepeatableController extends Controller
     public function delete(string $slug, int $repeatable_id)
     {
         $repeatable = RepeatableEvent::query()->find($repeatable_id);
-        $guild      = Guild::query()->find($repeatable->guild_id);
-
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('g/'.$slug);
-        }
 
         Event::query()->where('parent_repeatable', '=', $repeatable->id)->update(['parent_repeatable' => null]);
 
         $repeatable->delete();
 
-        return redirect('/g/'.$guild->slug.'/settings');
+        return redirect('/g/'.$slug.'/settings');
     }
 }
