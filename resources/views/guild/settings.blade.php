@@ -44,7 +44,7 @@
                                 <th>Interval</th>
                                 </thead>
                                 <tbody>
-                                @foreach($repeatables as $repeatable)
+                                @foreach($guild->getRepeatableEvents() as $repeatable)
                                     <tr>
                                         <td>{{ $repeatable->name }}</td>
                                         <td>{{ $repeatable->getRepetitionString() }}</td>

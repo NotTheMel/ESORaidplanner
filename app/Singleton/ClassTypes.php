@@ -78,4 +78,27 @@ class ClassTypes
                 return '';
         }
     }
+
+    public static function getClassIcon(int $class_id): string
+    {
+        switch ($class_id) {
+            case self::CLASS_DRAGONKNIGHT:
+                return 'dragon-knight-icon-eso.png';
+
+            case self::CLASS_SORCERER:
+                return 'sorcerer-icon-eso.png';
+
+            case self::CLASS_NIGHTBLADE:
+                return 'nightblade-icon-eso.png';
+
+            case self::CLASS_WARDEN:
+                return 'warden_class_icon_morrowind-eso.png';
+
+            case self::CLASS_TEMPLAR:
+                return 'templar-icon-eso.png';
+
+            default:
+                return '';
+        }
+    }
 }

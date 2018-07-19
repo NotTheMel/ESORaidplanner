@@ -18,7 +18,6 @@ namespace App\Http\Controllers;
 use App\Event;
 use App\Guild;
 use App\LogEntry;
-use App\RepeatableEvent;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -216,10 +215,10 @@ class GuildController extends Controller
      */
     public function settings(string $slug)
     {
-        $guild       = Guild::query()->where('slug', '=', $slug)->first();
-        $repeatables = RepeatableEvent::query()->where('guild_id', '=', $guild->id)->get()->all() ?? [];
+        $guild
+            = Guild::query()->where('slug', '=', $slug)->first();
 
-        return view('guild.settings', compact('guild', 'repeatables'));
+        return view('guild.settings', compact('guild'));
     }
 
     /**

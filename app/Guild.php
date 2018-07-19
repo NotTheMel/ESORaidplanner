@@ -386,6 +386,14 @@ class Guild extends Model
     }
 
     /**
+     * @return array
+     */
+    public function getRepeatableEvents(): array
+    {
+        return RepeatableEvent::query()->where('guild_id', '=', $this->id)->get()->all() ?? [];
+    }
+
+    /**
      * @param User $user
      */
     private function removeFromAllTeams(User $user)
