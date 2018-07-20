@@ -25,6 +25,9 @@ before_script:
   - php artisan key:generate
   - php artisan migrate --seed
 
+before_install:
+  - phpenv config-rm xdebug.ini || return
+
 script:
   - vendor/bin/phpunit
   # Check if the code standards weren't broken.
