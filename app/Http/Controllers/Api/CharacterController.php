@@ -35,10 +35,6 @@ class CharacterController extends ApiController
     {
         $user = $this->login($request);
 
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
         return response(Character::query()->where('user_id', '=', $user->id)->orderBy('name')->get() ?? [], Response::HTTP_OK);
     }
 
@@ -52,10 +48,6 @@ class CharacterController extends ApiController
     public function create(Request $request): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         $character          = new Character();
         $character->name    = $request->input('name');
@@ -86,10 +78,6 @@ class CharacterController extends ApiController
     public function edit(Request $request, int $character_id): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         $character = Character::query()->find($character_id);
 
@@ -139,10 +127,6 @@ class CharacterController extends ApiController
     public function delete(Request $request, int $character_id): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         $character = Character::query()->find($character_id);
 

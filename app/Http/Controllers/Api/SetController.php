@@ -30,12 +30,6 @@ class SetController extends ApiController
      */
     public function all(Request $request): Response
     {
-        $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
         return response(Set::query()->orderBy('name')->get(), Response::HTTP_OK);
     }
 

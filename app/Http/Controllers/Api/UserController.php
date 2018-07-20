@@ -39,10 +39,6 @@ class UserController extends ApiController
     {
         $user = $this->login($request);
 
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
         return response($user, Response::HTTP_OK);
     }
 
@@ -56,12 +52,6 @@ class UserController extends ApiController
      */
     public function getInfo(Request $request, int $user_id): Response
     {
-        $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
         $u = DB::table('users')
             ->select('id', 'name', 'avatar')
             ->where('id', '=', $user_id)
@@ -120,10 +110,6 @@ class UserController extends ApiController
     {
         $user = $this->login($request);
 
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
         $device_id    = $request->input('device');
         $onesignal_id = $request->input('onesignal_id');
 
@@ -144,10 +130,6 @@ class UserController extends ApiController
     public function deleteOnesignal(Request $request): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         $device_id = $request->input('device');
 
@@ -170,10 +152,6 @@ class UserController extends ApiController
     public function getGuilds(Request $request): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         $ids = DB::table('user_guilds')
             ->where('user_id', '=', $user->id)
@@ -204,10 +182,6 @@ class UserController extends ApiController
     {
         $user = $this->login($request);
 
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
         $ids = DB::table('user_guilds')
             ->where('user_id', '=', $user->id)
             ->where('status', '=', 0)
@@ -232,10 +206,6 @@ class UserController extends ApiController
     public function getEvents(Request $request): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         $events = [];
 
@@ -267,10 +237,6 @@ class UserController extends ApiController
     {
         $user = $this->login($request);
 
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
         /** @var array $events */
         $events = $user->getEventsSignedUp();
 
@@ -287,10 +253,6 @@ class UserController extends ApiController
     public function getSignups(Request $request): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         $events = $user->getEventsSignedUp();
 

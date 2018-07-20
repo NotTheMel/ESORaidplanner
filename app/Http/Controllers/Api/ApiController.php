@@ -35,10 +35,6 @@ class ApiController extends Controller
     {
         $user = $this->login($request);
 
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
         $u = [];
 
         $u['name']   = $user->name;
