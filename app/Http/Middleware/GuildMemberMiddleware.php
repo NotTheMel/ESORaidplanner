@@ -26,10 +26,10 @@ class GuildMemberMiddleware
             return redirect('/');
         }
         if (0 === $guild->userStatus(Auth::user())) {
-            return view('guild.guild_awaiting_confirmation', compact('guild'));
+            return redirect('/g/'.$guild->slug.'/application/pending');
         }
         if (!$guild->isMember(Auth::user())) {
-            return view('guild.guild_apply', compact('guild'));
+            return redirect('/g/'.$guild->slug.'/application');
         }
 
         return $next($request);

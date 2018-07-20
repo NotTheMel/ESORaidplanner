@@ -60,6 +60,8 @@ Route::get('/termsofuse', function () {
  */
 
 Route::group(['middleware' => ['auth', 'guild.member']], function () {
+    Route::get('/g/{slug}', 'GuildController@detail');
+
     /* EVENTS */
     Route::get('/g/{slug}/pastevents', 'GuildController@pastEvents');
 
@@ -137,7 +139,6 @@ Route::group(['middleware' => ['auth', 'hook.owner']], function () {
 
 Route::group(['middleware' => 'auth'], function () {
 
-    Route::get('/g/{slug}', 'GuildController@detail');
     /*
      *
      * ROUTES FOR EVENTS
@@ -164,6 +165,8 @@ Route::group(['middleware' => 'auth'], function () {
      * ROUTES FOR GUILDS
      *
      */
+    Route::get('/g/{slug}/application', 'GuildController@application');
+    Route::get('/g/{slug}/application/pending', 'GuildController@applicationPending');
 
     Route::get('/guild/create', function () {
         return view('guild.create');

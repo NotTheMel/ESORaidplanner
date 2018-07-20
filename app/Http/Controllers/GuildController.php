@@ -282,4 +282,18 @@ class GuildController extends Controller
 
         return view('event.events', compact('guild'));
     }
+
+    public function application(string $slug)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        return view('guild.guild_apply', compact('guild'));
+    }
+
+    public function applicationPending(string $slug)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        return view('guild.guild_awaiting_confirmation', compact('guild'));
+    }
 }
