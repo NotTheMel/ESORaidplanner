@@ -26,6 +26,9 @@ class Set extends Model
 
     public static function Array(string $sets): array
     {
+        if (empty($sets)) {
+            return [];
+        }
         if (false !== strpos($sets, ', ')) {
             return explode(', ', $sets);
         }
