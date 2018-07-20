@@ -31,12 +31,6 @@ class GuildController extends ApiController
      */
     public function all(Request $request): Response
     {
-        $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
         return response(Guild::query()->orderBy('name')->get(), Response::HTTP_OK);
     }
 
@@ -51,10 +45,6 @@ class GuildController extends ApiController
     public function get(Request $request, int $guild_id): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
@@ -76,10 +66,6 @@ class GuildController extends ApiController
     {
         $user = $this->login($request);
 
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
 
@@ -97,10 +83,6 @@ class GuildController extends ApiController
     public function leave(Request $request, int $guild_id): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
@@ -120,10 +102,6 @@ class GuildController extends ApiController
     public function approveMembership(Request $request, int $guild_id, int $user_id): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
@@ -149,10 +127,6 @@ class GuildController extends ApiController
     public function removeMembership(Request $request, int $guild_id, int $user_id): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         /** @var User $user_1 */
         $user_1 = User::query()->find($user_id);
@@ -182,10 +156,6 @@ class GuildController extends ApiController
     {
         $user = $this->login($request);
 
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
-
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
         /** @var User $user_1 */
@@ -210,10 +180,6 @@ class GuildController extends ApiController
     public function removeAdmin(Request $request, int $guild_id, int $user_id): Response
     {
         $user = $this->login($request);
-
-        if (false === $user) {
-            return response(null, Response::HTTP_UNAUTHORIZED);
-        }
 
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
@@ -246,7 +212,7 @@ class GuildController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
 
-        if (false === $user || !$guild->isMember($user)) {
+        if (!$guild->isMember($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -274,7 +240,7 @@ class GuildController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
 
-        if (false === $user || !$guild->isMember($user)) {
+        if (!$guild->isMember($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -301,7 +267,7 @@ class GuildController extends ApiController
         /** @var Guild $guild */
         $guild = Guild::query()->find($guild_id);
 
-        if (false === $user || !$guild->isAdmin($user)) {
+        if (!$guild->isAdmin($user)) {
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
