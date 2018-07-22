@@ -24,10 +24,13 @@ class Set extends Model
         'version',
     ];
 
-    public static function Array(string $sets): array
+    public static function Array($sets): array
     {
         if (empty($sets)) {
             return [];
+        }
+        if (\is_array($sets)) {
+            return $sets;
         }
         if (false !== strpos($sets, ', ')) {
             return explode(', ', $sets);
