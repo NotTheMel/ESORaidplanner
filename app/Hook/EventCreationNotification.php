@@ -21,7 +21,7 @@ class EventCreationNotification extends NotificationHook
 {
     public function call(Event $event)
     {
-        $this->send($this->buildMessage($event));
+        $this->send($this->buildMessage($event), $event->buildDiscordEmbeds());
     }
 
     private function buildMessage(Event $event)
