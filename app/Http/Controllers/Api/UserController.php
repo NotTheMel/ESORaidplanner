@@ -112,7 +112,6 @@ class UserController extends ApiController
 
         $device_id    = $request->input('device');
         $onesignal_id = $request->input('onesignal_id');
-
         if (!empty($device_id) && !empty($onesignal_id)) {
             $user->addOnesignalId($device_id, $onesignal_id);
 

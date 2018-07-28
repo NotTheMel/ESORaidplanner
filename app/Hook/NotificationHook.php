@@ -115,20 +115,30 @@ class NotificationHook extends Model
         }
     }
 
-    protected function discord(string $message)
+    protected function discord(string $message, ?array $embeds = null)
     {
-        $ch = curl_init($this->url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(
-            [
-                'content'    => $message,
-                'username'   => 'ESO Raidplanner',
-                'avatar_url' => env('APP_URL').self::AVATAR_URL,
-            ]
-        ));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_exec($ch);
-        curl_close($ch);
+        if (null === $embeds) {
+            $ch = curl_init($this->url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(
+                [
+                    'content'    => $message,
+                    'username'   => 'ESO Raidplanner',
+                    'avatar_url' => env('APP_URL').self::AVATAR_URL,
+                ]
+            ));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_exec($ch);
+            curl_close($ch);
+        } else {
+            $embeds['content'] = $message;
+            $ch                = curl_init($this->url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($embeds));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_exec($ch);
+            curl_close($ch);
+        }
     }
 
     protected function telegram(string $message)
@@ -168,10 +178,10 @@ class NotificationHook extends Model
         ]);
     }
 
-    protected function send(string $message)
+    protected function send(string $message, ?array $embeds = null)
     {
         if (self::TYPE_DISCORD === $this->type) {
-            $this->discord($message);
+            $this->discord($message, $embeds);
         } elseif (self::TYPE_TELEGRAM === $this->type) {
             $this->telegram($message);
         } elseif (self::TYPE_SLACK === $this->type) {

@@ -25,7 +25,7 @@ class ReminderNotification extends NotificationHook
 {
     public function call(Event $event)
     {
-        $this->send($this->buildMessage($event));
+        $this->send($this->buildMessage($event), $event->buildDiscordEmbeds());
 
         $this->wasCalled($event);
     }

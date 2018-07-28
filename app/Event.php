@@ -17,7 +17,9 @@ namespace App;
 
 use App\Hook\ConfirmedSignupsNotification;
 use App\Hook\EventCreationNotification;
+use App\Hook\NotificationHook;
 use App\Singleton\HookTypes;
+use App\Singleton\RoleTypes;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Database\Eloquent\Model;
@@ -465,5 +467,71 @@ class Event extends Model
         $start_date->setTimezone(new DateTimeZone(Auth::user()->timezone));
 
         return $start_date;
+    }
+
+    public function buildDiscordEmbeds(): array
+    {
+        $data = [
+            'username'   => 'ESO Raidplanner',
+            'content'    => '',
+            'avatar_url' => 'https://esoraidplanner.com'.NotificationHook::AVATAR_URL,
+            'embeds'     => [[
+                'title'       => $this->name,
+                'description' => $this->description ?? '',
+                'url'         => 'https://esoraidplanner.com/g/'.$this->getGuild()->slug.'/event/'.$this->id,
+                'color'       => 9660137,
+                'author'      => [
+                    'name'     => 'ESO Raidplanner',
+                    'url'      => 'https://esoraidplanner.com',
+                    'icon_url' => 'https://esoraidplanner.com/favicon/appicon.jpg',
+                ],
+                'fields' => [
+                    [
+                        'name'   => 'Tanks',
+                        'value'  => $this->getSignupsDiscordFormatted(RoleTypes::ROLE_TANK),
+                        'inline' => true,
+                    ],
+                    [
+                        'name'   => 'Healers',
+                        'value'  => $this->getSignupsDiscordFormatted(RoleTypes::ROLE_HEALER),
+                        'inline' => true,
+                    ],
+                    [
+                        'name'   => 'Magicka DD\'s',
+                        'value'  => $this->getSignupsDiscordFormatted(RoleTypes::ROLE_MAGICKA_DD),
+                        'inline' => true,
+                    ],
+                    [
+                        'name'   => 'Stamina DD\'s',
+                        'value'  => $this->getSignupsDiscordFormatted(RoleTypes::ROLE_STAMINA_DD),
+                        'inline' => true,
+                    ],
+                ],
+                'footer' => [
+                    'text'     => 'ESO Raidplanner by Woeler',
+                    'icon_url' => 'https://esoraidplanner.com/favicon/appicon.jpg',
+                ],
+            ]],
+        ];
+
+        return $data;
+    }
+
+    private function getSignupsDiscordFormatted(int $role_id): string
+    {
+        $signs  = $this->getSignupsByRole($role_id);
+        $return = '';
+
+        foreach ($signs as $sign) {
+            $u = User::query()->find($sign->user_id);
+            $return .= $u->name.PHP_EOL;
+        }
+        $return = rtrim($return, PHP_EOL);
+
+        if ('' === $return) {
+            $return = 'None';
+        }
+
+        return $return;
     }
 }
