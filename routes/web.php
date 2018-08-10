@@ -78,6 +78,9 @@ Route::group(['middleware' => ['auth', 'guild.member', 'guild.event']], function
 
     /* COMMENTS */
     Route::post('/g/{slug}/event/{event_id}/comment/create', 'CommentController@create');
+});
+
+Route::group(['middleware' => ['auth', 'guild.member', 'guild.event', 'comment.owner']], function () {
     Route::post('/g/{slug}/event/{event_id}/comment/modify/{comment_id}', 'CommentController@edit');
     Route::get('/g/{slug}/event/{event_id}/comment/delete/{comment_id}', 'CommentController@delete');
 });
