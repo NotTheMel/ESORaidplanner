@@ -56,11 +56,15 @@ class NotificationHook extends Model
      */
     public function matchesEventTags(Event $event): bool
     {
-        if (empty($this->tags)) {
+        if (empty($this->tags) && empty($event->tags)) {
             return true;
         }
 
-        if (empty($event->tags)) {
+        if (empty($this->tags) && !empty($event->tags)) {
+            return false;
+        }
+
+        if (!empty($this->tags) && empty($event->tags)) {
             return false;
         }
 
