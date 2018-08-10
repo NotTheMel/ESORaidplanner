@@ -55,6 +55,7 @@ class Kernel extends HttpKernel
         'auth.api'         => \App\Http\Middleware\ApiAuth::class,
         'bindings'         => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'can'              => \Illuminate\Auth\Middleware\Authorize::class,
+        'comment.owner'    => \App\Http\Middleware\CommentOwnerMiddleware::class,
         'guest'            => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'guild.member'     => \App\Http\Middleware\GuildMemberMiddleware::class,
         'guild.admin'      => \App\Http\Middleware\GuildAdminMiddleware::class,

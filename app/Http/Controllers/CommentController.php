@@ -22,8 +22,9 @@ use Illuminate\Support\Facades\Auth;
 class CommentController extends Controller
 {
     /**
-     * @param string $slug
-     * @param int    $event_id
+     * @param Request $request
+     * @param string  $slug
+     * @param int     $event_id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
@@ -39,9 +40,10 @@ class CommentController extends Controller
     }
 
     /**
-     * @param string $slug
-     * @param int    $event_id
-     * @param int    $comment_id
+     * @param Request $request
+     * @param string  $slug
+     * @param int     $event_id
+     * @param int     $comment_id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
@@ -67,8 +69,7 @@ class CommentController extends Controller
      */
     public function delete(string $slug, int $event_id, int $comment_id)
     {
-        Comment::query()->where('id', '=', $comment_id)
-            ->where('user_id', '=', Auth::id())->delete();
+        Comment::query()->where('id', '=', $comment_id)->delete();
 
         return redirect('/g/'.$slug.'/event/'.$event_id);
     }

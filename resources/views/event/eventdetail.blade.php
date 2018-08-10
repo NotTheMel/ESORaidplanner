@@ -476,7 +476,7 @@
                                             <div class="panel-heading">
                                                 <strong>{{ $comment->getUserName() }}</strong> <span
                                                         class="text-muted">{{ $comment->getNiceDate() }}</span>
-                                                @if ($comment->user_id === Auth::id())
+                                                @if ($comment->user_id === Auth::id() || $guild->isAdmin(Auth::user()))
                                                     <a href="{{ '/g/' . $guild->slug . '/event/' . $event->id . '/comment/delete/' . $comment->id }}">Remove</a>
                                                 @endif
                                             </div>
