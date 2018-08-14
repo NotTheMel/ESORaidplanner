@@ -43,10 +43,14 @@ class DiscordController extends Controller
             ->first();
 
         if (empty($request->input('guild_id'))) {
-            $return = 'Please type !setup and then the id of the guild you would like to use. Guilds you are an admin of are listed below:'.PHP_EOL;
+            if (0 === count($user->getGuildsWhereIsAdmin())) {
+                return \response('You are currently not an admin in any guild.', Response::HTTP_OK);
+            }
+            $return = 'Please type !setup and then the id of the guild you would like to use. Guilds you are an admin of are listed below:'.PHP_EOL.'```'.PHP_EOL;
             foreach ($user->getGuildsWhereIsAdmin() as $guild) {
                 $return .= $guild->id.': '.$guild->name.PHP_EOL;
             }
+            $return .= '```';
 
             return response($return, Response::HTTP_OK);
         }
