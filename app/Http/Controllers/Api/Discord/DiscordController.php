@@ -28,10 +28,18 @@ class DiscordController extends Controller
 {
     public function setup(Request $request)
     {
-        /** @var Guild $guild */
-        $guild = Guild::query()->find($request->input('guild_id'));
         /** @var User $user */
         $user  = User::query()->where('discord_id', '=', $request->input('discord_user_id'))->first();
+        if (empty($request->input('guild_id'))) {
+            $return = 'Please type !setup and then the id of the guild you would like to use. Guilds you are an admin of are listed below:'.PHP_EOL;
+            foreach ($user->getGuildsWhereIsAdmin() as $guild) {
+                $return .= $guild->id.': '.$guild->name.PHP_EOL;
+            }
+
+            return response($return, Response::HTTP_OK);
+        }
+        /** @var Guild $guild */
+        $guild = Guild::query()->find($request->input('guild_id'));
 
         if (!$guild->isAdmin($user)) {
             return response('You are not an admin of this guild.', Response::HTTP_UNAUTHORIZED);
