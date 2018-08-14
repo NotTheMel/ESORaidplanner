@@ -60,7 +60,7 @@ class DiscordController extends Controller
 
         $event->signup($user, $request->input('role'), $request->input('class'));
 
-        return response('', Response::HTTP_OK);
+        return response('Signed up.', Response::HTTP_OK);
     }
 
     public function signOff(Request $request)
@@ -71,7 +71,7 @@ class DiscordController extends Controller
 
         $event->signoff($user);
 
-        return response('', Response::HTTP_OK);
+        return response('Signed off.', Response::HTTP_OK);
     }
 
     public function listEvents(Request $request)
