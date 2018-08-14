@@ -19,6 +19,7 @@ namespace App\Http\Controllers\Api\Discord;
 
 use App\Event;
 use App\Guild;
+use App\GuildLogger;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
@@ -26,6 +27,13 @@ use Illuminate\Http\Response;
 
 class DiscordController extends Controller
 {
+    protected $logger;
+
+    public function __construct()
+    {
+        $this->logger = new GuildLogger();
+    }
+
     public function setup(Request $request)
     {
         /** @var User $user */
@@ -48,6 +56,8 @@ class DiscordController extends Controller
         $guild->discord_id         = $request->input('discord_server_id');
         $guild->discord_channel_id = $request->input('discord_channel_id');
         $guild->save();
+
+        $this->logger->addDiscordBot($guild, $user);
 
         return response('The bot is now set up for '.$guild->name.'.', Response::HTTP_OK);
     }

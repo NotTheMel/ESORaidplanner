@@ -104,6 +104,12 @@ class GuildLogger
         $log->create($guild->id, $admin->name.' deleted the event '.$event->name.'.');
     }
 
+    public function addDiscordBot(Guild $guild, User $admin)
+    {
+        $log   = new LogEntry();
+        $log->create($admin->name.' set up the Discord bot for '.$guild->name.'.');
+    }
+
     private function getGuild(int $guild_id)
     {
         return Guild::query()->find($guild_id);
