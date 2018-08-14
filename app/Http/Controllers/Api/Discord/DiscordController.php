@@ -39,10 +39,10 @@ class DiscordController extends Controller
         /** @var User $user */
         $user  = User::query()
             ->whereNotNull('discord_id')
-            ->where('discord_id', '=', $request->post('discord_user_id'))
+            ->where('discord_id', '=', $request->get('discord_user_id'))
             ->first();
 
-        if (empty($request->post('guild_id'))) {
+        if (empty($request->get('guild_id'))) {
             $return = 'Please type !setup and then the id of the guild you would like to use. Guilds you are an admin of are listed below:'.PHP_EOL;
             foreach ($user->getGuildsWhereIsAdmin() as $guild) {
                 $return .= $guild->id.': '.$guild->name.PHP_EOL;
@@ -51,14 +51,14 @@ class DiscordController extends Controller
             return response($return, Response::HTTP_OK);
         }
         /** @var Guild $guild */
-        $guild = Guild::query()->find($request->post('guild_id'));
+        $guild = Guild::query()->find($request->get('guild_id'));
 
         if (!$guild->isAdmin($user)) {
             return response('You are not an admin of this guild.', Response::HTTP_UNAUTHORIZED);
         }
 
-        $guild->discord_id         = $request->post('discord_server_id');
-        $guild->discord_channel_id = $request->post('discord_channel_id');
+        $guild->discord_id         = $request->get('discord_server_id');
+        $guild->discord_channel_id = $request->get('discord_channel_id');
         $guild->save();
 
         $this->logger->addDiscordBot($guild, $user);
