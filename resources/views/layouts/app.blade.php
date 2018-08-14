@@ -311,9 +311,7 @@
                     </ul>
                 </nav>
                 <p class="copyright pull-right">
-                    &copy;
-                    <script>document.write(new Date().getFullYear())</script>
-                    ESO Raidplanner - By Woeler
+                    &copy; {{ date('Y') }} ESO Raidplanner - By <a href="https://woeler.eu" target="_blank">Woeler</a>®
                 </p>
             </div>
         </footer>
