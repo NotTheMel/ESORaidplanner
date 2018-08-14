@@ -60,50 +60,25 @@ class UserController extends Controller
     public function editProfile(Request $request)
     {
         $request->validate([
+            'username'       => 'required',
+            'email'          => 'required|email',
+            'password'       => 'same:password_repeat',
+            'timezone'       => 'required',
+            'clock'          => 'required',
+            'layout'         => 'required',
             'discord_handle' => new \App\Rules\DiscordHandleRule(),
         ]);
 
-        $username        = Input::get('username');
-        $email           = Input::get('email');
-        $password        = Input::get('password');
-        $password_repeat = Input::get('password_repeat');
-        $timezone        = Input::get('timezone');
-        $clock           = Input::get('clock');
-        $layout          = Input::get('layout');
-        $telegram        = str_replace('@', '', Input::get('telegram_username'));
-        $discord         = Input::get('discord_handle');
+        Auth::user()->update($request->except(['password', 'password_repeat', 'telegram_username']));
 
-        $timezones = TimeZones::list();
-
-        if ($password !== $password_repeat) {
-            $error = 'Given passwords do not match';
-
-            $sets = $this->getSets();
-
-            return view('profile.edit', compact('timezones', 'error', 'sets'));
+        if (!empty($request->input('telegram_username'))) {
+            Auth::user()->telegram_username = str_replace('@', '', $request->input('telegram_username'));
+        }
+        if (!empty($request->input('password'))) {
+            Auth::user()->password = bcrypt($request->input('password'));
         }
 
-        if ($email !== Auth::user()->email && count(User::query()->where('email', '=', $email)->get()) > 0) {
-            $error = 'A user with that email address already exists.';
-
-            $sets = $this->getSets();
-
-            return view('profile.edit', compact('timezones', 'error', 'sets'));
-        }
-
-        $values                      = [];
-        $values['name']              = $username;
-        $values['email']             = $email;
-        $values['timezone']          = $timezone;
-        $values['clock']             = $clock;
-        $values['layout']            = $layout;
-        $values['telegram_username'] = $telegram;
-        $values['discord_handle']    = $discord;
-        if (!empty($password)) {
-            $values['password'] = bcrypt($password);
-        }
-
-        User::query()->where('id', '=', Auth::id())->update($values);
+        Auth::user()->save();
 
         return redirect('/profile/accountsettings');
     }
