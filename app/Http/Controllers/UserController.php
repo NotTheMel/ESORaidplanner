@@ -57,8 +57,12 @@ class UserController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
      */
-    public function editProfile()
+    public function editProfile(Request $request)
     {
+        $request->validate([
+            'discord_handle' => new \App\Rules\DiscordHandleRule(),
+        ]);
+
         $username        = Input::get('username');
         $email           = Input::get('email');
         $password        = Input::get('password');
