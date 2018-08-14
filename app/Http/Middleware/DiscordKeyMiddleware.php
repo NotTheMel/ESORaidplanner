@@ -34,8 +34,10 @@ class DiscordKeyMiddleware
                 return response('I do not know you. Make sure to set your Discord handle in your ESO Raidplanner profile.', Response::HTTP_BAD_REQUEST);
             }
             $user->discord_handle = $user_id;
-            $user->save();
         }
+
+        $user->discord_id = $user_discord_long;
+        $user->save();
 
         return $next($request);
     }
