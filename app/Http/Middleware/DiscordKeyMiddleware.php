@@ -42,7 +42,7 @@ class DiscordKeyMiddleware
         }
 
         $user->discord_handle = $user_id;
-        $user->discord_id = $user_discord_long;
+        $user->discord_id     = $user_discord_long;
         $user->save();
 
         return $next($request);
