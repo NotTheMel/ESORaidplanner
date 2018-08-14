@@ -105,7 +105,7 @@ Route::group(['middleware' => ['discord.token']], function () {
 Route::post('/discord/setup', 'Api\Discord\DiscordController@setup');
 });
 
-Route::group(['middleware' => ['discord', 'discord.token']], function () {
+Route::group(['middleware' => ['discord.token', 'discord']], function () {
     Route::post('/discord/signup', 'Api\Discord\DiscordController@signUp');
     Route::post('/discord/signoff', 'Api\Discord\DiscordController@signOff');
     Route::post('/discord/events', 'Api\Discord\DiscordController@listEvents');
