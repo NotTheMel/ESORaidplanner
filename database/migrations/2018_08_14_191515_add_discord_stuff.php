@@ -16,7 +16,7 @@ class AddDiscordStuff extends Migration
         Schema::table('users', function($table) {
             $table->string('discord_handle')->nullable();
         });
-        Schema::table('guild', function($table) {
+        Schema::table('guilds', function($table) {
             $table->string('discord_id')->nullable();
         });
     }
