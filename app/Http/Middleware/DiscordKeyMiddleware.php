@@ -21,6 +21,8 @@ class DiscordKeyMiddleware
         $token = str_replace('Basic ', '', $request->header('Authorization'));
         $token = base64_decode($token);
 
+        \Log::info(print_r($request->all(), true));
+
         if ($token !== env('DISCORD_BOT_TOKEN')) {
             return response('Invalid token.', Response::HTTP_UNAUTHORIZED);
         }
