@@ -79,6 +79,17 @@ class DiscordController extends Controller
         /** @var Guild $guild */
         $guild = Guild::query()->where('discord_id', '=', $request->input('discord_server_id'))->first();
 
-        return response($guild->getEvents() ?? [], Response::HTTP_OK);
+        $return = 'Upcoming events for '.$guild->name.':'.PHP_EOL;
+        $return .= '```';
+        if (0 === count($guild->getEvents())) {
+            $return .= 'No events available'.PHP_EOL;
+        } else {
+            foreach ($guild->getEvents() as $event) {
+                $return .= $event->id.': '.$event->name.PHP_EOL;
+            }
+        }
+        $return .= '```';
+
+        return response($return, Response::HTTP_OK);
     }
 }
