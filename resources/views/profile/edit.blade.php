@@ -48,6 +48,10 @@
                         {!! Form::text('telegram_username', Auth::user()->telegram_username, array('class' => 'form-control')) !!}
                         <br>
 
+                        Discord Handle (optional):
+                        {!! Form::text('discord_handle', Auth::user()->discord_handle, array('class' => 'form-control')) !!}
+                        <br>
+
                         {!! Form::submit('Save changes', ['class' => 'btn btn-info']) !!}<br>
 
                         {{ Form::close() }}

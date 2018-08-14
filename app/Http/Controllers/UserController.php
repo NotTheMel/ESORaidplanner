@@ -67,6 +67,7 @@ class UserController extends Controller
         $clock           = Input::get('clock');
         $layout          = Input::get('layout');
         $telegram        = str_replace('@', '', Input::get('telegram_username'));
+        $discord         = Input::get('discord_handle');
 
         $timezones = TimeZones::list();
 
@@ -93,6 +94,7 @@ class UserController extends Controller
         $values['clock']             = $clock;
         $values['layout']            = $layout;
         $values['telegram_username'] = $telegram;
+        $values['discord_handle']    = $discord;
         if (!empty($password)) {
             $values['password'] = bcrypt($password);
         }
