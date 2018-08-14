@@ -100,3 +100,9 @@ Route::group(['middleware' => 'auth.api'], function () {
 
     Route::post('/event/delete/{event_id}', 'Api\EventController@delete');
 });
+
+Route::group(['middleware' => 'discord'], function () {
+    Route::post('/discord/signup', 'Api\Discord\DiscordController@signUp');
+    Route::post('/discord/signoff', 'Api\Discord\DiscordController@signOff');
+    Route::post('/discord/events', 'Api\Discord\DiscordController@listEvents');
+});
