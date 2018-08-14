@@ -20,16 +20,16 @@ class DiscordMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $guild_id = $request->input('guild_id');
+        $guild_id = $request->input('discord_server_id');
         $user_id  = $request->input('user_handle');
         $event_id = $request->input('event_id') ?? null;
 
         /** @var Guild $guild */
         $guild = Guild::query()->where('discord_id', '=', $guild_id)->first();
-        $user  = User::query()->where('discord_handle', '=', $user)->first();
+        $user  = User::query()->where('discord_handle', '=', $user_id)->first();
 
         if (null === $guild) {
-            return response('I do not know your guild. Make sure the GM configures it correctly.', Response::HTTP_BAD_REQUEST);
+            return response('I do not know your guild. Make sure to set me up correctly using the !setup command.', Response::HTTP_BAD_REQUEST);
         }
         if (null === $user) {
             return response('I do not know you. Make sure to set your Discord handle in your ESO Raidplanner profile.', Response::HTTP_BAD_REQUEST);
