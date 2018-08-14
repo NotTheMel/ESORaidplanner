@@ -37,7 +37,7 @@ class DiscordKeyMiddleware
                 ->where('discord_handle', '=', $user_id)
                 ->first();
             if (null === $user) {
-                return response('I do not know you. Make sure to set your Discord handle in your ESO Raidplanner profile.', Response::HTTP_BAD_REQUEST);
+                return response('I do not know you. Make sure to set your Discord handle in your ESO Raidplanner profile. Your Discord handle is `'.$user_id.'`.', Response::HTTP_BAD_REQUEST);
             }
         }
 
