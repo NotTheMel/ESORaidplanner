@@ -31,13 +31,14 @@ class DiscordController extends Controller
         /** @var Guild $guild */
         $guild = Guild::query()->find($request->input('guild_id'));
         /** @var User $user */
-        $user  = User::query()->where('discord_handle', '=', $request->input('user_id'))->first();
+        $user  = User::query()->where('discord_id', '=', $request->input('discord_user_id'))->first();
 
         if (!$guild->isAdmin($user)) {
             return response('You are not an admin of this guild.', Response::HTTP_UNAUTHORIZED);
         }
 
-        $guild->discord_id = $request->input('discord_server_id');
+        $guild->discord_id         = $request->input('discord_server_id');
+        $guild->discord_channel_id = $request->input('discord_channel_id');
         $guild->save();
 
         return response('The bot is now set up for '.$guild->name.'.', Response::HTTP_OK);
@@ -47,7 +48,7 @@ class DiscordController extends Controller
     {
         /** @var Event $event */
         $event = Event::query()->find($request->input('event_id'));
-        $user  = User::query()->where('discord_handle', '=', $request->input('user_id'))->first();
+        $user  = User::query()->where('discord_id', '=', $request->input('discord_user_id'))->first();
 
         $event->signup($user, $request->input('role'), $request->input('class'));
 
@@ -68,7 +69,7 @@ class DiscordController extends Controller
     public function listEvents(Request $request)
     {
         /** @var Guild $guild */
-        $guild = Guild::query()->where('discord_id', '=', $request->input('guild_id'))->first();
+        $guild = Guild::query()->where('discord_id', '=', $request->input('discord_server_id'))->first();
 
         return response($guild->getEvents() ?? [], Response::HTTP_OK);
     }
