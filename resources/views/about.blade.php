@@ -29,6 +29,10 @@
                                     <td><b>Rullof</b></td>
                                     <td>Telegram Bot Programmer</td>
                                 </tr>
+                                <tr>
+                                    <td><b>wayfarerx</b></td>
+                                    <td>Discord Bot Programmer</td>
+                                </tr>
                                 </tbody>
                             </table>
 
