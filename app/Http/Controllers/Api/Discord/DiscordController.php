@@ -37,7 +37,11 @@ class DiscordController extends Controller
     public function setup(Request $request)
     {
         /** @var User $user */
-        $user  = User::query()->where('discord_id', '=', $request->input('discord_user_id'))->first();
+        $user  = User::query()
+            ->whereNotNull('discord_id')
+            ->where('discord_id', '=', $request->input('discord_user_id'))
+            ->first();
+
         if (empty($request->input('guild_id'))) {
             $return = 'Please type !setup and then the id of the guild you would like to use. Guilds you are an admin of are listed below:'.PHP_EOL;
             foreach ($user->getGuildsWhereIsAdmin() as $guild) {
@@ -66,7 +70,10 @@ class DiscordController extends Controller
     {
         /** @var Event $event */
         $event = Event::query()->find($request->input('event_id'));
-        $user  = User::query()->where('discord_id', '=', $request->input('discord_user_id'))->first();
+        $user  = User::query()
+            ->whereNotNull('discord_id')
+            ->where('discord_id', '=', $request->input('discord_user_id'))
+            ->first();
 
         $event->signup($user, $request->input('role'), $request->input('class'));
 
@@ -77,7 +84,10 @@ class DiscordController extends Controller
     {
         /** @var Event $event */
         $event = Event::query()->find($request->input('event_id'));
-        $user  = User::query()->where('discord_handle', '=', $request->input('user_id'))->first();
+        $user  = User::query()
+            ->whereNotNull('discord_id')
+            ->where('discord_handle', '=', $request->input('user_id'))
+            ->first();
 
         $event->signoff($user);
 
