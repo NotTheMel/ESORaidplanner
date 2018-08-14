@@ -27,8 +27,8 @@ class DiscordKeyMiddleware
             return response('Invalid token.', Response::HTTP_UNAUTHORIZED);
         }
 
-        $user_discord_long = $request->get('discord_user_id');
-        $user_id           = $request->get('discord_handle');
+        $user_discord_long = $request->input('discord_user_id');
+        $user_id           = $request->input('discord_handle');
         $user              = User::query()
             ->whereNotNull('discord_handle')
             ->where('discord_handle', '=', $user_id)
