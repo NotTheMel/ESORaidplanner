@@ -2,15 +2,20 @@
 
 namespace App\Rules;
 
+use App\User;
+use Auth;
 use Illuminate\Contracts\Validation\Rule;
 
 class DiscordHandleRule implements Rule
 {
+    private $message;
+
     /**
      * Create a new rule instance.
      */
     public function __construct()
     {
+        $this->message = 'You did not set a valid Discord handle. A valid handle looks something like this: Yourname#1234.';
     }
 
     /**
@@ -37,6 +42,14 @@ class DiscordHandleRule implements Rule
             return false;
         }
 
+        $u = User::query()->where('discord_handle', '=', $value)->first();
+
+        if (null !== $u && Auth::id() !== $u->id) {
+            $this->message = 'Someone else is already using the Discord handle '.$value.'.';
+
+            return false;
+        }
+
         return true;
     }
 
@@ -47,6 +60,6 @@ class DiscordHandleRule implements Rule
      */
     public function message()
     {
-        return 'You did not set a valid Discord handle. A valid handle looks something like this: Yourname#1234.';
+        return $this->message;
     }
 }
