@@ -26,6 +26,23 @@ use Illuminate\Http\Response;
 
 class DiscordController extends Controller
 {
+    public function setup(Request $request)
+    {
+        /** @var Guild $guild */
+        $guild = Guild::query()->find($request->input('guild_id'));
+        /** @var User $user */
+        $user  = User::query()->where('discord_handle', '=', $request->input('user_id'))->first();
+
+        if (!$guild->isAdmin($user)) {
+            return response('You are not an admin of this guild.', Response::HTTP_UNAUTHORIZED);
+        }
+
+        $guild->discord_id = $request->input('discord_server_id');
+        $guild->save();
+
+        return response('The bot is now set up for '.$guild->name.'.', Response::HTTP_OK);
+    }
+
     public function signUp(Request $request)
     {
         /** @var Event $event */
