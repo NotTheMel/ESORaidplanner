@@ -15,8 +15,14 @@
                     </div>
                     <div class="content">
 
-                        @if (!empty($error))
-                            <p class="text-warning">{{ $error }}</p><br>
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         @endif
 
                         {{ Form::open(array('url' => '/profile/accountsettings')) }}
@@ -25,7 +31,7 @@
                         <br>
 
                         Display
-                        name:{!! Form::text('username', Auth::user()->name, array('class' => 'form-control', 'required' => 'required')) !!}
+                        name:{!! Form::text('name', Auth::user()->name, array('class' => 'form-control', 'required' => 'required')) !!}
                         <br>
 
                         New password:{!! Form::password('password', array('class' => 'form-control')) !!}<br>
