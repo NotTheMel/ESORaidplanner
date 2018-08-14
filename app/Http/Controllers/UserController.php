@@ -60,7 +60,7 @@ class UserController extends Controller
     public function editProfile(Request $request)
     {
         $request->validate([
-            'username'       => 'required',
+            'name'           => 'required',
             'email'          => 'required|email',
             'password'       => 'same:password_repeat',
             'timezone'       => 'required',
