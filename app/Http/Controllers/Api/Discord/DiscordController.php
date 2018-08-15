@@ -142,10 +142,22 @@ class DiscordController extends Controller
         return response($return, Response::HTTP_OK);
     }
 
-    private function buildReply(string $base, User $user, Event $event): string
+    public function help(Request $request)
+    {
+        $user  = User::query()
+            ->whereNotNull('discord_id')
+            ->where('discord_id', '=', $request->input('discord_user_id'))
+            ->first();
+
+        return response($this->buildReply(DiscordMessages::HELP, $user), Response::HTTP_OK);
+    }
+
+    private function buildReply(string $base, User $user, ?Event $event = null): string
     {
         $base = str_replace('{USER_MENTION}', $user->getDiscordMention(), $base);
-        $base = str_replace('{EVENT_NAME}', $event->name, $base);
+        if (null !== $event) {
+            $base = str_replace('{EVENT_NAME}', $event->name, $base);
+        }
 
         return $base;
     }
