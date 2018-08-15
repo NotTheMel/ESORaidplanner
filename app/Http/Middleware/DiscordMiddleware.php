@@ -42,6 +42,9 @@ class DiscordMiddleware
             }
         }
 
+        $guild->discord_last_activity = date('Y-m-d H:i:s');
+        $guild->save();
+
         return $next($request);
     }
 }

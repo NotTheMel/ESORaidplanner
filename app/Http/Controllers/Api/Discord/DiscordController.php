@@ -120,4 +120,24 @@ class DiscordController extends Controller
 
         return response($return, Response::HTTP_OK);
     }
+
+    public function getLastActivity(Request $request)
+    {
+        $guilds = Guild::query()
+            ->select(['id', 'discord_id', 'discord_last_activity'])
+            ->whereNotNull('discord_id')
+            ->whereNotNull('discord_last_activity')
+            ->get()->all();
+
+        $return = [];
+
+        foreach ($guilds as $guild) {
+            $dt = new \DateTime($guild->discord_last_activity, new \DateTimeZone(env('DEFAULT_TIMEZONE')));
+            $dt->setTimezone(new \DateTimeZone('UTC'));
+            $guild->discord_last_activity = $dt->format('Y-m-d H:i:s');
+            $return[]                     = $guild;
+        }
+
+        return response($return, Response::HTTP_OK);
+    }
 }
