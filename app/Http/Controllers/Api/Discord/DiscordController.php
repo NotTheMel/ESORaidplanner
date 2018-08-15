@@ -80,7 +80,12 @@ class DiscordController extends Controller
             ->where('discord_id', '=', $request->input('discord_user_id'))
             ->first();
 
-        $event->signup($user, $request->input('role'), $request->input('class'));
+        if (!$event->userIsSignedUp($user->id)) {
+            $event->signup($user, $request->input('role'), $request->input('class'));
+        } else {
+            $event->editSignup($user, $request->input('role'), $request->input('class'));
+            return response($this->buildReply(DiscordMessages::EDIT, $user, $event));
+        }
 
         return response($this->buildReply(DiscordMessages::SIGNUP[array_rand(DiscordMessages::SIGNUP)], $user, $event), Response::HTTP_OK);
     }
@@ -142,10 +147,22 @@ class DiscordController extends Controller
         return response($return, Response::HTTP_OK);
     }
 
-    private function buildReply(string $base, User $user, Event $event): string
+    public function help(Request $request)
+    {
+        $user  = User::query()
+            ->whereNotNull('discord_id')
+            ->where('discord_id', '=', $request->input('discord_user_id'))
+            ->first();
+
+        return response($this->buildReply(DiscordMessages::HELP, $user), Response::HTTP_OK);
+    }
+
+    private function buildReply(string $base, User $user, ?Event $event = null): string
     {
         $base = str_replace('{USER_MENTION}', $user->getDiscordMention(), $base);
-        $base = str_replace('{EVENT_NAME}', $event->name, $base);
+        if (null !== $event) {
+            $base = str_replace('{EVENT_NAME}', $event->name, $base);
+        }
 
         return $base;
     }
