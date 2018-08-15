@@ -481,7 +481,7 @@ class Event extends Model
                 'url'         => 'https://esoraidplanner.com/g/'.$this->getGuild()->slug.'/event/'.$this->id,
                 'color'       => 9660137,
                 'author'      => [
-                    'name'     => 'ESO Raidplanner',
+                    'name'     => 'ESO Raidplanner: '.$this->getGuild()->name,
                     'url'      => 'https://esoraidplanner.com',
                     'icon_url' => 'https://esoraidplanner.com/favicon/appicon.jpg',
                 ],
