@@ -107,7 +107,7 @@ class GuildLogger
     public function addDiscordBot(Guild $guild, User $admin)
     {
         $log   = new LogEntry();
-        $log->create($admin->name.' set up the Discord bot for '.$guild->name.'.');
+        $log->create($guild->id, $admin->name.' set up the Discord bot for '.$guild->name.'.');
     }
 
     private function getGuild(int $guild_id)
