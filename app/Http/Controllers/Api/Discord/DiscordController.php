@@ -90,7 +90,7 @@ class DiscordController extends Controller
         $event = Event::query()->find($request->input('event_id'));
         $user  = User::query()
             ->whereNotNull('discord_id')
-            ->where('discord_handle', '=', $request->input('user_id'))
+            ->where('discord_id', '=', $request->input('discord_user_id'))
             ->first();
 
         $event->signoff($user);
