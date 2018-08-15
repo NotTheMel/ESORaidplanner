@@ -80,7 +80,12 @@ class DiscordController extends Controller
             ->where('discord_id', '=', $request->input('discord_user_id'))
             ->first();
 
-        $event->signup($user, $request->input('role'), $request->input('class'));
+        if (!$event->userIsSignedUp($user->id)) {
+            $event->signup($user, $request->input('role'), $request->input('class'));
+        } else {
+            $event->editSignup($user, $request->input('role'), $request->input('class'));
+            return response($this->buildReply(DiscordMessages::EDIT, $user, $event));
+        }
 
         return response($this->buildReply(DiscordMessages::SIGNUP[array_rand(DiscordMessages::SIGNUP)], $user, $event), Response::HTTP_OK);
     }

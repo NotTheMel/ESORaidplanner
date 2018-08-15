@@ -30,6 +30,8 @@ class DiscordMessages
         'There is no justice here, only judgement! {USER_MENTION} signed up for {EVENT_NAME}.',
     ];
 
+    const EDIT = '{USER_MENTION}, you were already signed up for {EVENT_NAME}. So I have updated your signup instead.';
+
     const HELP = '{USER_MENTION}, here are the commands that you can use:'.PHP_EOL.
     '`!events` => List all upcoming events.'.PHP_EOL.
     '`!signup [event_id] [class] [role]` => Sign up for an event (use the event id from `!events`)'.PHP_EOL.
