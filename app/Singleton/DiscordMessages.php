@@ -20,17 +20,19 @@ namespace App\Singleton;
 class DiscordMessages
 {
     const SIGNUP = [
-        '{USER_MENTION} signed up for {EVENT_NAME}. We\'d better bring some more healers!',
-        '{USER_MENTION} signed up for {EVENT_NAME}. Everbody hide your loot!',
-        'Behold the wrath of Lorkhaj! {USER_MENTION} signed up for {EVENT_NAME}.',
-        'Doom stands upon your treshold, {USER_MENTION} signed up for {EVENT_NAME}.',
-        'The master draws his sword, {USER_MENTION} signed up for {EVENT_NAME}.',
-        'Death by a hundred cuts, {USER_MENTION} signed up for {EVENT_NAME}.',
-        'None shall be spared, {USER_MENTION} signed up for {EVENT_NAME}.',
-        'There is no justice here, only judgement! {USER_MENTION} signed up for {EVENT_NAME}.',
+        '{USER_MENTION} signed up for {EVENT_NAME}. We\'d better bring some more healers! [{CLASS} {ROLE}]',
+        '{USER_MENTION} signed up for {EVENT_NAME}. Everbody hide your loot! [{CLASS} {ROLE}]',
+        'Behold the wrath of Lorkhaj! {USER_MENTION} signed up for {EVENT_NAME}. [{CLASS} {ROLE}]',
+        'Doom stands upon your treshold, {USER_MENTION} signed up for {EVENT_NAME}. [{CLASS} {ROLE}]',
+        'The master draws his sword, {USER_MENTION} signed up for {EVENT_NAME}. [{CLASS} {ROLE}]',
+        'Death by a hundred cuts, {USER_MENTION} signed up for {EVENT_NAME}. [{CLASS} {ROLE}]',
+        'None shall be spared, {USER_MENTION} signed up for {EVENT_NAME}. [{CLASS} {ROLE}]',
+        'There is no justice here, only judgement! {USER_MENTION} signed up for {EVENT_NAME}. [{CLASS} {ROLE}]',
     ];
 
-    const EDIT = '{USER_MENTION}, you were already signed up for {EVENT_NAME}. So I have updated your signup instead.';
+    const EDIT = '{USER_MENTION}, you were already signed up for {EVENT_NAME}. So I have updated your signup instead. [{CLASS} {ROLE}]';
+
+    const SIGNOFF = '{USER_MENTION}, you signed off for {EVENT_NAME}.';
 
     const HELP = '{USER_MENTION}, here are the commands that you can use:'.PHP_EOL.
     '`!events` => List all upcoming events.'.PHP_EOL.

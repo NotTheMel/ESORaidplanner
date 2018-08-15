@@ -21,7 +21,9 @@ use App\Event;
 use App\Guild;
 use App\GuildLogger;
 use App\Http\Controllers\Controller;
+use App\Singleton\ClassTypes;
 use App\Singleton\DiscordMessages;
+use App\Singleton\RoleTypes;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -84,10 +86,11 @@ class DiscordController extends Controller
             $event->signup($user, $request->input('role'), $request->input('class'));
         } else {
             $event->editSignup($user, $request->input('role'), $request->input('class'));
-            return response($this->buildReply(DiscordMessages::EDIT, $user, $event));
+
+            return response($this->buildReply(DiscordMessages::EDIT, $user, $event, $request->input('class'), $request->input('role')));
         }
 
-        return response($this->buildReply(DiscordMessages::SIGNUP[array_rand(DiscordMessages::SIGNUP)], $user, $event), Response::HTTP_OK);
+        return response($this->buildReply(DiscordMessages::SIGNUP[array_rand(DiscordMessages::SIGNUP)], $user, $event, $request->input('class'), $request->input('role')), Response::HTTP_OK);
     }
 
     public function signOff(Request $request)
@@ -101,7 +104,7 @@ class DiscordController extends Controller
 
         $event->signoff($user);
 
-        return response($user->getDiscordMention().', You signed off for '.$event->name.'.', Response::HTTP_OK);
+        return response($this->buildReply(DiscordMessages::SIGNOFF, $user, $event), Response::HTTP_OK);
     }
 
     public function listEvents(Request $request)
@@ -157,11 +160,17 @@ class DiscordController extends Controller
         return response($this->buildReply(DiscordMessages::HELP, $user), Response::HTTP_OK);
     }
 
-    private function buildReply(string $base, User $user, ?Event $event = null): string
+    private function buildReply(string $base, User $user, ?Event $event = null, ?int $class = null, ?int $role = null): string
     {
         $base = str_replace('{USER_MENTION}', $user->getDiscordMention(), $base);
         if (null !== $event) {
             $base = str_replace('{EVENT_NAME}', $event->name, $base);
+        }
+        if (null !== $class) {
+            $base = str_replace('{CLASS}', ClassTypes::getClassName($class), $base);
+        }
+        if (null !== $role) {
+            $base = str_replace('{ROLE}', RoleTypes::getRoleName($role), $base);
         }
 
         return $base;
