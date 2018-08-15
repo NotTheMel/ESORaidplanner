@@ -279,4 +279,9 @@ class User extends Authenticatable
 
         return $signups;
     }
+
+    public function getDiscordMention(): string
+    {
+        return '<@'.$this->discord_id.'>';
+    }
 }

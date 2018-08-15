@@ -44,9 +44,9 @@ class DiscordController extends Controller
 
         if (empty($request->input('guild_id'))) {
             if (0 === count($user->getGuildsWhereIsAdmin())) {
-                return \response('You are currently not an admin in any guild.', Response::HTTP_OK);
+                return \response($user->getDiscordMention().', You are currently not an admin in any guild.', Response::HTTP_OK);
             }
-            $return = 'Please type !setup and then the id of the guild you would like to use. Guilds you are an admin of are listed below:'.PHP_EOL.'```'.PHP_EOL;
+            $return = $user->getDiscordMention().', Please type !setup and then the id of the guild you would like to use. Guilds you are an admin of are listed below:'.PHP_EOL.'```'.PHP_EOL;
             foreach ($user->getGuildsWhereIsAdmin() as $guild) {
                 $return .= $guild->id.': '.$guild->name.PHP_EOL;
             }
@@ -58,7 +58,7 @@ class DiscordController extends Controller
         $guild = Guild::query()->find($request->input('guild_id'));
 
         if (!$guild->isAdmin($user)) {
-            return response('You are not an admin of this guild.', Response::HTTP_UNAUTHORIZED);
+            return response($user->getDiscordMention().', You are not an admin of this guild.', Response::HTTP_UNAUTHORIZED);
         }
 
         $guild->discord_id         = $request->input('discord_server_id');
@@ -67,7 +67,7 @@ class DiscordController extends Controller
 
         $this->logger->addDiscordBot($guild, $user);
 
-        return response('The bot is now set up for '.$guild->name.'.', Response::HTTP_OK);
+        return response($user->getDiscordMention().', The bot is now set up for '.$guild->name.'.', Response::HTTP_OK);
     }
 
     public function signUp(Request $request)
@@ -81,7 +81,7 @@ class DiscordController extends Controller
 
         $event->signup($user, $request->input('role'), $request->input('class'));
 
-        return response('Signed up.', Response::HTTP_OK);
+        return response($user->getDiscordMention().', You signed up for '.$event->name.'.', Response::HTTP_OK);
     }
 
     public function signOff(Request $request)
@@ -95,15 +95,19 @@ class DiscordController extends Controller
 
         $event->signoff($user);
 
-        return response('Signed off.', Response::HTTP_OK);
+        return response($user->getDiscordMention().', You signed off for '.$event->name.'.', Response::HTTP_OK);
     }
 
     public function listEvents(Request $request)
     {
         /** @var Guild $guild */
         $guild = Guild::query()->where('discord_id', '=', $request->input('discord_server_id'))->first();
+        $user  = User::query()
+            ->whereNotNull('discord_id')
+            ->where('discord_id', '=', $request->input('discord_user_id'))
+            ->first();
 
-        $return = 'Upcoming events for '.$guild->name.':'.PHP_EOL;
+        $return = $user->getDiscordMention().', Upcoming events for '.$guild->name.':'.PHP_EOL;
         $return .= '```';
         if (0 === count($guild->getEvents())) {
             $return .= 'No events available'.PHP_EOL;
