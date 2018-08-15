@@ -21,6 +21,7 @@ use App\Event;
 use App\Guild;
 use App\GuildLogger;
 use App\Http\Controllers\Controller;
+use App\Singleton\DiscordMessages;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -81,7 +82,7 @@ class DiscordController extends Controller
 
         $event->signup($user, $request->input('role'), $request->input('class'));
 
-        return response($user->getDiscordMention().', You signed up for '.$event->name.'.', Response::HTTP_OK);
+        return response($this->buildReply(DiscordMessages::SIGNUP[array_rand(DiscordMessages::SIGNUP)], $user, $event), Response::HTTP_OK);
     }
 
     public function signOff(Request $request)
@@ -139,5 +140,13 @@ class DiscordController extends Controller
         }
 
         return response($return, Response::HTTP_OK);
+    }
+
+    private function buildReply(string $base, User $user, Event $event): string
+    {
+        $base = str_replace('{USER_MENTION}', $user->getDiscordMention(), $base);
+        $base = str_replace('{EVENT_NAME}', $event->name, $base);
+
+        return $base;
     }
 }
