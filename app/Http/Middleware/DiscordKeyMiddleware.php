@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Singleton\DiscordMessages;
 use App\User;
 use Closure;
 use Illuminate\Http\Response;
@@ -37,7 +38,7 @@ class DiscordKeyMiddleware
                 ->where('discord_handle', '=', $user_id)
                 ->first();
             if (null === $user) {
-                return response('I do not know you. Make sure to set your Discord handle in your ESO Raidplanner profile. Your Discord handle is `'.$user_id.'`.', Response::HTTP_BAD_REQUEST);
+                return response(DiscordMessages::makeMention($user_discord_long).', I do not know you. Make sure to set your Discord handle in your ESO Raidplanner profile. Your Discord handle is `'.$user_id.'`. Please go here and set your handle: https://esoraidplanner.com/profile/accountsettings', Response::HTTP_BAD_REQUEST);
             }
         }
 
