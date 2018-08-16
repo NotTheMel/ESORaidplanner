@@ -58,6 +58,7 @@ class Kernel extends HttpKernel
         'comment.owner'          => \App\Http\Middleware\CommentOwnerMiddleware::class,
         'discord'                => \App\Http\Middleware\DiscordMiddleware::class,
         'discord.token'          => \App\Http\Middleware\DiscordKeyMiddleware::class,
+        'discord.plain'          => \App\Http\Middleware\DiscordPlainMiddleware::class,
         'guest'                  => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'guild.member'           => \App\Http\Middleware\GuildMemberMiddleware::class,
         'guild.admin'            => \App\Http\Middleware\GuildAdminMiddleware::class,

@@ -101,9 +101,12 @@ Route::group(['middleware' => 'auth.api'], function () {
     Route::post('/event/delete/{event_id}', 'Api\EventController@delete');
 });
 
+Route::group(['middleware' => ['discord.plain']], function () {
+    Route::post('/discord/last-activity', 'Api\Discord\DiscordController@getLastActivity');
+});
+
 Route::group(['middleware' => ['discord.token']], function () {
     Route::post('/discord/setup', 'Api\Discord\DiscordController@setup');
-    Route::post('/discord/last-activity', 'Api\Discord\DiscordController@getLastActivity');
     Route::post('/discord/help', 'Api\Discord\DiscordController@help');
 });
 
