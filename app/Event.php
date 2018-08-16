@@ -79,7 +79,7 @@ class Event extends Model
 
         $date->setTimezone(new DateTimeZone($u->timezone));
 
-        if (12 === Auth::user()->clock) {
+        if (12 === $u->clock) {
             return $date->format('F jS g:i a');
         }
 
