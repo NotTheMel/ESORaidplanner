@@ -510,7 +510,7 @@ class Event extends Model
                     ],
                     [
                         'name'   => 'Legend',
-                        'value'  => '✅ = Confirmed, ⚠ = Backup',
+                        'value'  => '✅ = Confirmed, ⚠️ = Backup, ❔ = No status',
                         'inline' => false,
                     ],
                 ],
@@ -532,9 +532,11 @@ class Event extends Model
         foreach ($signs as $sign) {
             $u = User::query()->find($sign->user_id);
             if (SignupStatusses::STATUS_CONFIRMED === $sign->status) {
-                $return .= '✅';
+                $return .= '✅ ';
             } elseif (SignupStatusses::STATUS_BACKUP === $sign->status) {
-                $return .= '⚠️';
+                $return .= '⚠️ ';
+            } else {
+                $return .= '❔ ';
             }
             $return .= $u->name.PHP_EOL;
         }
