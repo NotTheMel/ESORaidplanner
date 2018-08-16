@@ -32,13 +32,13 @@ class DiscordMiddleware
             return response('I do not know your guild. Make sure to set me up correctly using the !setup command.', Response::HTTP_BAD_REQUEST);
         }
         if (!$guild->isMember($user)) {
-            return response('You are not a member of '.$guild->name.'.', Response::HTTP_UNAUTHORIZED);
+            return response($user->getDiscordMention().', you are not a member of '.$guild->name.'.', Response::HTTP_UNAUTHORIZED);
         }
         if (null !== $event_id) {
             /** @var Event $event */
             $event = Event::query()->find($event_id);
             if (null === $event || $event->guild_id !== $guild->id) {
-                return response('The event you are trying to sign up for does not exist');
+                return response($user->getDiscordMention().', the event you are trying to sign up for does not exist');
             }
         }
 
