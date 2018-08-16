@@ -28,6 +28,10 @@ class ConfirmedSignupsNotification extends NotificationHook
         $message = str_replace(['{EVENT_NAME}', '{EVENT_DESCRIPTION}', '{EVENT_NUM_SIGNUPS}', '{EVENT_URL}'], [$event->name, $event->description, $event->getTotalSignups(), 'https://esoraidplanner.com/g/'.$guild->slug.'/event/'.$event->id], $this->message);
 
         if (NotificationHook::TYPE_DISCORD !== $this->type) {
+            $message = str_replace(['{CONFIRMED_SIGNUPS}', '{BACKUP_SIGNUPS}'], ['', ''], $message);
+        }
+
+        if (NotificationHook::TYPE_DISCORD !== $this->type) {
             if (false !== strpos($message, '{CONFIRMED_SIGNUPS}')) {
                 $signups = $event->getSignupsOrderedByRole(SignupStatusses::STATUS_CONFIRMED);
                 if (count($signups) > 0) {
