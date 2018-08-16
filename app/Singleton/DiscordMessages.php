@@ -41,4 +41,9 @@ class DiscordMessages
     '**Classes:** `dragonknight`, `sorcerer`, `nightblade`, `warden`, `templar`'.PHP_EOL.
     '**Roles:** `tank`, `healer`, `magickadd`, `staminadd`, `other`'.PHP_EOL.PHP_EOL.
     'A typical signup request would look like this `!signup 123 dragonknight tank`';
+
+    public static function makeMention(string $uid)
+    {
+        return '<@'.$uid.'>';
+    }
 }

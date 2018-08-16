@@ -29,7 +29,7 @@ class DiscordMiddleware
         $user  = User::query()->where('discord_id', '=', $user_discord_long)->first();
 
         if (null === $guild) {
-            return response('I do not know your guild. Make sure to set me up correctly using the !setup command.', Response::HTTP_BAD_REQUEST);
+            return response($user->getDiscordMention().', I do not know your guild. Make sure to set me up correctly using the !setup command.', Response::HTTP_BAD_REQUEST);
         }
         if (!$guild->isMember($user)) {
             return response($user->getDiscordMention().', you are not a member of '.$guild->name.'.', Response::HTTP_UNAUTHORIZED);
