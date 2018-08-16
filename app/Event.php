@@ -20,6 +20,7 @@ use App\Hook\EventCreationNotification;
 use App\Hook\NotificationHook;
 use App\Singleton\HookTypes;
 use App\Singleton\RoleTypes;
+use App\Singleton\SignupStatusses;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Database\Eloquent\Model;
@@ -507,6 +508,11 @@ class Event extends Model
                         'value'  => $this->getSignupsDiscordFormatted(RoleTypes::ROLE_STAMINA_DD),
                         'inline' => true,
                     ],
+                    [
+                        'name'   => 'Legend',
+                        'value'  => '✅ = Confirmed, ⚠ = Backup',
+                        'inline' => false,
+                    ],
                 ],
                 'footer' => [
                     'text'     => 'ESO Raidplanner by Woeler',
@@ -525,6 +531,11 @@ class Event extends Model
 
         foreach ($signs as $sign) {
             $u = User::query()->find($sign->user_id);
+            if (SignupStatusses::STATUS_CONFIRMED === $sign->status) {
+                $return .= '✅';
+            } elseif (SignupStatusses::STATUS_BACKUP === $sign->status) {
+                $return .= '⚠️';
+            }
             $return .= $u->name.PHP_EOL;
         }
         $return = rtrim($return, PHP_EOL);
