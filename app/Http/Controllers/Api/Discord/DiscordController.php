@@ -129,13 +129,13 @@ class DiscordController extends Controller
             ->where('discord_id', '=', $request->input('discord_user_id'))
             ->first();
 
-        $return = $user->getDiscordMention().', Upcoming events for '.$guild->name.':'.PHP_EOL;
+        $return = $user->getDiscordMention().', Upcoming events for '.$guild->name.' (date/time based on your configured timezone '.$user->timezone.'):'.PHP_EOL;
         $return .= '```';
         if (0 === count($guild->getEvents())) {
             $return .= 'No events available'.PHP_EOL;
         } else {
             foreach ($guild->getEvents() as $event) {
-                $return .= $event->id.': '.$event->name.PHP_EOL;
+                $return .= $event->id.': '.$event->name.' ('.$event->getNiceDate($user).' '.$user->timezone.')'.PHP_EOL;
             }
         }
         $return .= '```';

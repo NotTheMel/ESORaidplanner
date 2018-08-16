@@ -72,11 +72,12 @@ class Event extends Model
     /**
      * @return string
      */
-    public function getNiceDate(): string
+    public function getNiceDate(User $user = null): string
     {
+        $u    = $user ?? Auth::user();
         $date = new DateTime($this->start_date);
 
-        $date->setTimezone(new DateTimeZone(Auth::user()->timezone));
+        $date->setTimezone(new DateTimeZone($u->timezone));
 
         if (12 === Auth::user()->clock) {
             return $date->format('F jS g:i a');
