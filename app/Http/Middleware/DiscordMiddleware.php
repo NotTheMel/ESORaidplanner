@@ -32,7 +32,7 @@ class DiscordMiddleware
             return response('I do not know your guild. Make sure to set me up correctly using the !setup command.', Response::HTTP_BAD_REQUEST);
         }
         if (!$guild->isMember($user)) {
-            return response('You are not a member of '.$guild_id->name.'.', Response::HTTP_UNAUTHORIZED);
+            return response('You are not a member of '.$guild->name.'.', Response::HTTP_UNAUTHORIZED);
         }
         if (null !== $event_id) {
             /** @var Event $event */
