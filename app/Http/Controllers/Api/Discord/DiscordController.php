@@ -135,7 +135,7 @@ class DiscordController extends Controller
             $return .= 'No events available'.PHP_EOL;
         } else {
             foreach ($guild->getEvents() as $event) {
-                $return .= $event->id.': '.$event->name.' ('.$event->getNiceDate($user).' '.$user->timezone.')'.PHP_EOL;
+                $return .= $event->id.': '.$event->name.' ('.$event->getNiceDate($user).')'.PHP_EOL;
             }
         }
         $return .= '```';
