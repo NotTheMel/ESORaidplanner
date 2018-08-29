@@ -394,6 +394,14 @@ class Guild extends Model
     }
 
     /**
+     * @return bool
+     */
+    public function hasDiscordBot(): bool
+    {
+        return !empty($this->discord_id) && !empty($this->discord_channel_id);
+    }
+
+    /**
      * @param User $user
      */
     private function removeFromAllTeams(User $user)

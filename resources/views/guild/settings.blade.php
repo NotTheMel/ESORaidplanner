@@ -30,6 +30,26 @@
 
                     <div class="card">
                         <div class="header">
+                            <h4 class="title">Discord bot</h4>
+                        </div>
+                        <div class="content">
+                            @if($guild->hasDiscordBot())
+                                <div class="alert alert-success">
+                                    <p>The Discord bot is connected to your guild.</p>
+                                </div>
+                            @else
+                                <div class="alert alert-danger">
+                                    <p>The Discord bot is not connected to your guild. Add the Discord bot by clicking the button below. Once the bot is added type '!setup' in the channel you want the bot to function in (make sure the bot has read/write/embed permissions in that channel!).</p>
+                                </div>
+                                <a href="https://discordapp.com/oauth2/authorize?client_id=479385645224165406&scope=bot&permissions=215040" target="_blank">
+                                    <button type="button" class="btn btn-success">Add the Discord bot!</button>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="header">
                             <div class="pull-right">
                                 <a href="{{ '/g/' . $guild->slug . '/repeatable/create' }}">
                                     <button type="button" class="btn btn-info">Create a recurring event</button>
@@ -62,7 +82,9 @@
                             </table>
                             <div class="content">
                                 <div class="alert alert-danger">
-                            <p>Take note that deleting a recurring event will not delete any of the events that it created. It will just stop new events from being created.</p>
+                                    <p>Take note that deleting a recurring event will not delete any of the events that
+                                        it
+                                        created. It will just stop new events from being created.</p>
                                 </div>
                             </div>
                         </div>
