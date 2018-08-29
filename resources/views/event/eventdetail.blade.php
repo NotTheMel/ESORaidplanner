@@ -25,7 +25,7 @@
                                             <button type="button" class="btn btn-warning">Lock event</button>
                                         </a>
                                     @endif
-                                    <a href="{{ '/g/' . $guild->slug . '/events/delete/' . $event->id }}">
+                                    <a href="{{ '/g/' . $guild->slug . '/events/delete/' . $event->id }}" onclick="return confirm('Are you sure you want to delete this event?')">
                                         <button type="button" class="btn btn-danger">Delete event</button>
                                     </a>
                                     @if($guild->hasConfirmedSignupsHooks())
