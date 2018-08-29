@@ -35,12 +35,14 @@ class DiscordMessages
     const SIGNOFF = '{USER_MENTION}, you signed off for {EVENT_NAME}.';
 
     const HELP = '{USER_MENTION}, here are the commands that you can use:'.PHP_EOL.
-    '`!events` => List all upcoming events.'.PHP_EOL.
-    '`!signup [event_id] [class] [role]` => Sign up for an event (use the event id from `!events`)'.PHP_EOL.
-    '`!signoff [event_id]` => Sign off for an event (use the event id from `!events`)'.PHP_EOL.
-    '**Classes:** `dragonknight`, `sorcerer`, `nightblade`, `warden`, `templar`'.PHP_EOL.
-    '**Roles:** `tank`, `healer`, `magickadd`, `staminadd`, `other`'.PHP_EOL.PHP_EOL.
-    'A typical signup request would look like this `!signup 123 dragonknight tank`';
+    '```'.PHP_EOL.
+    '!events => List all upcoming events.'.PHP_EOL.
+    '!signup [event_id] [class] [role] => Sign up for an event (use the event id from !events)'.PHP_EOL.
+    '!signoff [event_id] => Sign off for an event (use the event id from !events)'.PHP_EOL.
+    '```'.PHP_EOL.
+    '**Classes:** dragonknight (D), sorcerer (S), nightblade (N), warden (W), templar (T)'.PHP_EOL.
+    '**Roles:** tank (T), healer (H), magickadd (M), staminadd (S), other (O)'.PHP_EOL.PHP_EOL.
+    'A typical signup request would look like this `!signup 123 dragonknight tank` or the shorter version for lazy people `!signup 123 D T`';
 
     public static function makeMention(string $uid)
     {
