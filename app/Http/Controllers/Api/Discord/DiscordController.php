@@ -112,10 +112,10 @@ class DiscordController extends Controller
         } else {
             $event->editSignup($user, $role, $class, $sets, $character ?? null);
 
-            return response($this->buildReply(DiscordMessages::EDIT, $user, $event, $request->input('class'), $request->input('role')));
+            return response($this->buildReply(DiscordMessages::EDIT, $user, $event, $class, $role));
         }
 
-        return response($this->buildReply(DiscordMessages::SIGNUP[array_rand(DiscordMessages::SIGNUP)], $user, $event, $request->input('class'), $request->input('role')), Response::HTTP_OK);
+        return response($this->buildReply(DiscordMessages::SIGNUP[array_rand(DiscordMessages::SIGNUP)], $user, $event, $class, $role), Response::HTTP_OK);
     }
 
     public function signOff(Request $request)
