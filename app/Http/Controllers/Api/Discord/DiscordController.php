@@ -180,14 +180,9 @@ class DiscordController extends Controller
         return response($return, Response::HTTP_OK);
     }
 
-    public function help(Request $request)
+    public function help()
     {
-        $user  = User::query()
-            ->whereNotNull('discord_id')
-            ->where('discord_id', '=', $request->input('discord_user_id'))
-            ->first();
-
-        return response($this->buildReply(DiscordMessages::HELP, $user), Response::HTTP_OK);
+        return response(DiscordMessages::HELP_EMBEDS, Response::HTTP_OK);
     }
 
     public function status(Request $request)

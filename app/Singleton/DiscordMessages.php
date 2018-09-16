@@ -17,6 +17,8 @@
 
 namespace App\Singleton;
 
+use App\Hook\NotificationHook;
+
 class DiscordMessages
 {
     const SIGNUP = [
@@ -49,6 +51,59 @@ class DiscordMessages
     '**Classes:** dragonknight (D), sorcerer (S), nightblade (N), warden (W), templar (T)'.PHP_EOL.
     '**Roles:** tank (T), healer (H), magickadd (M), staminadd (S), other (O)'.PHP_EOL.PHP_EOL.
     'A typical signup request would look like this `!signup 123 dragonknight tank` or the shorter version for lazy people `!signup 123 D T`';
+
+    const HELP_EMBEDS = [
+        'username'   => 'ESO Raidplanner',
+        'content'    => '',
+        'avatar_url' => 'https://esoraidplanner.com'.NotificationHook::AVATAR_URL,
+        'embeds'     => [[
+            'title'       => 'ESO Raidplanner Commands',
+            'description' => 'These are the commands you can use with the ESO Raidplanner bot.',
+            'url'         => 'https://esoraidplanner.com/',
+            'color'       => 9660137,
+            'author'      => [
+                'name'     => 'ESO Raidplanner',
+                'url'      => 'https://esoraidplanner.com',
+                'icon_url' => 'https://esoraidplanner.com/favicon/appicon.jpg',
+            ],
+            'fields' => [
+                [
+                    'name'   => '!events',
+                    'value'  => 'List all upcoming events.',
+                    'inline' => false,
+                ],
+                [
+                    'name'   => '!signup [event_id] [class] [role]',
+                    'value'  => 'Sign up for an event (use the event id from !events).',
+                    'inline' => false,
+                ],
+                [
+                    'name'   => '!signup "[character preset name]"',
+                    'value'  => 'Use this to sign up using one of your raidplanner character presets. Make sure the name is inside double quotes!',
+                    'inline' => false,
+                ],
+                [
+                    'name'   => '!signoff [event_id]',
+                    'value'  => 'Sign off for an event (use the event id from !events).',
+                    'inline' => false,
+                ],
+                [
+                    'name'   => '!status [event_id]',
+                    'value'  => 'Shows if you are signed up or not, and with what.',
+                    'inline' => false,
+                ],
+                [
+                    'name'   => '!signups [event_id]',
+                    'value'  => 'Shows the signup roster for an event.',
+                    'inline' => false,
+                ],
+            ],
+            'footer' => [
+                'text'     => 'ESO Raidplanner by Woeler',
+                'icon_url' => 'https://esoraidplanner.com/favicon/appicon.jpg',
+            ],
+        ]],
+    ];
 
     public static function makeMention(string $uid)
     {
