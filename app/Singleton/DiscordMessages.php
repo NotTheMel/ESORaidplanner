@@ -34,6 +34,10 @@ class DiscordMessages
 
     const SIGNOFF = '{USER_MENTION}, you signed off for {EVENT_NAME}.';
 
+    const SIGNED_UP_STATUS = '{USER_MENTION}, you are signed up for {EVENT_NAME} as a {CLASS} {ROLE}.';
+
+    const NOT_SIGNUP_STATUS = '{USER_MENTION}, you are not signed up for {EVENT_NAME}.';
+
     const HELP = '{USER_MENTION}, here are the commands that you can use:'.PHP_EOL.
     '```'.PHP_EOL.
     '!events => List all upcoming events.'.PHP_EOL.
