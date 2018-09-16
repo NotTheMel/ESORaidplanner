@@ -21,6 +21,7 @@ use App\Event;
 use App\Guild;
 use App\GuildLogger;
 use App\Http\Controllers\Controller;
+use App\Signup;
 use App\Singleton\ClassTypes;
 use App\Singleton\DiscordMessages;
 use App\Singleton\RoleTypes;
@@ -171,6 +172,35 @@ class DiscordController extends Controller
             ->first();
 
         return response($this->buildReply(DiscordMessages::HELP, $user), Response::HTTP_OK);
+    }
+
+    public function status(Request $request)
+    {
+        /** @var User $user */
+        $user  = User::query()
+            ->whereNotNull('discord_id')
+            ->where('discord_id', '=', $request->input('discord_user_id'))
+            ->first();
+
+        if (empty($request->input('event_id'))) {
+            return response($user->getDiscordMention().', You did not specify an event id.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $event = Event::query()->find($request->input('event_id'));
+
+        if (null === $event) {
+            return response($user->getDiscordMention().', I do not know that event.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $signup = Signup::query()->where('user_id', '=', $user->id)
+            ->where('event_id', '=', $request->input('event_id'))
+            ->first();
+
+        if (null !== $signup) {
+            return response($this->buildReply(DiscordMessages::SIGNED_UP_STATUS, $user, $event, $signup->class_id, $signup->role_id));
+        }
+
+        return response($this->buildReply(DiscordMessages::NOT_SIGNUP_STATUS, $user, $event));
     }
 
     private function buildReply(string $base, User $user, ?Event $event = null, ?int $class = null, ?int $role = null): string
