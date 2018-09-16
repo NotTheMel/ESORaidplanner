@@ -17,6 +17,7 @@
 
 namespace App\Http\Controllers\Api\Discord;
 
+use App\Character;
 use App\Event;
 use App\Guild;
 use App\GuildLogger;
@@ -84,17 +85,32 @@ class DiscordController extends Controller
         if (empty($request->input('event_id'))) {
             return response($user->getDiscordMention().', You did not specify an event id.', Response::HTTP_BAD_REQUEST);
         }
-        if (empty($request->input('class')) || empty($request->input('role'))) {
-            return response($user->getDiscordMention().', You did not specify a class and/or role.', Response::HTTP_BAD_REQUEST);
+        if (!empty($request->input('preset'))) {
+            $character = Character::query()->where('name', 'like', $request->input('preset'))
+                ->where('user_id', '=', $user->id)
+                ->first();
+            if (null === $character) {
+                return response($user->getDiscordMention().', I do not know that character preset.', Response::HTTP_BAD_REQUEST);
+            }
+            $class = $character->class;
+            $role  = $character->role;
+            $sets  = explode(',', $character->sets) ?? [];
+        } else {
+            if (empty($request->input('class')) || empty($request->input('role'))) {
+                return response($user->getDiscordMention().', You did not specify a class and/or role.', Response::HTTP_BAD_REQUEST);
+            }
+            $class = $request->input('class');
+            $role  = $request->input('role');
+            $sets  = [];
         }
 
         /** @var Event $event */
         $event = Event::query()->find($request->input('event_id'));
 
         if (!$event->userIsSignedUp($user->id)) {
-            $event->signup($user, $request->input('role'), $request->input('class'));
+            $event->signup($user, $role, $class, $sets, $character ?? null);
         } else {
-            $event->editSignup($user, $request->input('role'), $request->input('class'));
+            $event->editSignup($user, $role, $class, $sets, $character ?? null);
 
             return response($this->buildReply(DiscordMessages::EDIT, $user, $event, $request->input('class'), $request->input('role')));
         }
