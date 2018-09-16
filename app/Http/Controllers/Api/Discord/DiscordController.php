@@ -219,6 +219,24 @@ class DiscordController extends Controller
         return response($this->buildReply(DiscordMessages::NOT_SIGNUP_STATUS, $user, $event));
     }
 
+    public function signups(Request $request)
+    {
+        /** @var User $user */
+        $user  = User::query()
+            ->whereNotNull('discord_id')
+            ->where('discord_id', '=', $request->input('discord_user_id'))
+            ->first();
+
+        if (empty($request->input('event_id'))) {
+            return response($user->getDiscordMention().', You did not specify an event id.', Response::HTTP_BAD_REQUEST);
+        }
+
+        /** @var Event $event */
+        $event = Event::query()->find($request->input('event_id'));
+
+        return response($event->buildDiscordEmbeds(), Response::HTTP_OK);
+    }
+
     private function buildReply(string $base, User $user, ?Event $event = null, ?int $class = null, ?int $role = null): string
     {
         $base = str_replace('{USER_MENTION}', $user->getDiscordMention(), $base);
