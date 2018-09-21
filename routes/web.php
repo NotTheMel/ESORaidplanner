@@ -128,8 +128,8 @@ Route::group(['middleware' => ['auth', 'guild.admin', 'guild.event']], function 
 });
 
 Route::group(['middleware' => ['auth', 'guild.owner']], function () {
-    Route::get('/guild/delete/{id}', 'GuildController@deleteConfirm');
-    Route::get('/guild/delete/{id}/confirm', 'GuildController@delete');
+    Route::get('/g/{slug}/delete', 'GuildController@deleteConfirm');
+    Route::get('/g/{slug}/delete/confirm', 'GuildController@delete');
     Route::get('/g/{slug}/member/makeadmin/{user_id}', 'GuildController@makeAdmin');
     Route::get('/g/{slug}/member/removeadmin/{user_id}', 'GuildController@removeAdmin');
 });

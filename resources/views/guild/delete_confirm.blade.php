@@ -21,7 +21,7 @@
                         <a href="{{ '/g/' . $guild->slug }}">
                             <button type="button" class="btn btn-success">No, I don't want to delete this guild</button>
                         </a>
-                        <a href="{{ '/guild/delete/' . $guild->id . '/confirm' }}">
+                        <a href="{{ '/g/'.$guild->slug.'/delete/confirm' }}">
                             <button type="button" class="btn btn-danger">Yes, I want to delete this guild and all data
                                 associated with it
                             </button>
