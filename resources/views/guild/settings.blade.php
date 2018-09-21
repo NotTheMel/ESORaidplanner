@@ -21,7 +21,7 @@
                             {{ Form::close() }}
 
                             @if ($guild->isOwner(Auth::user()))
-                                <br><br><br><br><a href="{{ '/guild/delete/' . $guild->id }}">
+                                <br><br><br><br><a href="{{ '/g/'.$guild->slug.'/delete' }}">
                                     <button type="button" class="btn btn-danger">Delete Guild</button>
                                 </a>
                             @endif

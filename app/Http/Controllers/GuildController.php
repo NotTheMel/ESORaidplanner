@@ -69,9 +69,9 @@ class GuildController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function delete(int $id)
+    public function delete(string $slug)
     {
-        $guild = Guild::query()->where('id', '=', $id)->first();
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
         $guild->delete();
 
         return redirect('/');
@@ -226,9 +226,9 @@ class GuildController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function deleteConfirm(int $id)
+    public function deleteConfirm(string $slug)
     {
-        $guild = Guild::query()->find($id);
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
 
         return view('guild.delete_confirm', compact('guild'));
     }
