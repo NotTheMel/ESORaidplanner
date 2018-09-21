@@ -48,13 +48,7 @@ class RepeatableController extends Controller
             'create_interval' => 'required',
         ]);
 
-        if (12 === Auth::user()->clock) {
-            $date = new DateTime($request->input('year').'-'.$request->input('month').'-'.$request->input('day').' '.$request->input('hour').':'.$request->input('minute').' '.$request->input('meridiem'), new DateTimeZone(Auth::user()->timezone));
-        } else {
-            $date = new DateTime($request->input('year').'-'.$request->input('month').'-'.$request->input('day').' '.$request->input('hour').':'.$request->input('minute'), new DateTimeZone(Auth::user()->timezone));
-        }
-
-        $date->setTimezone(new DateTimeZone(env('DEFAULT_TIMEZONE')));
+        $date = $this->requestToDateTime($request->all());
 
         $guild = Guild::query()
             ->where('slug', '=', $slug)
@@ -137,5 +131,30 @@ class RepeatableController extends Controller
         $repeatable->delete();
 
         return redirect('/g/'.$slug.'/settings');
+    }
+
+    private function requestToDateTime(array $request): DateTime
+    {
+        if (1 === \strlen($request['hour'])) {
+            $hour = '0'.$request['hour'];
+        } else {
+            $hour = $request['hour'];
+        }
+
+        if (1 === \strlen($request['minute'])) {
+            $minute = '0'.$request['minute'];
+        } else {
+            $minute = $request['minute'];
+        }
+
+        if (12 === Auth::user()->clock) {
+            $date = new DateTime($request['year'].'-'.$request['month'].'-'.$request['day'].' '.$hour.':'.$minute.' '.$request['meridiem'], new DateTimeZone(Auth::user()->timezone));
+        } else {
+            $date = new DateTime($request['year'].'-'.$request['month'].'-'.$request['day'].' '.$hour.':'.$minute, new DateTimeZone(Auth::user()->timezone));
+        }
+
+        $date->setTimezone(new DateTimeZone(env('DEFAULT_TIMEZONE')));
+
+        return $date;
     }
 }
