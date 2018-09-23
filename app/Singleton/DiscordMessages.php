@@ -44,7 +44,7 @@ class DiscordMessages
     '```'.PHP_EOL.
     '!events => List all upcoming events.'.PHP_EOL.
     '!signup [event_id] [class] [role] => Sign up for an event (use the event id from !events)'.PHP_EOL.
-    '!signup "[character preset name]" => Use this to sign up using one of your raidplanner character presets. Make sure the name is inside double quotes!'.PHP_EOL.
+    '!signup [event_id] "[character preset name]" => Use this to sign up using one of your raidplanner character presets. Make sure the name is inside double quotes!'.PHP_EOL.
     '!signoff [event_id] => Sign off for an event (use the event id from !events)'.PHP_EOL.
     '!status [event_id] => Shows if you are signed up or not, and with what.'.PHP_EOL.
     '```'.PHP_EOL.
