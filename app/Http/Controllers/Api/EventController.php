@@ -411,6 +411,8 @@ class EventController extends ApiController
             return response(null, Response::HTTP_UNAUTHORIZED);
         }
 
+        $event->start_date = $event->getUtcTime();
+
         return response($event, Response::HTTP_OK);
     }
 }
