@@ -395,4 +395,22 @@ class EventController extends ApiController
 
         return response(null, Response::HTTP_OK);
     }
+
+    public function get(Request $request, int $event_id)
+    {
+        $user = $this->login($request);
+
+        if (false === $user) {
+            return response(null, Response::HTTP_UNAUTHORIZED);
+        }
+
+        $event = Event::query()->find($event_id);
+        $guild = Guild::query()->find($event->guild_id);
+
+        if (!$guild->isMember($user)) {
+            return response(null, Response::HTTP_UNAUTHORIZED);
+        }
+
+        return response($event, Response::HTTP_OK);
+    }
 }

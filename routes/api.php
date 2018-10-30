@@ -99,6 +99,8 @@ Route::group(['middleware' => 'auth.api'], function () {
     Route::post('/event/modify/{event_id}', 'Api\EventController@edit');
 
     Route::post('/event/delete/{event_id}', 'Api\EventController@delete');
+
+    Route::post('/event/{event_id}', 'Api\EventController@get');
 });
 
 Route::group(['middleware' => ['discord.plain']], function () {
