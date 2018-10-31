@@ -163,7 +163,7 @@ class Guild extends Model
     public function makeAdmin(User $user, User $admin = null)
     {
         $admin = $admin ?? Auth::user();
-        if (!$this->isOwner($admin)) {
+        if ($this->owner_id !== $user->id) {
             return;
         }
         $admins = json_decode($this->admins, true);
@@ -228,7 +228,7 @@ class Guild extends Model
      */
     public function leave(User $user)
     {
-        if ($this->isOwner($user)) {
+        if ($this->owner_id === $user->id) {
             return;
         }
 
@@ -247,7 +247,7 @@ class Guild extends Model
     public function removeAdmin(User $user, User $admin = null)
     {
         $admin = $admin ?? Auth::user();
-        if (!$this->isOwner($admin)) {
+        if ($this->owner_id !== $user->id) {
             return;
         }
         $admins = json_decode($this->admins, true);
