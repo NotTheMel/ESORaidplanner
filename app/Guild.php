@@ -232,7 +232,7 @@ class Guild extends Model
             return;
         }
 
-        $this->removeAdmin($user);
+        //$this->removeAdmin($user);
         $this->removeFromAllTeams($user);
 
         DB::table('user_guilds')->where('user_id', '=', $user->id)->where('guild_id', '=', $this->id)->delete();
