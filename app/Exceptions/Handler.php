@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Woeler\DiscordPhp\Message\DiscordEmbedsMessage;
 use Woeler\DiscordPhp\Webhook\DiscordWebhook;
 
@@ -21,6 +22,7 @@ class Handler extends ExceptionHandler
         \Illuminate\Database\Eloquent\ModelNotFoundException::class,
         \Illuminate\Session\TokenMismatchException::class,
         \Illuminate\Validation\ValidationException::class,
+        NotFoundHttpException::class,
     ];
 
     /**
