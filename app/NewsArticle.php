@@ -15,11 +15,31 @@
 
 namespace App;
 
+use App\Utility\UserDateHandler;
 use DateTime;
-use DateTimeZone;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
+/**
+ * App\NewsArticle.
+ *
+ * @mixin \Eloquent
+ *
+ * @property int                             $id
+ * @property string                          $title
+ * @property string                          $content
+ * @property string                          $image
+ * @property int                             $author_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\NewsArticle whereAuthorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\NewsArticle whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\NewsArticle whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\NewsArticle whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\NewsArticle whereImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\NewsArticle whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\NewsArticle whereUpdatedAt($value)
+ */
 class NewsArticle extends Model
 {
     protected $table    = 'newsarticles';
@@ -31,26 +51,18 @@ class NewsArticle extends Model
     ];
 
     /**
+     * Get a human readable date string based on user settings.
+     *
      * @return string
      */
-    public function getNiceDate(): string
+    public function getUserHumanReadableDate(): string
     {
-        $date = new DateTime($this->created_at);
-
-        $date->setTimezone(new DateTimeZone(Auth::user()->timezone ?? env('DEFAULT_TIMEZONE')));
-
-        if (!Auth::check()) {
-            return $date->format('F jS H:i');
-        }
-
-        if (12 === Auth::user()->clock) {
-            return $date->format('F jS g:i a');
-        }
-
-        return $date->format('F jS H:i');
+        return UserDateHandler::getUserHumanReadableDate(new DateTime($this->{self::CREATED_AT}));
     }
 
     /**
+     * Get the author user of this article.
+     *
      * @return User
      */
     public function getAuthor(): User

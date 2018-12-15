@@ -20,13 +20,14 @@ namespace App\Http\Controllers\Api\Discord;
 use App\Character;
 use App\Event;
 use App\Guild;
-use App\GuildLogger;
 use App\Http\Controllers\Controller;
+use App\Notification\System\AbstractNotificationSystem;
 use App\Signup;
-use App\Singleton\ClassTypes;
-use App\Singleton\DiscordMessages;
-use App\Singleton\RoleTypes;
 use App\User;
+use App\Utility\Classes;
+use App\Utility\DiscordBotMessages;
+use App\Utility\GuildLogger;
+use App\Utility\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -48,11 +49,11 @@ class DiscordController extends Controller
             ->first();
 
         if (empty($request->input('guild_id'))) {
-            if (0 === count($user->getGuildsWhereIsAdmin())) {
+            if (0 === count($user->guildsWhereIsAdmin())) {
                 return \response($user->getDiscordMention().', You are currently not an admin in any guild.', Response::HTTP_OK);
             }
             $return = $user->getDiscordMention().', Please type !setup and then the id of the guild you would like to use. Guilds you are an admin of are listed below:'.PHP_EOL.'```'.PHP_EOL;
-            foreach ($user->getGuildsWhereIsAdmin() as $guild) {
+            foreach ($user->guildsWhereIsAdmin() as $guild) {
                 $return .= $guild->id.': '.$guild->name.PHP_EOL;
             }
             $return .= '```';
@@ -92,9 +93,6 @@ class DiscordController extends Controller
             if (null === $character) {
                 return response($user->getDiscordMention().', I do not know that character preset.', Response::HTTP_BAD_REQUEST);
             }
-            $class = $character->class;
-            $role  = $character->role;
-            $sets  = explode(',', $character->sets) ?? [];
         } else {
             if (empty($request->input('class')) || empty($request->input('role'))) {
                 return response($user->getDiscordMention().', You did not specify a class and/or role.', Response::HTTP_BAD_REQUEST);
@@ -107,15 +105,23 @@ class DiscordController extends Controller
         /** @var Event $event */
         $event = Event::query()->find($request->input('event_id'));
 
-        if (!$event->userIsSignedUp($user->id)) {
-            $event->signup($user, $role, $class, $sets, $character ?? null);
+        if (!$event->isSignedUp($user)) {
+            if (empty($character)) {
+                $event->signup($user, $role, $class, $sets);
+            } else {
+                $event->signupWithCharacter($user, $character);
+            }
         } else {
-            $event->editSignup($user, $role, $class, $sets, $character ?? null);
+            if (empty($character)) {
+                $event->signup($user, $role, $class, $sets);
+            } else {
+                $event->signupWithCharacter($user, $character);
+            }
 
-            return response($this->buildReply(DiscordMessages::EDIT, $user, $event, $class, $role));
+            return response($this->buildReply(DiscordBotMessages::EDIT, $user, $event, $class ?? $character->class, $role ?? $character->role));
         }
 
-        return response($this->buildReply(DiscordMessages::SIGNUP[array_rand(DiscordMessages::SIGNUP)], $user, $event, $class, $role), Response::HTTP_OK);
+        return response($this->buildReply(DiscordBotMessages::SIGNUP[array_rand(DiscordBotMessages::SIGNUP)], $user, $event, $class ?? $character->class, $role ?? $character->role), Response::HTTP_OK);
     }
 
     public function signOff(Request $request)
@@ -134,7 +140,7 @@ class DiscordController extends Controller
 
         $event->signoff($user);
 
-        return response($this->buildReply(DiscordMessages::SIGNOFF, $user, $event), Response::HTTP_OK);
+        return response($this->buildReply(DiscordBotMessages::SIGNOFF, $user, $event), Response::HTTP_OK);
     }
 
     public function listEvents(Request $request)
@@ -148,11 +154,11 @@ class DiscordController extends Controller
 
         $return = $user->getDiscordMention().', Upcoming events for '.$guild->name.' (date/time based on your configured timezone '.$user->timezone.'):'.PHP_EOL;
         $return .= '```';
-        if (0 === count($guild->getEvents())) {
+        if (0 === count($guild->upcomingEvents())) {
             $return .= 'No events available'.PHP_EOL;
         } else {
-            foreach ($guild->getEvents() as $event) {
-                $return .= $event->id.': '.$event->name.' ('.$event->getNiceDate($user).')'.PHP_EOL;
+            foreach ($guild->upcomingEvents() as $event) {
+                $return .= $event->id.': '.$event->name.' ('.$event->getUserHumanReadableDate($user->timezone, $user->clock).')'.PHP_EOL;
             }
         }
         $return .= '```';
@@ -182,7 +188,7 @@ class DiscordController extends Controller
 
     public function help()
     {
-        return response(DiscordMessages::HELP_EMBEDS, Response::HTTP_OK);
+        return response(DiscordBotMessages::HELP_EMBEDS, Response::HTTP_OK);
     }
 
     public function status(Request $request)
@@ -208,10 +214,10 @@ class DiscordController extends Controller
             ->first();
 
         if (null !== $signup) {
-            return response($this->buildReply(DiscordMessages::SIGNED_UP_STATUS, $user, $event, $signup->class_id, $signup->role_id));
+            return response($this->buildReply(DiscordBotMessages::SIGNED_UP_STATUS, $user, $event, $signup->class_id, $signup->role_id));
         }
 
-        return response($this->buildReply(DiscordMessages::NOT_SIGNUP_STATUS, $user, $event));
+        return response($this->buildReply(DiscordBotMessages::NOT_SIGNUP_STATUS, $user, $event));
     }
 
     public function signups(Request $request)
@@ -229,7 +235,7 @@ class DiscordController extends Controller
         /** @var Event $event */
         $event = Event::query()->find($request->input('event_id'));
 
-        return response($event->buildDiscordEmbeds(), Response::HTTP_OK);
+        return response($this->buildEmbedsReplyFromEvent($event), Response::HTTP_OK);
     }
 
     private function buildReply(string $base, User $user, ?Event $event = null, ?int $class = null, ?int $role = null): string
@@ -239,12 +245,87 @@ class DiscordController extends Controller
             $base = str_replace('{EVENT_NAME}', $event->name, $base);
         }
         if (null !== $class) {
-            $base = str_replace('{CLASS}', ClassTypes::getClassName($class), $base);
+            $base = str_replace('{CLASS}', Classes::CLASSES[$class], $base);
         }
         if (null !== $role) {
-            $base = str_replace('{ROLE}', RoleTypes::getRoleName($role), $base);
+            $base = str_replace('{ROLE}', Roles::ROLES[$role], $base);
         }
 
         return $base;
+    }
+
+    private function buildEmbedsReplyFromEvent(Event $event): array
+    {
+        $data = [
+            'username'   => 'ESO Raidplanner',
+            'content'    => '',
+            'avatar_url' => 'https://esoraidplanner.com'.AbstractNotificationSystem::AVATAR_URL,
+            'embeds'     => [[
+                'title'       => $event->name,
+                'description' => $event->description ?? '',
+                'url'         => 'https://esoraidplanner.com/g/'.$event->guild->slug.'/event/'.$event->id,
+                'color'       => 9660137,
+                'author'      => [
+                    'name'     => 'ESO Raidplanner: '.$event->guild->name,
+                    'url'      => 'https://esoraidplanner.com',
+                    'icon_url' => 'https://esoraidplanner.com/favicon/appicon.jpg',
+                ],
+                'fields' => [
+                    [
+                        'name'   => 'Tanks',
+                        'value'  => $this->formatSignupsForEmbeds($event->signupsByRole(Roles::TANK)),
+                        'inline' => true,
+                    ],
+                    [
+                        'name'   => 'Healers',
+                        'value'  => $this->formatSignupsForEmbeds($event->signupsByRole(Roles::HEALER)),
+                        'inline' => true,
+                    ],
+                    [
+                        'name'   => 'Magicka DD\'s',
+                        'value'  => $this->formatSignupsForEmbeds($event->signupsByRole(Roles::MAGICKA_DD)),
+                        'inline' => true,
+                    ],
+                    [
+                        'name'   => 'Stamina DD\'s',
+                        'value'  => $this->formatSignupsForEmbeds($event->signupsByRole(Roles::STAMINA_DD)),
+                        'inline' => true,
+                    ],
+                    [
+                        'name'   => 'Legend',
+                        'value'  => '✅ = Confirmed, ⚠️ = Backup, ❔ = No status',
+                        'inline' => false,
+                    ],
+                ],
+                'footer' => [
+                    'text'     => 'ESO Raidplanner by Woeler',
+                    'icon_url' => 'https://esoraidplanner.com/favicon/appicon.jpg',
+                ],
+            ]],
+        ];
+
+        return $data;
+    }
+
+    private function formatSignupsForEmbeds(array $signups): string
+    {
+        $return = '';
+        foreach ($signups as $sign) {
+            $u = User::query()->find($sign->user_id);
+            if (Signup::STATUS_CONFIRMED === $sign->status) {
+                $return .= '✅ ';
+            } elseif (Signup::STATUS_BACKUP === $sign->status) {
+                $return .= '⚠️ ';
+            } else {
+                $return .= '❔ ';
+            }
+            $return .= $u->name.PHP_EOL;
+        }
+        $return = rtrim($return, PHP_EOL);
+        if ('' === $return) {
+            $return = 'None';
+        }
+
+        return $return;
     }
 }

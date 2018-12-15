@@ -11,231 +11,97 @@
 |
 */
 
-Route::get('/', 'HomeController@index');
+Route::get('/login/discord', 'Auth\LoginController@redirectToProvider')->name('discordAuth');
+Route::get('/login/discord/callback', 'Auth\LoginController@handleProviderCallback');
 
-Route::get('/news/{article_id}', 'NewsController@show');
+Auth::routes();
 
-// Authentication Routes...
-Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
-Route::post('login', 'Auth\LoginController@login');
-Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+Route::get('/', 'HomeController@index')->name('home');
 
-// Registration Routes...
-Route::get('register', 'UserController@showRegistrationForm')->name('register');
-Route::post('register', 'Auth\RegisterController@register');
-
-// Password Reset Routes...
-Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
-Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
-Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
-Route::post('password/reset', 'Auth\ResetPasswordController@reset');
-
-/*
- *
- * ROUTES FOR GENERAL
- *
- */
-
-Route::get('/changelog', function () {
-    return view('changelog');
-});
-
-Route::get('/faq', function () {
-    return view('faq');
-});
-
-Route::get('/about', function () {
-    return view('about');
-});
-
-Route::get('/termsofuse', function () {
-    return view('termsofuse');
-});
-
-
-/*
- *
- * ROUTES FOR EVENTS
- *
- */
-
-Route::group(['middleware' => ['auth', 'guild.member']], function () {
-    Route::get('/g/{slug}', 'GuildController@detail');
-
-    /* EVENTS */
-    Route::get('/g/{slug}/pastevents', 'GuildController@pastEvents');
-
-    /* GUILDS */
-    Route::get('/g/{slug}/member/leave', 'GuildController@leave');
-    Route::get('/g/{slug}/members', 'GuildController@members');
-});
-
-Route::group(['middleware' => ['auth', 'guild.member', 'guild.event']], function () {
-    Route::get('/g/{slug}/event/{event_id}', 'EventController@detail');
-    Route::post('/g/{slug}/sign/up/{event_id}', 'EventController@signUpUser');
-    Route::post('/g/{slug}/sign/off/{event_id}', 'EventController@signOffUser');
-    Route::post('/g/{slug}/sign/modify/{event_id}', 'EventController@modifySignup');
-
-    /* COMMENTS */
-    Route::post('/g/{slug}/event/{event_id}/comment/create', 'CommentController@create');
-});
-
-Route::group(['middleware' => ['auth', 'guild.member', 'guild.event', 'comment.owner']], function () {
-    Route::post('/g/{slug}/event/{event_id}/comment/modify/{comment_id}', 'CommentController@edit');
-    Route::get('/g/{slug}/event/{event_id}/comment/delete/{comment_id}', 'CommentController@delete');
-});
-
-Route::group(['middleware' => ['auth', 'guild.admin']], function () {
-    /* EVENTS */
-    Route::post('/g/{slug}/sign/other/{event_id}', 'EventController@signUpOther');
-    Route::get('/g/{slug}/events/create', 'EventController@new');
-    Route::post('/g/{slug}/events/create', 'EventController@create');
-    Route::get('/g/{slug}/logs', 'GuildController@logs');
-
-    /* REPEATABLES */
-    Route::get('/g/{slug}/repeatable/create', 'RepeatableController@new');
-    Route::post('/g/{slug}/repeatable/create', 'RepeatableController@create');
-    Route::get('/g/{slug}/repeatable/edit/{repeatable_id}', 'RepeatableController@view');
-    Route::post('/g/{slug}/repeatable/edit/{repeatable_id}', 'RepeatableController@edit');
-    Route::get('/g/{slug}/repeatable/delete/{repeatable_id}', 'RepeatableController@delete');
-
-    /* GUILDS */
-    Route::post('/g/{slug}/member/approve/{guild_id}/{user_id}', 'GuildController@approveMembership');
-    Route::get('/g/{slug}/member/remove/{guild_id}/{user_id}', 'GuildController@removeMembership');
-    Route::get('/g/{slug}/settings', 'GuildController@settings');
-    Route::post('/g/{slug}/settings', 'GuildController@saveSettings');
-    Route::get('/g/{slug}/teams', 'TeamController@list');
-    Route::get('/g/{slug}/team/create', 'TeamController@new');
-    Route::post('/g/{slug}/team/create', 'TeamController@create');
-    Route::get('/g/{slug}/team/{team_id}', 'TeamController@view');
-    Route::post('/g/{slug}/team/{team_id}/addmember', 'TeamController@addMember');
-    Route::get('/g/{slug}/team/{team_id}/removemember/{user_id}', 'TeamController@removeMember');
-    Route::get('/g/{slug}/team/{team_id}/remove', 'TeamController@delete');
-
-    /* SIGNUPS */
-    Route::post('/g/{slug}/event/{event_id}/signup/status', 'EventController@setSignupStatus');
-    Route::get('/signup/delete/{slug}/{event_id}/{id}', 'EventController@deleteSignup');
-
-});
-
-Route::group(['middleware' => ['auth', 'guild.admin', 'guild.event']], function () {
-    Route::get('/g/{slug}/events/edit/{event_id}', 'EventController@show');
-    Route::post('/g/{slug}/events/edit/{event_id}', 'EventController@edit');
-    Route::get('/g/{slug}/events/delete/{event_id}', 'EventController@delete');
-    Route::get('/g/{slug}/events/lock/{event_id}/{lockstatus}', 'EventController@changeLockStatus');
-    Route::get('/g/{slug}/event/{event_id}/postsignups', 'EventController@postSignupsHooks');
-
-});
-
-Route::group(['middleware' => ['auth', 'guild.owner']], function () {
-    Route::get('/g/{slug}/delete', 'GuildController@deleteConfirm');
-    Route::get('/g/{slug}/delete/confirm', 'GuildController@delete');
-    Route::get('/g/{slug}/member/makeadmin/{user_id}', 'GuildController@makeAdmin');
-    Route::get('/g/{slug}/member/removeadmin/{user_id}', 'GuildController@removeAdmin');
-});
-
-Route::group(['middleware' => ['auth', 'hook.owner']], function () {
-    Route::get('/hooks/modify/{hook_id}', 'HookController@show');
-    Route::post('/hooks/modify/{hook_id}', 'HookController@edit');
-    Route::post('/hooks/delete/{hook_id}', 'HookController@delete');
-});
 
 Route::group(['middleware' => 'auth'], function () {
+    Route::get('/user/account-settings', 'UserController@accountSettingsView')->name('userAccountSettingsView');
+    Route::post('/user/account-settings', 'UserController@updateAccountSettings')->name('userUpdateAccountSettings');
+    Route::get('/user/profile-settings', 'UserController@profileSettingsView')->name('userProfileSettingsView');
+    Route::post('/user/profile-settings', 'UserController@updateProfileSettings')->name('userUpdateProfileSettings');
+    Route::get('/user/avatar', 'UserController@avatarView')->name('userAvatarView');
+    Route::post('/user/avatar', 'UserController@updateAvatar')->name('userUpdateAvatar');
+    Route::get('/user/characters', 'UserController@characterListView')->name('userCharacterList');
+    Route::get('/user/characters/create', 'CharacterController@createView')->name('characterCreateView');
+    Route::post('/user/characters/create', 'CharacterController@create')->name('characterCreate');
+    Route::post('/user/characters/update/{character_id}', 'CharacterController@update')->name('characterUpdate');
+    Route::get('/user/characters/update/{character_id}', 'CharacterController@updateView')->name('characterUpdateView');
+    Route::get('/user/characters/delete/{character_id}', 'CharacterController@delete')->name('characterDelete');
+    Route::get('/user/ical', 'UserController@icalView')->name('userIcalView');
 
-    /*
-     *
-     * ROUTES FOR EVENTS
-     *
-     */
+    Route::get('/guilds', 'GuildController@listView');
+    Route::get('/guild/create', 'GuildController@createView')->name('guildCreateView');
+    Route::post('/guild/create', 'GuildController@create')->name('guildCreate');
 
-    Route::get('/events', 'EventController@index')->name('events');
+    Route::get('/g/{slug}/deactivated', 'GuildController@inactiveView')->name('guildInactiveView');
 
-    // Repeatables //
-
-    /*
-     *
-     * ROUTES FOR WEBHOOKS
-     *
-     */
-    Route::get('/hooks', 'HookController@all');
-    Route::get('/hooks/calltypeselect', 'HookController@callTypeSelectForm');
-    Route::get('/hooks/typeselect/{call_type}', 'HookController@typeSelectForm');
-    Route::get('/hooks/create/{call_type}/{type}', 'HookController@new');
-    Route::post('/hooks/create/{call_type}/{type}', 'HookController@create');
-
-    /*
-     *
-     * ROUTES FOR GUILDS
-     *
-     */
-    Route::get('/g/{slug}/application', 'GuildController@application');
-    Route::get('/g/{slug}/application/pending', 'GuildController@applicationPending');
-
-    Route::get('/guild/create', function () {
-        return view('guild.create');
+    Route::group(['middleware' => ['guild.active']], function () {
+        Route::get('/g/{slug}/apply', 'GuildController@applyView')->name('guildApplyView');
+        Route::post('/g/{slug}/apply', 'GuildController@apply')->name('guildApply');
+        Route::get('/g/{slug}/pending', 'GuildController@pendingView')->name('guildPendingView');
     });
 
-    Route::get('/guilds', 'GuildController@listAll');
+    Route::group(['middleware' => ['guild.member', 'guild.active']], function () {
+        Route::get('/g/{slug}', 'GuildController@detailView')->name('guildDetailView');
+        Route::get('/g/{slug}/pastevents', 'GuildController@pastEventsView')->name('guildPastEventsView');
+        Route::get('/g/{slug}/member/leave', 'GuildController@leave')->name('guildLeave');
 
-    Route::post('/guild/create', 'GuildController@create');
+        Route::post('/g/{slug}/event/{event_id}/signup', 'EventController@signup')->name('eventSignup');
+        Route::get('/g/{slug}/event/{event_id}/signoff', 'EventController@signoff')->name('eventSignoff');
+        Route::get('/g/{slug}/event/view/{event_id}', 'EventController@detailView')->name('eventDetailView');
+        Route::post('/g/{slug}/event/{event_id}/comment/add', 'EventController@addComment')->name('eventAddComment');
+        Route::post('/g/{slug}/event/{event_id}/comment/update/{comment_id}', 'EventController@updateComment')->name('eventUpdateComment');
+    });
 
-    Route::post('/g/{slug}/member/request/{id}', 'GuildController@requestMembership');
+    Route::group(['middleware' => ['guild.admin']], function () {
+        Route::get('/g/{slug}/activate', 'GuildController@activate')->name('guildActivate');
 
-    /*
-     *
-     * ROUTES FOR Profile
-     *
-     */
+        Route::group(['middleware' => ['guild.active']], function () {
+            Route::get('/g/{slug}/logs', 'GuildController@logsView')->name('guildLogsView');
+            Route::get('/g/{slug}/settings', 'GuildController@settingsView')->name('guildSettingsView');
+            Route::get('/g/{slug}/members', 'GuildController@membersView')->name('guildMembersView');
+            Route::post('/g/{slug}/settings', 'GuildController@saveSettings')->name('guildSaveSettings');
+            Route::get('/g/{slug}/member/approve/{user_id}', 'GuildController@approveMember')->name('guildApproveMember');
+            Route::get('/g/{slug}/member/remove/{user_id}', 'GuildController@removeMember')->name('guildRemoveMember');
 
-    Route::get('/profile/menu', 'UserController@menuProfilePage');
+            Route::get('/g/{slug}/event/create', 'EventController@createView')->name('eventCreateView');
+            Route::post('/g/{slug}/event/create', 'EventController@create')->name('eventCreate');
+            Route::get('/g/{slug}/event/update/{event_id}', 'EventController@updateView')->name('eventUpdateView');
+            Route::post('/g/{slug}/event/update/{event_id}', 'EventController@update')->name('eventUpdate');
+            Route::get('/g/{slug}/event/delete/{event_id}', 'EventController@delete')->name('eventDelete');
+            Route::get('/g/{slug}/event/postsignups/{event_id}', 'EventController@postSignups')->name('eventPostSignups');
+            Route::get('/g/{slug}/event/lock/{event_id}/{status}', 'EventController@lock')->name('eventLock');
+            Route::get('/g/{slug}/event/{event_id}/comment/delete/{comment_id}', 'EventController@deleteComment')->name('eventDeleteComment');
+            Route::post('/g/{slug}/event/{event_id}/signups/set-status', 'EventController@setSignupStatus')->name('eventSetSignupStatus');
 
-    Route::get('/profile/characters', 'UserController@profileCharacters');
+            Route::get('/g/{slug}/repeatable/create', 'RepeatableEventController@createView')->name('repeatableCreateView');
+            Route::post('/g/{slug}/repeatable/create', 'RepeatableEventController@create')->name('repeatableCreate');
+            Route::get('/g/{slug}/repeatable/update/{repeatable_id}', 'RepeatableEventController@updateView')->name('repeatableUpdateView');
+            Route::post('/g/{slug}/repeatable/update/{repeatable_id}', 'RepeatableEventController@update')->name('repeatableUpdate');
+            Route::get('/g/{slug}/repeatable/delete/{repeatable_id}', 'RepeatableEventController@delete')->name('repeatableDelete');
 
-    Route::get('/profile/membership', 'UserController@profileMembership');
+            Route::get('/g/{slug}/notification/{notification_id}/test', 'NotificationController@sendTestMessage')->name('notificationSendTest');
+            Route::get('/g/{slug}/notification/create', 'NotificationController@messageTypeSelectView')->name('notificationMessageTypeSelectView');
+            Route::get('/g/{slug}/notification/create/{message_type}', 'NotificationController@systemTypeSelectView')->name('notificationSystemTypeSelectView');
+            Route::get('/g/{slug}/notification/create/{message_type}/{system_type}', 'NotificationController@createView')->name('notificationCreateView');
+            Route::post('/g/{slug}/notification/create/{message_type}/{system_type}', 'NotificationController@create')->name('notificationCreate');
+            Route::get('/g/{slug}/notification/update/{notification_id}', 'NotificationController@updateView')->name('notificationUpdateView');
+            Route::post('/g/{slug}/notification/update/{notification_id}', 'NotificationController@update')->name('notificationUpdate');
+            Route::get('/g/{slug}/notification/delete/{notification_id}', 'NotificationController@delete')->name('notificationDelete');
+        });
 
-    Route::get('/profile/accountsettings', 'UserController@editProfilePage');
+    });
 
-    Route::post('/profile/accountsettings', 'UserController@editProfile');
-
-    Route::get('/profile/profilesettings', 'UserController@profileEdit');
-
-    Route::post('/profile/profilesettings', 'UserController@profileEditPost');
-
-    Route::get('/profile/edit/avatar', 'UserController@avatarEditPage');
-
-    Route::post('/profile/edit/avatar', 'UserController@editAvatar');
-
-    Route::post('/profile/edit/avatar/upload', 'UserController@uploadAvatar');
-
-    Route::get('/profile/nightmode/{mode}', 'UserController@setNightMode');
-
-    /*
-     *
-     * ROUTES FOR CHARACTERS
-     *
-     */
-
-    Route::post('/profile/character/create', 'CharacterController@create');
-
-    Route::post('/profile/character/modify/{id}', 'CharacterController@edit');
-
-    Route::post('/profile/character/delete/{id}', 'CharacterController@delete');
-
-    /*
-     *
-     * ROUTES FOR PAGES
-     *
-     */
-
-    Route::get('/dashboard', 'HomeController@index');
-    Route::get('/home', 'HomeController@index');
-
-    Route::get('/patreon/error', 'PatreonController@error');
-
-    Route::get('/patreon/success', 'PatreonController@success');
-
-    Route::get('/patreon/login', 'PatreonController@OAuth');
-
-    Route::get('profile/{user_id}', 'UserController@profile');
-
+    Route::group(['middleware' => ['guild.owner', 'guild.active']], function () {
+        Route::get('/g/{slug}/member/addadmin/{user_id}', 'GuildController@addAdmin')->name('guildAddAdmin');
+        Route::get('/g/{slug}/member/removeadmin/{user_id}', 'GuildController@removeAdmin')->name('guildRemoveAdmin');
+        Route::get('/g/{slug/member/makeowner', 'GuildController@makeOwner')->name('guildMakeOwner');
+        Route::get('/g/{slug}/delete', 'GuildController@deleteConfirmView')->name('guildDeleteConfirmView');
+        Route::get('/g/{slug}/delete/confirm', 'GuildController@delete')->name('guildDelete');
+    });
 });

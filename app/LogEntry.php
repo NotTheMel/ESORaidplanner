@@ -15,11 +15,28 @@
 
 namespace App;
 
+use App\Utility\UserDateHandler;
 use DateTime;
-use DateTimeZone;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
+/**
+ * App\LogEntry.
+ *
+ * @property \App\Guild $guild
+ * @mixin \Eloquent
+ *
+ * @property int                             $id
+ * @property int                             $guild_id
+ * @property string                          $message
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\LogEntry whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\LogEntry whereGuildId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\LogEntry whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\LogEntry whereMessage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\LogEntry whereUpdatedAt($value)
+ */
 class LogEntry extends Model
 {
     protected $table    = 'guildlogs';
@@ -27,6 +44,11 @@ class LogEntry extends Model
         'guild_id',
         'message',
     ];
+
+    public function guild()
+    {
+        return $this->belongsTo('App\Guild');
+    }
 
     /**
      * @param int    $guild_id
@@ -42,16 +64,8 @@ class LogEntry extends Model
     /**
      * @return string
      */
-    public function getNiceDate(): string
+    public function getUserHumanReadableDate(): string
     {
-        $date = new DateTime($this->created_at);
-
-        $date->setTimezone(new DateTimeZone(Auth::user()->timezone));
-
-        if (12 === Auth::user()->clock) {
-            return $date->format('F jS g:i a');
-        }
-
-        return $date->format('F jS H:i');
+        return UserDateHandler::getUserHumanReadableDate(new DateTime($this->{self::CREATED_AT}));
     }
 }

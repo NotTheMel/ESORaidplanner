@@ -1,7 +1,6 @@
 <?php
-
 /**
- * This file is part of the ESO Raidplanner project.
+ * This file is part of the ESO-Database project.
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 3
@@ -10,195 +9,78 @@
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  *
- * @see https://github.com/ESORaidplanner/ESORaidplanner
+ * @see https://eso-database.com
+ * Created by woeler
+ * Date: 18.09.18
+ * Time: 16:29
  */
 
 namespace App\Http\Controllers;
 
 use App\Character;
+use App\Comment;
 use App\Event;
 use App\Guild;
 use App\Signup;
 use App\Team;
 use App\User;
-use DateTime;
-use DateTimeZone;
+use App\Utility\TagHandler;
+use App\Utility\UserDateHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function detailView(string $slug, int $event_id)
     {
-        $events = Event::query()
-            ->where('start_date', '>=', date('Y-m-d H:i:s'))
-            ->orderBy('start_date', 'asc')
-            ->get();
+        $guild = Guild::query()
+            ->where('slug', '=', $slug)
+            ->first();
+        /** @var Event $event */
+        $event  = Event::query()->find($event_id);
+        $signup = $event->getSignup(Auth::user()) ?? new Signup();
 
-        return view('event.events', compact('events'));
+        return view('event.details', compact('guild', 'event', 'signup'));
     }
 
     /**
-     * @param string $slug
-     * @param int    $id
+     * Show the event creation page.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     * @param string $slug
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function detail(string $slug, int $id)
+    public function createView(string $slug)
     {
-        /** @var Event $event */
-        $event = Event::query()->find($id);
-
         /** @var Guild $guild */
         $guild = Guild::query()
             ->where('slug', '=', $slug)
             ->first();
 
-        return view('event.eventdetail', compact('event', 'guild'));
-    }
-
-    /**
-     * @param string $slug
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
-     */
-    public function new(string $slug)
-    {
-        /** @var Guild $guild */
-        $guild = Guild::query()
-            ->where('slug', '=', $slug)
-        ->first();
-
         return view('event.create', compact('guild'));
     }
 
     /**
+     * Show the event update page.
+     *
      * @param string $slug
-     * @param int    $id
+     * @param int    $event_id
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show(string $slug, int $id)
+    public function updateView(string $slug, int $event_id)
     {
-        $event = Event::query()->find($id);
+        $guild = Guild::query()
+            ->where('slug', '=', $slug)
+            ->first();
+        $event = Event::query()->find($event_id);
 
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        return view('event.edit', compact('event', 'guild'));
+        return view('event.update', compact('guild', 'event'));
     }
 
     /**
-     * @param Request $request
-     * @param string  $slug
-     * @param int     $id
+     * Create an event.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function signUpUser(Request $request, string $slug, int $id)
-    {
-        /** @var Event $event */
-        $event = Event::query()->find($id);
-
-        if (!empty($request->input('character'))) {
-            $character = Character::query()->find($request->input('character'));
-            $event->signup(Auth::user(), null, null, [], $character);
-        } else {
-            $event->signup(Auth::user(), $request->input('role'), $request->input('class'), $request->input('sets') ?? []);
-        }
-
-        return redirect('g/'.$slug.'/event/'.$id);
-    }
-
-    /**
-     * @param Request $request
-     * @param string  $slug
-     * @param int     $id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function signUpOther(Request $request, string $slug, int $id)
-    {
-        /** @var Event $event */
-        $event = Event::query()->find($id);
-
-        /** @var User $user */
-        $user = User::query()->find($request->input('user'));
-
-        if (!empty($request->input('character'))) {
-            $character = Character::query()->find($request->input('character'));
-            $event->signupOther($user, Auth::user(), null, null, [], $character);
-        } else {
-            $event->signupOther($user, Auth::user(), $request->input('role'), $request->input('class'), $request->input('sets') ?? []);
-        }
-
-        return redirect('g/'.$slug.'/event/'.$id);
-    }
-
-    /**
-     * @param Request $request
-     * @param string  $slug
-     * @param int     $id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function modifySignUp(Request $request, string $slug, int $id)
-    {
-        /** @var Event $event */
-        $event = Event::query()->find($id);
-
-        if (!empty($request->input('character'))) {
-            $character = Character::query()->find($request->input('character'));
-            $event->editSignup(Auth::user(), null, null, [], $character);
-        } else {
-            $event->editSignup(Auth::user(), $request->input('role'), $request->input('class'), $request->input('sets') ?? []);
-        }
-
-        return redirect('g/'.$slug.'/event/'.$id);
-    }
-
-    /**
-     * @param string $slug
-     * @param int    $event_id
-     * @param int    $id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function deleteSignup(string $slug, int $event_id, int $id)
-    {
-        /** @var Event $event */
-        $event  = Event::query()->find($event_id);
-        $signup = Signup::query()->find($id);
-        $guild  = Guild::query()->find($event->guild_id);
-
-        if (isset($signup->user_id)) {
-            $event->signoffOther(User::query()->find($signup->user_id));
-        }
-
-        return redirect('/g/'.$slug.'/event/'.$event_id);
-    }
-
-    /**
-     * @param string $slug
-     * @param int    $id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function signOffUser(string $slug, int $id)
-    {
-        /** @var Event $event */
-        $event = Event::query()->find($id);
-
-        $event->signoff(Auth::user());
-
-        return redirect('g/'.$slug.'/event/'.$id);
-    }
-
-    /**
      * @param Request $request
      * @param string  $slug
      *
@@ -215,41 +97,35 @@ class EventController extends Controller
             'minute' => 'required',
         ]);
 
-        $date  = $this->requestToDateTime($request->all());
+        /** @var Guild $guild */
         $guild = Guild::query()
             ->where('slug', '=', $slug)
             ->first();
-
-        $event              = new Event();
-        $event->name        = $request->input('name');
-        $event->type        = $request->input('type');
-        $event->start_date  = $date->format('Y-m-d H:i:s');
-        $event->guild_id    = $guild->id;
-        $event->description = $request->input('description') ?? '';
-        $event->tags        = $request->input('tags') ?? '';
-
-        $event->save();
+        $event = $guild->createEvent(
+            $request->input('name'),
+            UserDateHandler::requestToDateTime($request->all(), Auth::user()->clock, new \DateTimeZone(Auth::user()->timezone)),
+            $request->input('description'),
+            TagHandler::stringToArray($request->input('tags') ?? '')
+        );
 
         if (!empty($request->input('team_id'))) {
             $team = Team::query()->find($request->input('team_id'));
-            $event->signupTeam($team);
+            $event->signupWithTeam($team);
         }
 
-        $event->logger->eventCreate($event, Auth::user());
-
-        $event->callEventCreationHooks();
-
-        return redirect('g/'.$slug.'/event/'.$event->id);
+        return redirect(route('eventDetailView', ['slug' => $slug, 'event_id' => $event->id]));
     }
 
     /**
+     * Update an event.
+     *
      * @param Request $request
      * @param string  $slug
-     * @param int     $id
+     * @param int     $event_id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function edit(Request $request, string $slug, int $id)
+    public function update(Request $request, string $slug, int $event_id)
     {
         $request->validate([
             'name'   => 'required',
@@ -260,42 +136,117 @@ class EventController extends Controller
             'minute' => 'required',
         ]);
 
-        $date = $this->requestToDateTime($request->all());
+        /** @var Guild $guild */
+        $guild = Guild::query()
+            ->where('slug', '=', $slug)
+            ->first();
+        $event = Event::query()->find($event_id);
 
-        $event              = Event::query()->find($id);
-        $event->name        = $request->input('name');
-        $event->type        = $request->input('type');
-        $event->start_date  = $date->format('Y-m-d H:i:s');
-        $event->description = $request->input('description') ?? '';
-        $event->tags        = $request->input('tags') ?? '';
+        $guild->updateEvent(
+            $event,
+            $request->input('name'),
+            UserDateHandler::requestToDateTime($request->all(), Auth::user()->clock, new \DateTimeZone(Auth::user()->timezone)),
+            $request->input('description'),
+            TagHandler::stringToArray($request->input('tags') ?? '')
+        );
 
-        $event->save();
-
-        return redirect('g/'.$slug.'/event/'.$id);
+        return redirect(route('eventDetailView', ['slug' => $slug, 'event_id' => $event->id]));
     }
 
     /**
+     * Delete an event.
+     *
      * @param string $slug
-     * @param int    $id
+     * @param int    $event_id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     *
+     * @throws \Exception
      */
-    public function delete(string $slug, int $id)
+    public function delete(string $slug, int $event_id)
     {
-        $event = Event::query()->find($id);
-        $event->logger->eventDelete($event, Auth::user());
+        $event = Event::query()->find($event_id);
         $event->delete();
 
-        return redirect('g/'.$slug);
+        return redirect(route('guildDetailView', ['slug' => $slug]));
     }
 
     /**
+     * Signup for an event.
+     *
      * @param Request $request
      * @param string  $slug
      * @param int     $event_id
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
+    public function signup(Request $request, string $slug, int $event_id)
+    {
+        if (!empty($request->input('user'))) {
+            $user = User::query()->find($request->input('user'));
+        } else {
+            $user = Auth::user();
+        }
+
+        /** @var Event $event */
+        $event = Event::query()->find($event_id);
+        if (null === $request->input('character')) {
+            $event->signup(
+                $user,
+                (int) $request->input('class'),
+                (int) $request->input('role'),
+                $request->input('sets') ?? []
+            );
+        } else {
+            $character = Character::query()->find($request->input('character'));
+            $event->signupWithCharacter($user, $character);
+        }
+
+        return redirect(route('eventDetailView', ['slug' => $slug, 'event_id' => $event->id]));
+    }
+
+    /**
+     * Signoff for an event.
+     *
+     * @param Request $request
+     * @param string  $slug
+     * @param int     $event_id
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function signoff(Request $request, string $slug, int $event_id)
+    {
+        if (!empty($request->input('user'))) {
+            $user = User::query()->find($request->input('user'));
+        } else {
+            $user = Auth::user();
+        }
+
+        /** @var Event $event */
+        $event = Event::query()->find($event_id);
+        $event->signoff($user);
+
+        return redirect(route('eventDetailView', ['slug' => $slug, 'event_id' => $event->id]));
+    }
+
+    /**
+     * Lock or unlock the an event.
+     *
+     * @param string $slug
+     * @param int    $event_id
+     * @param int    $status
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function lock(string $slug, int $event_id, int $status)
+    {
+        /** @var Event $event */
+        $event = Event::query()->find($event_id);
+        $event->lock($status);
+
+        return redirect(route('eventDetailView', ['slug' => $slug, 'event_id' => $event->id]));
+    }
+
     public function setSignupStatus(Request $request, string $slug, int $event_id)
     {
         if ('Confirm selected' === $request->post('action')) {
@@ -307,79 +258,60 @@ class EventController extends Controller
         } else {
             $status = 0;
         }
-
         $request->offsetUnset('action');
-
+        /** @var Event $event */
         $event = Event::query()->find($event_id);
-        $guild = Guild::query()->find($event->guild_id);
 
-        foreach ($request->all() as $signup) {
-            if (is_numeric($signup) && is_numeric($status)) {
-                $event->setSignupStatus($signup, $status);
-            } elseif (is_numeric($signup) && 'delete' === $status) {
-                Signup::query()->where('id', '=', $signup)->delete();
+        $signups = $event->signups()
+            ->whereIn('id', $request->all())
+            ->get()->all();
+
+        /** @var Signup $signup */
+        foreach ($signups as $signup) {
+            if ('delete' === $status) {
+                $signup->delete();
+            } else {
+                $signup->setStatus($status);
             }
         }
 
-        return redirect('g/'.$guild->slug.'/event/'.$event->id);
+        return redirect(route('eventDetailView', ['slug' => $slug, 'event_id' => $event_id]));
     }
 
-    /**
-     * @param string $slug
-     * @param int    $event_id
-     * @param int    $lockstatus
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function changeLockStatus(string $slug, int $event_id, int $lockstatus)
+    public function addComment(Request $request, string $slug, int $event_id)
     {
+        /** @var Event $event */
         $event = Event::query()->find($event_id);
+        $event->addComment(Auth::user(), $request->input('text'));
 
-        if (Event::STATUS_LOCKED === $lockstatus) {
-            $event->lock();
-        } else {
-            $event->unlock();
-        }
-
-        return redirect('/g/'.$slug.'/event/'.$event_id);
+        return redirect(route('eventDetailView', ['slug' => $slug, 'event_id' => $event->id]));
     }
 
-    /**
-     * @param string $slug
-     * @param int    $event_id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function postSignupsHooks(string $slug, int $event_id)
+    public function updateComment(Request $request, string $slug, int $event_id, int $comment_id)
     {
-        $event         = Event::query()->find($event_id);
-        $event->callPostSignupsHooks();
+        /** @var Event $event */
+        $event   = Event::query()->find($event_id);
+        $comment = Comment::query()->find($comment_id);
+        $event->updateComment($comment, $request->input('text'));
 
-        return redirect('/g/'.$slug.'/event/'.$event_id);
+        return redirect(route('eventDetailView', ['slug' => $slug, 'event_id' => $event->id]));
     }
 
-    private function requestToDateTime(array $request): DateTime
+    public function deleteComment(string $slug, int $event_id, int $comment_id)
     {
-        if (1 === \strlen($request['hour'])) {
-            $hour = '0'.$request['hour'];
-        } else {
-            $hour = $request['hour'];
-        }
+        /** @var Event $event */
+        $event   = Event::query()->find($event_id);
+        $comment = Comment::query()->find($comment_id);
+        $event->deleteComment($comment);
 
-        if (1 === \strlen($request['minute'])) {
-            $minute = '0'.$request['minute'];
-        } else {
-            $minute = $request['minute'];
-        }
+        return redirect(route('eventDetailView', ['slug' => $slug, 'event_id' => $event->id]));
+    }
 
-        if (12 === Auth::user()->clock) {
-            $date = new DateTime($request['year'].'-'.$request['month'].'-'.$request['day'].' '.$hour.':'.$minute.' '.$request['meridiem'], new DateTimeZone(Auth::user()->timezone));
-        } else {
-            $date = new DateTime($request['year'].'-'.$request['month'].'-'.$request['day'].' '.$hour.':'.$minute, new DateTimeZone(Auth::user()->timezone));
-        }
+    public function postSignups(string $slug, int $event_id)
+    {
+        $event   = Event::query()->find($event_id);
+        $event->sendSignupsNotifications();
 
-        $date->setTimezone(new DateTimeZone(env('DEFAULT_TIMEZONE')));
-
-        return $date;
+        return redirect(route('eventDetailView', ['slug' => $slug, 'event_id' => $event->id]));
     }
 }

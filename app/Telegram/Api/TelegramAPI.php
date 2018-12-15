@@ -19,7 +19,7 @@ class TelegramAPI
     public static function load($updates)
     {
         if (empty($updates['message'])
-            || $updates['message']['chat']['type'] !== 'private'
+            || 'private' !== $updates['message']['chat']['type']
             || empty($updates['message']['chat']['username'])
             || empty($updates['message']['chat']['id'])
             || empty($updates['message']['text'])

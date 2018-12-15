@@ -7,37 +7,37 @@
 
                 <div class="col-md-8">
                     <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="header">
-                                <h4 class="title">Events you are signed up for</h4>
-                            </div>
-                            <div class="content table-responsive table-full-width">
-                                <table class="table  table-striped">
-                                    <thead>
-                                    <th>Event</th>
-                                    <th>Date and Time</th>
-                                    <th>Guild</th>
-                                    </thead>
-                                    <tbody>
-                                    @foreach (Auth::user()->getEvents() as $event)
-                                        @if($event->userIsSignedup())
-                                            <tr>
-                                                <td>
-                                                    <a href="{{ '/g/' . $event->getGuild()->slug . '/event/' . $event->id }}">{{ $event->name }}</a>
-                                                </td>
-                                                <td>{{ $event->getNiceDate() }}</td>
-                                                <td>
-                                                    <a href="{{ '/g/' . $event->getGuild()->slug }}">{{ $event->getGuild()->name }}</a>
-                                                </td>
-                                            </tr>
-                                        @endif
-                                    @endforeach
-                                    </tbody>
-                                </table>
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="header">
+                                    <h4 class="title">Events you are signed up for</h4>
+                                </div>
+                                <div class="content table-responsive table-full-width">
+                                    <table class="table  table-striped">
+                                        <thead>
+                                        <th>Event</th>
+                                        <th>Date and Time</th>
+                                        <th>Guild</th>
+                                        </thead>
+                                        <tbody>
+                                        @foreach (Auth::user()->UpcomingEvents() as $event)
+                                            @if($event->isSignedUp(Auth::user()))
+                                                <tr>
+                                                    <td>
+                                                        <a href="{{ route('eventDetailView', ['slug' => $event->guild->slug, 'event_id' => $event->id]) }}">{{ $event->name }}</a>
+                                                    </td>
+                                                    <td>{{ $event->getUserHumanReadableDate() }}</td>
+                                                    <td>
+                                                        <a href="{{ '/g/' . $event->guild->slug }}">{{ $event->guild->name }}</a>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     </div>
 
                     <div class="row">
@@ -54,14 +54,14 @@
                                         <th>Guild</th>
                                         </thead>
                                         <tbody>
-                                        @foreach (Auth::user()->getEvents() as $event)
+                                        @foreach (Auth::user()->UpcomingEvents() as $event)
                                             <tr>
                                                 <td>
-                                                    <a href="{{ '/g/' . $event->getGuild()->slug . '/event/' . $event->id }}">{{ $event->name }}</a>
+                                                    <a href="{{ route('eventDetailView', ['slug' => $event->guild->slug, 'event_id' => $event->id]) }}">{{ $event->name }}</a>
                                                 </td>
-                                                <td>{{ $event->getNiceDate() }}</td>
+                                                <td>{{ $event->getUserHumanReadableDate() }}</td>
                                                 <td>
-                                                    <a href="{{ '/g/' . $event->getGuild()->slug }}">{{ $event->getGuild()->name }}</a>
+                                                    <a href="{{ '/g/' . $event->guild->slug }}">{{ $event->guild->name }}</a>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -90,7 +90,7 @@
                                         <td>
                                             <a href="{{ '/news/' . $article->id }}">{{ $article->title }}</a>
                                         </td>
-                                        <td>{{ $article->getNiceDate() }}</td>
+                                        <td>{{ $article->getUserHumanReadableDate() }}</td>
                                     </tr>
                                 @endforeach
                                 </tbody>

@@ -1,7 +1,6 @@
 <?php
-
 /**
- * This file is part of the ESO Raidplanner project.
+ * This file is part of the ESO-Database project.
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 3
@@ -10,44 +9,35 @@
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  *
- * @see https://github.com/ESORaidplanner/ESORaidplanner
+ * @see https://eso-database.com
+ * Created by woeler
+ * Date: 18.09.18
+ * Time: 19:10
  */
 
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Set.
+ *
+ * @mixin \Eloquent
+ *
+ * @property int                             $id
+ * @property string                          $name
+ * @property int                             $version
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null                     $tooltip
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Set whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Set whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Set whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Set whereTooltip($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Set whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Set whereVersion($value)
+ */
 class Set extends Model
 {
-    protected $fillable = [
-        'name',
-        'version',
-    ];
-
-    public static function Array($sets): array
-    {
-        if (empty($sets)) {
-            return [];
-        }
-        if (\is_array($sets)) {
-            return $sets;
-        }
-        if (false !== strpos($sets, ', ')) {
-            return explode(', ', $sets);
-        }
-
-        return [$sets];
-    }
-
-    public static function formatForDropdown(): array
-    {
-        $sets      = self::all() ?? [];
-        $formatted = [];
-
-        foreach ($sets as $set) {
-            $formatted[$set->name] = $set->name;
-        }
-
-        return $formatted;
-    }
 }

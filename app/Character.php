@@ -1,7 +1,6 @@
 <?php
-
 /**
- * This file is part of the ESO Raidplanner project.
+ * This file is part of the ESO-Database project.
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 3
@@ -10,88 +9,98 @@
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  *
- * @see https://github.com/ESORaidplanner/ESORaidplanner
+ * @see https://eso-database.com
+ * Created by woeler
+ * Date: 12.09.18
+ * Time: 09:27
  */
 
 namespace App;
 
-use App\Singleton\ClassTypes;
-use App\Singleton\RoleTypes;
+use App\Utility\Classes;
+use App\Utility\Roles;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Character.
+ * App\Character.
+ *
+ * @property \App\User $user
+ * @mixin \Eloquent
+ *
+ * @property int                             $id
+ * @property int                             $user_id
+ * @property string                          $name
+ * @property int                             $class
+ * @property int                             $role
+ * @property mixed|null                      $sets
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int                             $public
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Character whereClass($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Character whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Character whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Character whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Character wherePublic($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Character whereRole($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Character whereSets($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Character whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Character whereUserId($value)
  */
 class Character extends Model
 {
-    protected $fillable = [
-        'user_id',
-        'name',
-        'class',
-        'role',
-        'sets',
-        'public',
+    protected $fillable = ['name', 'role', 'class', 'sets', 'user_id', 'public'];
+
+    protected $casts = [
+        'sets' => 'array',
     ];
+
+    /**
+     * Get the user this character belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
+
+    public function sets(): array
+    {
+        return $this->sets;
+    }
+
+    public function class(): string
+    {
+        return Classes::CLASSES[$this->class];
+    }
+
+    public function role(): string
+    {
+        return Roles::ROLES[$this->role];
+    }
 
     public function delete()
     {
-        Signup::query()
+        $signups = Signup::query()
             ->where('character_id', '=', $this->id)
-            ->update(['character_id' => null]);
+            ->get()->all();
+
+        foreach ($signups as $signup) {
+            $signup->character_id = null;
+            $signup->save();
+        }
 
         return parent::delete();
     }
 
-    /**
-     * @return string
-     */
-    public function getClassName(): string
+    public function setsStringFormatted(): string
     {
-        return ClassTypes::getClassName($this->class);
+        return implode(', ', $this->sets());
     }
 
-    /**
-     * @return string
-     */
-    public function getRoleName(): string
+    public function isPublic(): bool
     {
-        return RoleTypes::getRoleName($this->role);
-    }
-
-    /**
-     * @return string
-     */
-    public function getSetsFormatted(): string
-    {
-        if (empty($this->sets)) {
-            return '';
-        }
-        $sets = explode(', ', $this->sets);
-
-        $setsFound    = [];
-        $setsNotFound = [];
-
-        $string = ''
-        ;
-        foreach ($sets as $set) {
-            $new = Set::query()->whereRaw('LOWER(`name`) LIKE "%'.strtolower($set).'%"')->first();
-            if (!empty($new)) {
-                $setsFound[] = $new;
-            } else {
-                $setsNotFound[] = $set;
-            }
-        }
-
-        foreach ($setsFound as $set) {
-            $string .= '<a href="https://www.eso-sets.com/set/'.$set->id.'" target="_blank">'.$set->name.'</a>, ';
-        }
-
-        $string .= implode(', ', $setsNotFound);
-
-        if (', ' === substr($string, -2, 2)) {
-            $string = substr($string, 0, -2);
-        }
-
-        return $string;
+        return 1 === $this->public;
     }
 }

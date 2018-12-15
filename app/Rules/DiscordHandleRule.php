@@ -3,8 +3,8 @@
 namespace App\Rules;
 
 use App\User;
-use Auth;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class DiscordHandleRule implements Rule
 {
@@ -31,19 +31,14 @@ class DiscordHandleRule implements Rule
         if (empty($value)) {
             return true;
         }
-
         if (false === strpos($value, '#')) {
             return false;
         }
-
         $expl = explode('#', $value, 2);
-
         if (!is_numeric($expl[1]) || 4 !== strlen($expl[1])) {
             return false;
         }
-
         $u = User::query()->where('discord_handle', '=', $value)->first();
-
         if (null !== $u && Auth::id() !== $u->id) {
             $this->message = 'Someone else is already using the Discord handle '.$value.'.';
 

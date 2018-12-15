@@ -4,7 +4,6 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Psy\Command\Command;
 
 class Kernel extends ConsoleKernel
 {
@@ -14,10 +13,6 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\HooksCall::class,
-        Commands\RenewPatreon::class,
-        Commands\RepeatableEventsCommand::class,
-        Commands\FetchSetsCommand::class,
     ];
 
     /**
@@ -27,15 +22,20 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->command('trigger:dailies')->everyMinute();
+        $schedule->command('trigger:reminders')->everyMinute();
+        $schedule->command('repeatables:create')->everyFiveMinutes();
+        $schedule->command('fetch:sets')->dailyAt('01:00');
+        $schedule->command('instance:clean')->dailyAt('02:00');
     }
 
     /**
-     * Register the Closure based commands for the application.
+     * Register the commands for the application.
      */
     protected function commands()
     {
+        $this->load(__DIR__.'/Commands');
+
         require base_path('routes/console.php');
     }
 }

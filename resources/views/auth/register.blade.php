@@ -70,7 +70,7 @@
 
                                     <div class="col-md-6">
                                         <select id="timezone" class="form-control" name="timezone" required>
-                                            @foreach($timezones as $iden => $zone)
+                                            @foreach(\App\Utility\UserDateHandler::timeZones() as $iden => $zone)
                                                 @if (strpos($iden, 'Amsterdam') !== false)
                                                     <option value="{{ $iden }}" selected>{{ $zone }}</option>
                                                 @else
