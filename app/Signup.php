@@ -67,7 +67,7 @@ class Signup extends Model
     ];
 
     protected $casts = [
-        'sets' => 'array',
+        //'sets' => 'array',
     ];
 
     /**

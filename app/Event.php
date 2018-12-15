@@ -66,7 +66,7 @@ class Event extends \Illuminate\Database\Eloquent\Model
     ];
 
     protected $casts = [
-        'tags' => 'array',
+        //'tags' => 'array',
     ];
 
     protected $logger;
