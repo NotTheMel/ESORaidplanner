@@ -4,6 +4,8 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Woeler\DiscordPhp\Message\DiscordEmbedsMessage;
+use Woeler\DiscordPhp\Webhook\DiscordWebhook;
 
 class Handler extends ExceptionHandler
 {
@@ -32,6 +34,19 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
+        $message = new DiscordEmbedsMessage();
+        $message->setTitle('New '.get_class($exception));
+        $message->setDescription('```'.$exception->getMessage().'```');
+        $message->addField('File', $exception->getFile());
+        $message->addField('Line', $exception->getLine());
+
+        $hook = new DiscordWebhook(env('DEBUG_HOOK'), $message);
+        try {
+            $hook->send();
+        } catch (Exception $e) {
+
+        }
+
         parent::report($exception);
     }
 
