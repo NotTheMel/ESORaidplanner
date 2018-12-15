@@ -26,9 +26,13 @@ class ConvertJsonObjects extends Migration
         $events = \App\Event::all();
 
         foreach ($events as $event) {
-            $tags = explode(',', $event->tags);
-            foreach ($tags as &$tag) {
-                $tag = trim($tag);
+            if (null !== $event->tags) {
+                $tags = explode(',', $event->tags);
+                foreach ($tags as &$tag) {
+                    $tag = trim($tag);
+                }
+            } else {
+                $tags = [];
             }
             $event->tags = json_encode($tags);
             $event->save();
