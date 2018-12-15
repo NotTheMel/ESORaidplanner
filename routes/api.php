@@ -13,109 +13,78 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post('/telegram', 'TelegramController@exec');
+Route::post('/telegram', 'Api\Telegram\TelegramController@exec');
 
-Route::post('/sets/version', 'Api\SetController@getVersion');
+Route::get('/ical/guild/{uid}', 'Api\Ical\IcalController@guild');
+Route::get('/ical/user/{uid}', 'Api\Ical\IcalController@user');
 
-Route::post('/timezones', 'Api\TimeZoneController@all');
-
-Route::post('/user/create', 'Api\UserController@create');
-
-Route::post('/news', 'Api\NewsController@all');
-
-Route::post('/news/{article_id}', 'Api\NewsController@get');
-
-Route::group(['middleware' => 'auth.api'], function () {
-    Route::post('/characters', 'Api\CharacterController@all');
-
-    Route::post('/guild/{guild_id}', 'Api\GuildController@get');
-
-    Route::post('/guilds', 'Api\GuildController@all');
-
-    Route::post('/checklogin', 'Api\ApiController@checkLogin');
-
-    Route::post('/user', 'Api\UserController@get');
-
-    Route::post('/sets', 'Api\SetController@all');
-
-    Route::post('/user/guilds', 'Api\UserController@getGuilds');
-
-    Route::post('/user/guilds/pending', 'Api\UserController@getGuildsPending');
-
-    Route::post('/user/events', 'Api\UserController@getEvents');
-
-    Route::post('/user/signups', 'Api\UserController@getSignups');
-
-    Route::post('/user/{user_id}', 'Api\UserController@getInfo');
-
-    Route::post('/user/events/signedup', 'Api\UserController@getEventsSignedUp');
-
-    Route::post('/user/onesignal/add', 'Api\UserController@setOnesignal');
-
-    Route::post('/user/onesignal/remove', 'Api\UserController@deleteOnesignal');
-
-    Route::post('/guild/{guild_id}/events', 'Api\GuildController@getEvents');
-
-    Route::post('/guild/{guild_id}/members', 'Api\GuildController@getMembers');
-
-    Route::post('/guild/{guild_id}/members/pending', 'Api\GuildController@getMembersPending');
-
-    Route::post('/guild/{guild_id}/requestmembership', 'Api\GuildController@requestMembership');
-
-    Route::post('/guild/{guild_id}/leave', 'Api\GuildController@leave');
-
-    Route::post('/guild/{guild_id}/approve/{user_id}', 'Api\GuildController@approveMembership');
-
-    Route::post('/guild/{guild_id}/remove/{user_id}', 'Api\GuildController@removeMembership');
-
-    Route::post('/guild/{guild_id}/promote/{user_id}', 'Api\GuildController@makeAdmin');
-
-    Route::post('/guild/{guild_id}/demote/{user_id}', 'Api\GuildController@removeAdmin');
-
-    Route::post('/event/{event_id}/signups', 'Api\EventController@allSignups');
-
-    Route::post('/signup/create/{event_id}', 'Api\EventController@createSignup');
-
-    Route::post('/signup/modify/{event_id}', 'Api\EventController@editSignup');
-
-    Route::post('/signup/delete/{event_id}', 'Api\EventController@deleteSignup');
-
-    Route::post('/signup/get/{event_id}', 'Api\EventController@getSignup');
-
-    Route::post('/signup/confirm/{signup_id}', 'Api\EventController@confirmSignup');
-
-    Route::post('/signup/backup/{signup_id}', 'Api\EventController@backupSignup');
-
-    Route::post('/signup/remove/{signup_id}', 'Api\EventController@deleteSignupOther');
-
-    Route::post('/character/create', 'Api\CharacterController@create');
-
-    Route::post('/character/modify/{character_id}', 'Api\CharacterController@edit');
-
-    Route::post('/character/delete/{character_id}', 'Api\CharacterController@delete');
-
-    Route::post('/event/create', 'Api\EventController@create');
-
-    Route::post('/event/modify/{event_id}', 'Api\EventController@edit');
-
-    Route::post('/event/delete/{event_id}', 'Api\EventController@delete');
-
-    Route::post('/event/{event_id}', 'Api\EventController@get');
-});
 
 Route::group(['middleware' => ['discord.plain']], function () {
     Route::post('/discord/last-activity', 'Api\Discord\DiscordController@getLastActivity');
 });
-
 Route::group(['middleware' => ['discord.token']], function () {
     Route::post('/discord/setup', 'Api\Discord\DiscordController@setup');
     Route::post('/discord/help', 'Api\Discord\DiscordController@help');
 });
-
 Route::group(['middleware' => ['discord.token', 'discord']], function () {
     Route::post('/discord/signup', 'Api\Discord\DiscordController@signUp');
     Route::post('/discord/signoff', 'Api\Discord\DiscordController@signOff');
     Route::post('/discord/events', 'Api\Discord\DiscordController@listEvents');
     Route::post('/discord/status', 'Api\Discord\DiscordController@status');
     Route::post('/discord/signups', 'Api\Discord\DiscordController@signups');
+});
+
+/*
+ * User based API
+ */
+
+Route::post('/u/timezones', 'Api\UserBased\UserController@timeZones');
+Route::post('/u/user/create', 'Api\UserBased\UserController@create');
+
+Route::group(['middleware' => ['api.user.auth']], function () {
+    Route::post('/u/login', 'Api\UserBased\UserController@self');
+    Route::post('/u/self', 'Api\UserBased\UserController@self');
+    Route::post('/u/user/{user_id}', 'Api\UserBased\UserController@getPublicInfo');
+    Route::post('/u/self/guilds', 'Api\UserBased\UserController@getGuilds');
+    Route::post('/u/self/guilds/pending', 'Api\UserBased\UserController@getGuildsPending');
+    Route::post('/u/guilds', 'Api\UserBased\GuildController@all');
+    Route::post('/u/guild/{guild_id}/requestmembership', 'Api\UserBased\GuildController@requestMembership');
+
+    Route::post('/u/characters', 'Api\UserBased\UserController@getCharacters');
+    Route::post('/u/character/create', 'Api\UserBased\CharacterController@create');
+    Route::post('/u/character/update/{character_id}', 'Api\UserBased\CharacterController@update');
+    Route::post('/u/character/delete/{character_id}', 'Api\UserBased\CharacterController@delete');
+
+    Route::post('/u/sets', 'Api\UserBased\SetController@all');
+    Route::post('/u/sets/version', 'Api\UserBased\SetController@getVersion');
+
+    Route::post('/u/self/events', 'Api\UserBased\UserController@getEvents');
+    Route::post('/u/self/signups', 'Api\UserBased\UserController@getSignups');
+
+    Route::group(['middleware' => ['api.user.guild.member']], function () {
+        Route::post('/u/guild/{guild_id}', 'Api\UserBased\GuildController@get');
+        Route::post('/u/guild/{guild_id}/members', 'Api\UserBased\GuildController@getMembers');
+        Route::post('/u/guild/{guild_id}/members/pending', 'Api\UserBased\GuildController@getPendingMembers');
+        Route::post('/u/guild/{guild_id}/events', 'Api\UserBased\GuildController@getEvents');
+        Route::post('/u/guild/{guild_id}/leave', 'Api\UserBased\GuildController@leave');
+        Route::post('/u/event/{event_id}/signups', 'Api\UserBased\EventController@getSignups');
+
+        Route::post('/u/signup/create/{event_id}', 'Api\UserBased\EventController@signup');
+        Route::post('/u/signup/update/{event_id}', 'Api\UserBased\EventController@signup');
+        Route::post('/u/signup/delete/{event_id}', 'Api\UserBased\EventController@signoff');
+
+        Route::group(['middleware' => ['api.user.guild.admin']], function () {
+            Route::post('/u/guild/{guild_id}/approve/{user_id}', 'Api\UserBased\GuildController@approveMembership');
+            Route::post('/u/guild/{guild_id}/remove/{user_id}', 'Api\UserBased\GuildController@removeMembership');
+            Route::post('/u/event/create', 'Api\UserBased\EventController@create');
+            Route::post('/u/event/update/{event_id}', 'Api\UserBased\EventController@update');
+            Route::post('/u/event/delete/{event_id}', 'Api\UserBased\EventController@delete');
+            Route::post('/u/signup/status/{signup_id}/{status}', 'Api\UserBased\EventController@setSignupStatus');
+
+            Route::group(['middleware' => ['api.user.guild.owner']], function () {
+                Route::post('/u/guild/{guild_id}/promote/{user_id}', 'Api\UserBased\GuildController@promoteMember');
+                Route::post('/u/guild/{guild_id}/demote/{user_id}', 'Api\UserBased\GuildController@demoteMember');
+            });
+        });
+    });
 });

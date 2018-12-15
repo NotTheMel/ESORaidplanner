@@ -3,8 +3,8 @@
 namespace App\Http\Middleware;
 
 use App\Guild;
-use Auth;
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class GuildMemberMiddleware
 {
@@ -25,11 +25,11 @@ class GuildMemberMiddleware
         if (null === $guild) {
             return redirect('/');
         }
-        if (0 === $guild->userStatus(Auth::user())) {
-            return redirect('/g/'.$guild->slug.'/application/pending');
+        if ($guild->isPendingMember(Auth::user())) {
+            return redirect('/g/'.$guild->slug.'/pending');
         }
         if (!$guild->isMember(Auth::user())) {
-            return redirect('/g/'.$guild->slug.'/application');
+            return redirect('/g/'.$guild->slug.'/apply');
         }
 
         return $next($request);

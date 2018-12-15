@@ -24,7 +24,7 @@
                             <tbody>
                             @foreach ($logs as $log)
                                 <tr>
-                                    <td>{{ $log->getNiceDate() }}</td>
+                                    <td>{{ $log->getUserHumanReadableDate() }}</td>
                                     <td>{!! $log->message !!}</td>
                                 </tr>
                             @endforeach

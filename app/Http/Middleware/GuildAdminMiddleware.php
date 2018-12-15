@@ -3,8 +3,8 @@
 namespace App\Http\Middleware;
 
 use App\Guild;
-use Auth;
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class GuildAdminMiddleware
 {

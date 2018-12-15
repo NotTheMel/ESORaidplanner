@@ -21,21 +21,7 @@ class EsoRaidPlannerAPI
     {
         $user = User::query()->where('telegram_username', '=', $username)->first();
 
-        $guild_ids = DB::table('user_guilds')
-            ->where('user_id', '=', $user->id)
-            ->where('status', '>=', 1)
-            ->orderBy('guild_id', 'asc')
-            ->get();
-
-        $guilds = [];
-
-        foreach ($guild_ids as $guild_id) {
-            $guild = Guild::query()
-                ->where('id', '=', $guild_id->guild_id)
-                ->first();
-
-            array_push($guilds, $guild);
-        }
+        $guilds = $user->guilds();
 
         if (!empty($guilds)) {
             return $guilds;
@@ -52,17 +38,13 @@ class EsoRaidPlannerAPI
      */
     public static function getGuild(string $username, int $guildId)
     {
-        if (!self::isMemberOfGuild($username, $guildId)) {
+        $guild = Guild::query()->find($guildId);
+
+        if (empty($guild)) {
             return null;
         }
 
-        $guild = Guild::query()->find($guildId);
-
-        if (!empty($guild)) {
-            return $guild;
-        }
-
-        return null;
+        return $guild;
     }
 
     /**
@@ -92,12 +74,6 @@ class EsoRaidPlannerAPI
      */
     public static function getEvents(string $username, int $guildId)
     {
-        if (!self::isMemberOfGuild($username, $guildId)) {
-            return null;
-        }
-
-        $guild = Guild::query()->find($guildId);
-
         $events = Event::query()->where('guild_id', '=', $guildId)->where('start_date', '>', date('Y-m-d H:i:s'))->get();
 
         if (count($events) > 0) {
@@ -122,10 +98,6 @@ class EsoRaidPlannerAPI
      */
     public static function getEvent(string $username, int $guildId, int $eventId)
     {
-        if (!self::isMemberOfGuild($username, $guildId)) {
-            return null;
-        }
-
         $event = Event::query()->find($eventId);
 
         if (!empty($event)) {
@@ -148,10 +120,6 @@ class EsoRaidPlannerAPI
      */
     public static function getEventSignups(string $username, int $guildId, int $eventId)
     {
-        if (!self::isMemberOfGuild($username, $guildId)) {
-            return null;
-        }
-
         $signups = Signup::query()->where('event_id', '=', $eventId)->orderBy('created_at', 'asc')->get();
 
         if (count($signups) > 0) {
@@ -169,10 +137,6 @@ class EsoRaidPlannerAPI
      */
     public static function getSignedEvents(string $username, int $guildId)
     {
-        if (!self::isMemberOfGuild($username, $guildId)) {
-            return null;
-        }
-
         $guild = Guild::query()->find($guildId);
 
         $user = User::query()->where('telegram_username', '=', $username)->first();
@@ -210,10 +174,6 @@ class EsoRaidPlannerAPI
      */
     public static function getUnsignedEvents(string $username, int $guildId)
     {
-        if (!self::isMemberOfGuild($username, $guildId)) {
-            return null;
-        }
-
         $guild = Guild::query()->find($guildId);
 
         $user = User::query()->where('telegram_username', '=', $username)->first();
@@ -254,10 +214,6 @@ class EsoRaidPlannerAPI
      */
     public static function Signup(string $username, int $guildId, int $eventId, int $role, int $class, string $supportSets = null, string $comments = null)
     {
-        if (!self::isMemberOfGuild($username, $guildId)) {
-            return;
-        }
-
         /** @var Event $event */
         $event = Event::query()->find($eventId);
 
@@ -288,10 +244,6 @@ class EsoRaidPlannerAPI
      */
     public static function Signoff(string $username, int $guildId, int $eventId)
     {
-        if (!self::isMemberOfGuild($username, $guildId)) {
-            return;
-        }
-
         $user = User::query()->where('telegram_username', '=', $username)->first();
         /** @var Event $event */
         $event = Event::query()->find($eventId);

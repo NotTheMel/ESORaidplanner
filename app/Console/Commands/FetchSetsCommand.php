@@ -46,12 +46,9 @@ class FetchSetsCommand extends Command
         curl_setopt($ch, CURLOPT_POST, 1);
         $output = curl_exec($ch);
         curl_close($ch);
-
         $version = Set::query()->orderBy('version', 'desc')->first()->version;
-
         foreach (json_decode($output, true) as $key => $data) {
             $db = Set::query()->find($key);
-
             if (empty($db)) {
                 $set          = new Set();
                 $set->id      = $key;

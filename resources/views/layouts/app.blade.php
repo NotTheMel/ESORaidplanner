@@ -58,13 +58,13 @@
     <link href="{{ asset('css/light-bootstrap-dashboard.css') }}" rel="stylesheet"/>
     <link href="{{ asset('css/raidplanner.css') }}" rel="stylesheet"/>
     @if(Auth::check())
-    @if(Auth::user()->nightmode === 1)
-    <link href="{{ asset('css/nightmode.css') }}" rel="stylesheet"/>
-    @endif
+        @if(Auth::user()->nightmode === 1)
+            <link href="{{ asset('css/nightmode.css') }}" rel="stylesheet"/>
+        @endif
     @endif
 
 
-    <!--  CSS for Demo Purpose, don't include it in your project     -->
+<!--  CSS for Demo Purpose, don't include it in your project     -->
     <link href="{{ asset('css/demo.css') }}" rel="stylesheet"/>
 
     <link href="{{ asset('css/chosen.min.css') }}" rel="stylesheet"/>
@@ -79,14 +79,14 @@
 
     @if(env('APP_ENV') === 'production')
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('GOOGLE_ANALYTICS_ID') }}"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('GOOGLE_ANALYTICS_ID') }}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
 
-        gtag('config', '{{ env('GOOGLE_ANALYTICS_ID') }}');
-    </script>
+            gtag('config', '{{ env('GOOGLE_ANALYTICS_ID') }}');
+        </script>
     @endif
 
     <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
@@ -99,26 +99,26 @@
 <div class="wrapper">
     <div class="sidebar"
          @if(Auth::check())
-            @if(Auth::user()->nightmode === 0)
-                 @if (Auth::user()->layout === 1)
-                 data-color="orange"
-                 @elseif (Auth::user()->layout === 2)
-                 data-color="red"
-                 @elseif (Auth::user()->layout === 3)
-                 data-color="green"
-                 @elseif (Auth::user()->layout === 4)
-                 data-color="blue"
-                 @elseif (Auth::user()->layout === 5)
-                 data-color="green"
-                 @else
-                 data-color="purple"
-                 @endif
-            @else
-                data-color="grey"
-            @endif
+         @if(Auth::user()->nightmode === 0)
+         @if (Auth::user()->layout === 1)
+         data-color="orange"
+         @elseif (Auth::user()->layout === 2)
+         data-color="red"
+         @elseif (Auth::user()->layout === 3)
+         data-color="green"
+         @elseif (Auth::user()->layout === 4)
+         data-color="blue"
+         @elseif (Auth::user()->layout === 5)
+         data-color="green"
          @else
          data-color="purple"
-        @endif
+         @endif
+         @else
+         data-color="grey"
+         @endif
+         @else
+         data-color="purple"
+            @endif
     >
 
         <!--   you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple" -->
@@ -139,7 +139,7 @@
                             <p>Dashboard</p>
                         </a>
                     </li>
-                    @foreach(Auth::user()->getGuilds() as $guild)
+                    @foreach(Auth::user()->guilds() as $guild)
                         <li>
                             <a href="{{ '/g/' . $guild->slug }}">
                                 <i class="pe-7s-ribbon"></i>
@@ -161,13 +161,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/hooks">
-                            <i class="pe-7s-bell"></i>
-                            <p>Notification Center</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/profile/menu">
+                        <a href="/user/account-settings">
                             <i class="pe-7s-user"></i>
                             <p>User Profile</p>
                         </a>
@@ -192,24 +186,24 @@
 
     <div class="main-panel
     @if (Auth::check())
-            @if(Auth::user()->nightmode === 0)
-                @if (Auth::user()->layout === 1)
-                        rp-main-background-1
-                @elseif (Auth::user()->layout === 2)
-                        rp-main-background-2
-                @elseif (Auth::user()->layout === 3)
-                        rp-main-background-3
-                @elseif (Auth::user()->layout === 4)
-                        rp-main-background-4
-                @elseif (Auth::user()->layout === 5)
-                        rp-main-background-5
-                @else
-                        rp-main-background-0
-                @endif
-            @else
-                rp-main-background-0
-            @endif
+    @if(Auth::user()->nightmode === 0)
+    @if (Auth::user()->layout === 1)
+            rp-main-background-1
+@elseif (Auth::user()->layout === 2)
+            rp-main-background-2
+@elseif (Auth::user()->layout === 3)
+            rp-main-background-3
+@elseif (Auth::user()->layout === 4)
+            rp-main-background-4
+@elseif (Auth::user()->layout === 5)
+            rp-main-background-5
 @else
+            rp-main-background-0
+@endif
+    @else
+            rp-main-background-0
+@endif
+    @else
             rp-main-background-0
     @endif
             ">
@@ -245,7 +239,7 @@
                                     @else
                                         {!! Form::checkbox('nightmode', 1, true, ['onchange' => 'nightmode(this)']); !!}
                                     @endif
-                                        <span class="slider round"></span>
+                                    <span class="slider round"></span>
                                 </label>
                             </li>
                             <li>

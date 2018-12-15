@@ -1,25 +1,68 @@
 <?php
 
-/**
- * This file is part of the ESO Raidplanner project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 3
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- *
- * @see https://github.com/ESORaidplanner/ESORaidplanner
- */
-
 namespace App;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
+/**
+ * App\User.
+ *
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Character[]                                                 $characters
+ * @property \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Signup[]                                                    $signups
+ * @mixin \Eloquent
+ *
+ * @property int                             $id
+ * @property string                          $name
+ * @property string                          $email
+ * @property string                          $password
+ * @property string                          $timezone
+ * @property string                          $avatar
+ * @property int                             $global_admin
+ * @property int                             $membership_level
+ * @property string|null                     $remember_token
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int                             $clock
+ * @property int                             $layout
+ * @property string|null                     $telegram_username
+ * @property string                          $cover_image
+ * @property string                          $title
+ * @property string                          $description
+ * @property int                             $race
+ * @property int                             $alliance
+ * @property int                             $class
+ * @property mixed|null                      $onesignal_id
+ * @property int                             $nightmode
+ * @property string|null                     $discord_handle
+ * @property string|null                     $discord_id
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereAlliance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereAvatar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereClass($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereClock($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereCoverImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereDiscordHandle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereDiscordId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereGlobalAdmin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereLayout($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereMembershipLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereNightmode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereOnesignalId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereRace($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereTelegramUsername($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereTimezone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
+ */
 class User extends Authenticatable
 {
     use Notifiable;
@@ -30,7 +73,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'timezone', 'clock', 'layout', 'telegram_username', 'discord_handle',
+        'name', 'email', 'password', 'timezone', 'clock', 'layout', 'telegram_username', 'discord_handle', 'race', 'alliance', 'class', 'title', 'description',
     ];
 
     /**
@@ -43,56 +86,72 @@ class User extends Authenticatable
     ];
 
     /**
-     * @return array
+     * Get all signups for this user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function getGuilds(): array
+    public function signups()
     {
-        $guild_ids = DB::table('user_guilds')
-            ->where('user_id', '=', $this->id)
-            ->where('status', '>=', 1)
-            ->orderBy('guild_id', 'asc')
-            ->get();
+        return $this->hasMany('App\Signup');
+    }
 
-        $guilds = [];
-
-        foreach ($guild_ids as $guild_id) {
-            $guild = Guild::query()
-                ->where('id', '=', $guild_id->guild_id)
-                ->first();
-
-            $guilds[] = $guild;
-        }
-
-        return $guilds;
+    public function characters()
+    {
+        return $this->hasMany('App\Character');
     }
 
     /**
+     * Get all guilds for this user.
+     *
      * @return array
      */
-    public function getGuildsWhereIsAdmin(): array
+    public function guilds()
     {
-        $guilds = $this->getGuilds();
-        $return = [];
-        foreach ($guilds as $guild) {
-            if ($guild->isAdmin($this)) {
-                $return[] = $guild;
-            }
-        }
+        return Guild::query()
+            ->select('guilds.*')
+            ->join(Guild::X_REF_USERS, 'guilds.id', Guild::X_REF_USERS.'.guild_id')
+            ->where(Guild::X_REF_USERS.'.user_id', '=', $this->id)
+            ->where(Guild::X_REF_USERS.'.status', '=', Guild::MEMBERSHIP_STATUS_MEMBER)
+            ->orderBy('guilds.name')
+            ->get()->all();
+    }
 
-        return $return;
+    public function guildsPending()
+    {
+        return Guild::query()
+            ->select('guilds.*')
+            ->join(Guild::X_REF_USERS, 'guilds.id', Guild::X_REF_USERS.'.guild_id')
+            ->where(Guild::X_REF_USERS.'.user_id', '=', $this->id)
+            ->where(Guild::X_REF_USERS.'.status', '=', Guild::MEMBERSHIP_STATUS_PENDING)
+            ->orderBy('guilds.name')
+            ->get()->all();
+    }
+
+    public function guildsWhereIsAdmin()
+    {
+        return Guild::query()
+            ->select('guilds.*')
+            ->join(Guild::X_REF_USERS, 'guilds.id', Guild::X_REF_USERS.'.guild_id')
+            ->where(Guild::X_REF_USERS.'.user_id', '=', $this->id)
+            ->whereJsonContains('guilds.admins', $this->id)
+            ->orderBy('guilds.name')
+            ->get()->all();
     }
 
     /**
+     * Get all upcoming events for this user.
+     *
      * @return array
      */
-    public function getEvents(): array
+    public function UpcomingEvents(): array
     {
-        $guilds = $this->getGuilds();
+        $guilds = $this->guilds();
 
         $events = [];
 
+        /** @var Guild $guild */
         foreach ($guilds as $guild) {
-            foreach ($guild->getEvents() as $event) {
+            foreach ($guild->upcomingEvents() as $event) {
                 $events[] = $event;
             }
         }
@@ -104,184 +163,25 @@ class User extends Authenticatable
         return $events;
     }
 
-    /**
-     * @return array
-     */
-    public function getEventsSignedUp(): array
+    public function currentLocalDateTime(): \DateTime
     {
-        $events = $this->getEvents();
+        $dt = new \DateTime('now', new \DateTimeZone(env('DEFAULT_TIMEZONE')));
+        $dt->setTimezone(new \DateTimeZone($this->timezone));
 
-        $e = [];
-
-        foreach ($events as $event) {
-            if ($event->userIsSignedUp($this->id)) {
-                $e[] = $event;
-            }
-        }
-
-        return $e;
-    }
-
-    /**
-     * @param bool $forsignup
-     *
-     * @return array|\Illuminate\Database\Eloquent\Collection|static[]
-     */
-    public function getCharacters(bool $forsignup = false)
-    {
-        $characters = Character::query()
-            ->where('user_id', '=', $this->id)
-            ->get();
-
-        if ($forsignup) {
-            $arr = [];
-
-            foreach ($characters as $character) {
-                $arr[$character->id] = $character->name;
-            }
-
-            return $arr;
-        }
-
-        return $characters;
-    }
-
-    /**
-     * @param int $guild_id
-     */
-    public function sendGuildApproveEmail(int $guild_id)
-    {
-        $guild = Guild::query()->find($guild_id);
-
-        $user = $this;
-
-        Mail::send('emails.membership_approved', ['user' => $user, 'guild' => $guild], function ($m) use ($user) {
-            $m->from('noreply@esoraidplanner.com', '[ESORaidplanner] Guild membership approved');
-
-            $m->to('jurian.janssen@gmail.com', $user->name)->subject('Your Reminder!');
-        });
-    }
-
-    /**
-     * @return string
-     */
-    public function getMembershipLevel(): string
-    {
-        switch ($this->membership_level) {
-            case 1:
-                $return = 'Bronze';
-                break;
-            case 2:
-                $return = 'Silver';
-                break;
-            case 3:
-                $return = 'Gold';
-                break;
-            case 4:
-                $return = 'Platinum';
-                break;
-            default:
-                $return = 'No';
-        }
-
-        return $return;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRace()
-    {
-        return DB::table('races')->find($this->race);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getClass()
-    {
-        return DB::table('classes')->find($this->class);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAlliance()
-    {
-        return DB::table('alliances')->find($this->alliance);
-    }
-
-    /**
-     * @return array
-     */
-    public function getBadges(): array
-    {
-        $b = DB::table('user_badges')->where('user_id', '=', $this->id)->orderBy('created_at')->get();
-
-        $badges = [];
-
-        foreach ($b as $badge) {
-            $badges[] = Badge::query()->find($badge->badge_id);
-        }
-
-        return $badges;
-    }
-
-    /**
-     * @param $device_id
-     * @param string $onesignal_id
-     */
-    public function addOnesignalId($device_id, string $onesignal_id)
-    {
-        $ids = json_decode($this->onsesignal_id, true) ?? [];
-
-        $ids[$device_id] = $onesignal_id;
-
-        $this->onesignal_id = json_encode($ids);
-
-        $this->save();
-    }
-
-    /**
-     * @param $device_id
-     */
-    public function removeOnesignalId($device_id)
-    {
-        $ids = json_decode($this->onsesignal_id, true);
-
-        $this->onesignal_id = json_encode(array_except($ids, $device_id));
-
-        $this->save();
-    }
-
-    /**
-     * @return array
-     */
-    public function getSignups(): array
-    {
-        $events = $this->getEvents();
-
-        if (0 === count($events)) {
-            return [];
-        }
-
-        $signups = [];
-
-        foreach ($events as $event) {
-            $s = Signup::query()
-                ->where('user_id', '=', $this->id)
-                ->where('event_id', '=', $event->id)
-                ->first();
-            if (!empty($s)) {
-                $signups[] = $s;
-            }
-        }
-
-        return $signups;
+        return $dt;
     }
 
     public function getDiscordMention(): string
     {
+        if (null === $this->discord_id) {
+            return $this->name;
+        }
+
         return '<@'.$this->discord_id.'>';
+    }
+
+    public function createIcalUid(): string
+    {
+        return base64_encode($this->id.'|'.$this->created_at);
     }
 }

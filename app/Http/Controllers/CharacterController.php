@@ -1,16 +1,9 @@
 <?php
-
 /**
- * This file is part of the ESO Raidplanner project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 3
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- *
- * @see https://github.com/ESORaidplanner/ESORaidplanner
+ * Created by PhpStorm.
+ * User: woeler
+ * Date: 11.10.18
+ * Time: 13:43.
  */
 
 namespace App\Http\Controllers;
@@ -18,77 +11,60 @@ namespace App\Http\Controllers;
 use App\Character;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
 
-class CharacterController extends Controller
+class CharacterController
 {
-    /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
+    public function createView()
+    {
+        return view('user.character_create');
+    }
+
+    public function updateView(int $character_id)
+    {
+        $character = Character::query()
+            ->where('id', '=', $character_id)
+            ->where('user_id', '=', Auth::id())
+            ->first();
+
+        if (null === $character) {
+            return response('This character does not belong to you.', 401);
+        }
+
+        return view('user.character_update', compact('character'));
+    }
+
     public function create(Request $request)
     {
-        $data            = $request->all();
-        $data['user_id'] = Auth::id();
-
-        if (!empty(Input::get('sets'))) {
-            $data['sets'] = implode(', ', $request->input('sets'));
-        } else {
-            $data['sets'] = '';
-        }
-
-        $character = new Character($data);
+        $character          = new Character($request->except(['sets']));
+        $character->user_id = Auth::id();
+        $character->public  = $request->input('public') ?? 0;
+        $character->sets    = json_encode($request->input('sets') ?? []);
         $character->save();
 
-        return redirect('/profile/characters');
+        return redirect(route('userCharacterList'));
     }
 
-    /**
-     * @param int $id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function edit(Request $request, int $id)
+    public function update(Request $request, int $character_id)
     {
         $character = Character::query()
-            ->where('id', '=', $id)
+            ->where('id', '=', $character_id)
             ->where('user_id', '=', Auth::id())
             ->first();
+        $character->update($request->except(['sets']));
+        $character->public = $request->input('public') ?? 0;
+        $character->sets   = json_encode($request->input('sets') ?? []);
+        $character->save();
 
-        if (empty($character)) {
-            return redirect('/profile/character');
-        }
-
-        $data = $request->all();
-
-        if (!empty(Input::get('sets'))) {
-            $data['sets'] = implode(', ', $request->input('sets'));
-        } else {
-            $data['sets'] = '';
-        }
-
-        $character->update($data);
-
-        return redirect('/profile/character');
+        return redirect(route('userCharacterList'));
     }
 
-    /**
-     * @param int $id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function delete(int $id)
+    public function delete(int $character_id)
     {
-        $character = Character::query()
-            ->where('id', '=', $id)
+        Character::query()
+            ->where('id', '=', $character_id)
             ->where('user_id', '=', Auth::id())
-            ->first();
+            ->delete();
 
-        if (empty($character)) {
-            return redirect('/profile/characters');
-        }
-
-        $character->delete();
-
-        return redirect('/profile/characters');
+        return redirect(route('userCharacterList'));
     }
 }
