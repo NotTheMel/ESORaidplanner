@@ -52,7 +52,7 @@ class Character extends Model
     protected $fillable = ['name', 'role', 'class', 'sets', 'user_id', 'public'];
 
     protected $casts = [
-        //'sets' => 'array',
+        'sets' => 'array',
     ];
 
     /**
