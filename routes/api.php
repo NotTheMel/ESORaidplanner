@@ -67,6 +67,7 @@ Route::group(['middleware' => ['api.user.auth']], function () {
         Route::post('/u/guild/{guild_id}/members/pending', 'Api\UserBased\GuildController@getPendingMembers');
         Route::post('/u/guild/{guild_id}/events', 'Api\UserBased\GuildController@getEvents');
         Route::post('/u/guild/{guild_id}/leave', 'Api\UserBased\GuildController@leave');
+        Route::post('/u/event/{event_id}', 'Api\UserBased\EventController@get');
         Route::post('/u/event/{event_id}/signups', 'Api\UserBased\EventController@getSignups');
 
         Route::post('/u/signup/create/{event_id}', 'Api\UserBased\EventController@signup');
