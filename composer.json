@@ -18,7 +18,7 @@
         "simshaun/recurr": "^3.0",
         "socialiteproviders/discord": "^2.0",
         "socialiteproviders/patreon": "^2.0",
-        "woeler/phpdiscord": "^1.0.2"
+        "woeler/phpdiscord": "^1.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.5",
