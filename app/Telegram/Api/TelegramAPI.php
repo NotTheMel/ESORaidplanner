@@ -142,9 +142,9 @@ class TelegramAPI
     /**
      * @param string $supportSets
      */
-    public static function setSupportSets(string $supportSets = null)
+    public static function setSupportSets(array $supportSets = [])
     {
-        DB::table('telegram')->where('username', '=', self::$username)->update(['support_sets' => $supportSets ?? '']);
+        DB::table('telegram')->where('username', '=', self::$username)->update(['support_sets' => implode(',', $supportSets) ?? '']);
     }
 
     public static function getComments()
