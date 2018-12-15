@@ -38,6 +38,11 @@ class EventController extends Controller
             ->first();
         /** @var Event $event */
         $event  = Event::query()->find($event_id);
+
+        if (null === $event) {
+            abort(404);
+        }
+
         $signup = $event->getSignup(Auth::user()) ?? new Signup();
 
         return view('event.details', compact('guild', 'event', 'signup'));
