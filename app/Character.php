@@ -96,7 +96,7 @@ class Character extends Model
 
     public function setsStringFormatted(): string
     {
-        if (is_array($this->sets)) {
+        if (!is_array($this->sets)) {
             return '';
         }
 
