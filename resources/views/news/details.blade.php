@@ -13,7 +13,7 @@
                             {!! $article->content !!}
                             <div class="panel panel-default">
                                 <div class="panel-body text-right">
-                                    {{ $article->getNiceDate() }} - Written by <b>{{ $article->getAuthor()->name }}</b>
+                                    {{ $article->getUserHumanReadableDate() }} - Written by <b>{{ $article->getAuthor()->name }}</b>
                                     <img  class="img-rounded" width="50px" src="/storage/avatars/{{ $article->getAuthor()->avatar }}" />
                                 </div>
                             </div>
