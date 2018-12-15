@@ -38,7 +38,7 @@
                                         <td>
                                             <a href="{{ '/news/' . $article->id }}">{{ $article->title }}</a>
                                         </td>
-                                        <td>{{ $article->getNiceDate() }}</td>
+                                        <td>{{ $article->getUserHumanReadableDate() }}</td>
                                     </tr>
                                 @endforeach
                                 </tbody>
