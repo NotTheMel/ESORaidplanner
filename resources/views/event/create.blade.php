@@ -4,7 +4,7 @@
     <div class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="card">
                         <div class="header">
                             <h4 class="title">Create an event for {{ $guild->name }}</h4>
@@ -19,17 +19,13 @@
                             </div>
                         @endif
                         <div class="content">
-                            {{ Form::open(array('url' => 'g/' . $guild->slug . '/events/create')) }}
+                            {{ Form::open(array('url' => 'g/' . $guild->slug . '/event/create')) }}
 
                             Event name:{!! Form::text('name', '', array('class' => 'form-control')) !!}<br>
 
-                            Event
-                            type:{!! Form::select('type', array('1' => 'Trials', '2' => 'Dungeons', '3' => 'PvP', '4' => 'Guild Meeting', '6' => 'Other'), null, array('class' => 'form-control')) !!}
-                            <br>
-
-                            @if(count($guild->getTeams()) > 0)
+                            @if(count($guild->teams()->get()->all()) > 0)
                                 Sign up
-                                team:{!! Form::select('team_id', \App\Team::formatForForms($guild->id), '', array('class' => 'form-control')) !!}
+                                team:{!! Form::select('team_id', $guild->teams()->pluck('name', 'id'), '', array('class' => 'form-control')) !!}
                                 <br>
                             @endif
 

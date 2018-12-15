@@ -19,7 +19,7 @@ class CreateCharactersTable extends Migration
             $table->string('name');
             $table->integer('class');
             $table->integer('role');
-            $table->string('sets');
+            $table->json('sets')->nullable();
             $table->timestamps();
         });
     }

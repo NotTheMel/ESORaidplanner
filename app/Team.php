@@ -1,9 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: woeler
- * Date: 06.05.18
- * Time: 15:30.
+ * This file is part of the ESO-Database project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 3
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ *
+ * @see https://eso-database.com
+ * Created by woeler
+ * Date: 12.09.18
+ * Time: 08:53
  */
 
 namespace App;
@@ -11,96 +20,110 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * App\Team.
+ *
+ * @property \App\Guild $guild
+ * @mixin \Eloquent
+ *
+ * @property int                             $id
+ * @property int                             $guild_id
+ * @property string                          $name
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Team whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Team whereGuildId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Team whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Team whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Team whereUpdatedAt($value)
+ */
 class Team extends Model
 {
-    protected $fillable = ['guild_id', 'name'];
+    const X_REF_USERS = 'teams_users';
+
+    protected $fillable = ['name', 'guild_id'];
+
+    public function delete()
+    {
+        DB::table(self::X_REF_USERS)
+            ->where('team_id', '=', $this->id)
+            ->delete();
+
+        return parent::delete();
+    }
 
     /**
+     * Get all users in this team.
+     *
      * @return array
      */
-    public function getMembers(): array
+    public function users()
     {
-        $members = DB::table('teams_users')
-            ->select(['teams_users.*', 'users.name'])
-            ->join('users', 'teams_users.user_id', '=', 'users.id')
-            ->where('team_id', '=', $this->id)
+        return User::query()
+            ->select(['users.*', self::X_REF_USERS.'.class_id', self::X_REF_USERS.'.role_id', self::X_REF_USERS.'.sets'])
+            ->join(self::X_REF_USERS, 'users.id', self::X_REF_USERS.'.user_id')
+            ->where(self::X_REF_USERS.'.team_id', '=', $this->id)
             ->orderBy('users.name')
             ->get()->all();
+    }
 
-        return $members ?? [];
+    public function user(User $user)
+    {
+        return User::query()
+            ->select(['users.*', self::X_REF_USERS.'.class_id', self::X_REF_USERS.'.role_id', self::X_REF_USERS.'.sets'])
+            ->join(self::X_REF_USERS, 'users.id', self::X_REF_USERS.'.user_id')
+            ->where(self::X_REF_USERS.'.team_id', '=', $this->id)
+            ->where('user_id', '=', $user->id)
+            ->first();
     }
 
     /**
-     * @return int
+     * Get the guild this team belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function getMemberCount(): int
+    public function guild()
     {
-        return DB::table('teams_users')
-            ->where('team_id', '=', $this->id)
-            ->count() ?? 0;
+        return $this->belongsTo('App\Guild');
     }
 
-    /**
-     * @param int   $user_id
-     * @param int   $class_id
-     * @param int   $role_id
-     * @param array $sets
-     */
-    public function addMember(int $user_id, int $class_id, int $role_id, array $sets = [])
+    public function addMember(User $user, int $class, int $role, array $sets = [])
     {
-        $count = DB::table('teams_users')
-            ->where('team_id', '=', $this->id)
-            ->where('user_id', '=', $user_id)
-            ->count();
-
-        if (count($sets) > 0) {
-            $sets_s = implode(', ', $sets);
-        } else {
-            $sets_s = '';
-        }
-
-        if (0 === $count) {
-            DB::table('teams_users')->insert([
-                'team_id'  => $this->id,
-                'user_id'  => $user_id,
-                'class_id' => $class_id,
-                'role_id'  => $role_id,
-                'sets'     => $sets_s,
-            ]);
-        } else {
-            DB::table('teams_users')
-                ->where('team_id', '=', $this->id)
-                ->where('user_id', '=', $user_id)
-                ->update([
-                'user_id'  => $user_id,
-                'class_id' => $class_id,
-                'role_id'  => $role_id,
-                'sets'     => $sets_s,
-            ]);
-        }
+        DB::table(self::X_REF_USERS)->insert([
+            'team_id'  => $this->id,
+            'user_id'  => $user->id,
+            'class_id' => $class,
+            'role_id'  => $role,
+            'sets'     => json_encode($sets),
+        ]);
     }
 
-    /**
-     * @param int $user_id
-     */
-    public function removeMember(int $user_id)
+    public function removeMember(User $user)
     {
-        DB::table('teams_users')
+        DB::table(self::X_REF_USERS)
             ->where('team_id', '=', $this->id)
-            ->where('user_id', '=', $user_id)
+            ->where('user_id', '=', $user->id)
             ->delete();
     }
 
-    public static function formatForForms(int $guild_id)
+    public function updateMember(User $user, int $class, int $role, array $sets = [])
     {
-        $return     = [];
-        $return[''] = 'None';
-        $teams      = self::query()->where('guild_id', '=', $guild_id)
-            ->orderBy('name')->get()->all() ?? [];
-        foreach ($teams as $team) {
-            $return[$team->id] = $team->name;
-        }
+        DB::table(self::X_REF_USERS)
+            ->where('team_id', '=', $this->id)
+            ->where('user_id', '=', $user->id)
+            ->update([
+                'class_id' => $class,
+                'role_id'  => $role,
+                'sets'     => json_encode($sets),
+            ]);
+    }
 
-        return $return;
+    public function isMember(User $user): bool
+    {
+        return 1 === DB::table(self::X_REF_USERS)
+                ->where('team_id', '=', $this->id)
+                ->where('user_id', '=', $user->id)
+                ->count();
     }
 }

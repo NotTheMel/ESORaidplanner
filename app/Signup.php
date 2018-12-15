@@ -1,7 +1,6 @@
 <?php
-
 /**
- * This file is part of the ESO Raidplanner project.
+ * This file is part of the ESO-Database project.
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 3
@@ -10,119 +9,141 @@
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  *
- * @see https://github.com/ESORaidplanner/ESORaidplanner
+ * @see https://eso-database.com
+ * Created by woeler
+ * Date: 12.09.18
+ * Time: 08:43
  */
 
 namespace App;
 
-use App\Singleton\ClassTypes;
-use App\Singleton\RoleTypes;
-use DateTime;
-use DateTimeZone;
+use App\Utility\Classes;
+use App\Utility\Roles;
+use App\Utility\UserDateHandler;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
+/**
+ * App\Signup.
+ *
+ * @property \App\Event $event
+ * @property \App\User  $user
+ * @mixin \Eloquent
+ *
+ * @property int                             $id
+ * @property int                             $user_id
+ * @property int                             $event_id
+ * @property int                             $class_id
+ * @property int                             $role_id
+ * @property mixed|null                      $sets
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null                        $character_id
+ * @property int                             $status
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Signup whereCharacterId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Signup whereClassId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Signup whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Signup whereEventId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Signup whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Signup whereRoleId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Signup whereSets($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Signup whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Signup whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Signup whereUserId($value)
+ */
 class Signup extends Model
 {
-    const SIGNUP_STATUS_CONFIRMED = 1;
-    const SIGNUP_STATUS_BACKUP    = 2;
+    const STATUS_CONFIRMED = 1;
+    const STATUS_BACKUP    = 2;
+    const STATUS_UNKNOWN   = 0;
 
     protected $fillable = [
-        'user_id',
         'event_id',
+        'user_id',
         'class_id',
         'role_id',
         'sets',
         'character_id',
-        'status',
+    ];
+
+    protected $casts = [
+        'sets' => 'array',
     ];
 
     /**
-     * @return string
+     * Get the event this signup belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function getNiceDate(): string
+    public function event()
     {
-        $date = new DateTime($this->created_at);
-
-        $date->setTimezone(new DateTimeZone(Auth::user()->timezone));
-
-        if (12 === Auth::user()->clock) {
-            return $date->format('F jS g:i a');
-        }
-
-        return $date->format('F jS H:i');
+        return $this->belongsTo('App\Event');
     }
 
     /**
-     * @return User
+     * Get the user this signup belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function getUser(): User
+    public function user()
     {
-        return User::query()
-            ->where('id', '=', $this->user_id)
-            ->first();
+        return $this->belongsTo('App\User');
+    }
+
+    public function class(): string
+    {
+        return Classes::CLASSES[$this->class_id];
+    }
+
+    public function role(): string
+    {
+        return Roles::ROLES[$this->role_id];
+    }
+
+    public function classIcon()
+    {
+        return Classes::getClassIcon($this->class_id);
+    }
+
+    public function roleIcon()
+    {
+        return Roles::getRoleIcon($this->role_id);
     }
 
     /**
+     * Get a human readable date string based on user settings.
+     *
      * @return string
      */
-    public function getClassName(): string
+    public function getUserHumanReadableDate(): string
     {
-        return ClassTypes::getClassName($this->class_id);
-    }
-
-    public function getClassIcon(): string
-    {
-        return ClassTypes::getClassIcon($this->class_id);
+        return UserDateHandler::getUserHumanReadableDate(new \DateTime($this->{self::CREATED_AT}));
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getRoleName(): string
+    public function getSets(): array
     {
-        return RoleTypes::getRoleName($this->role_id);
+        return $this->sets ?? [];
     }
 
-    public function getRoleIcon(): string
+    public function setStatus(int $status)
     {
-        return RoleTypes::getRoleImage($this->role_id);
+        $this->status = $status;
+        $this->save();
     }
 
-    /**
-     * @return string
-     */
-    public function getSetsFormatted(): string
+    public function getStatusIcon(): string
     {
-        if (empty($this->sets)) {
-            return '';
+        switch ($this->status) {
+            case self::STATUS_CONFIRMED:
+                return '✅';
+            case self::STATUS_BACKUP:
+                return '⚠️';
+
+            default:
+                return '❔';
         }
-        $sets = explode(', ', $this->sets);
-
-        $setsFound    = [];
-        $setsNotFound = [];
-
-        $string = ''
-;
-        foreach ($sets as $set) {
-            $new = Set::query()->whereRaw('LOWER(`name`) LIKE "%'.strtolower($set).'%"')->first();
-            if (!empty($new)) {
-                $setsFound[] = $new;
-            } else {
-                $setsNotFound[] = $set;
-            }
-        }
-
-        foreach ($setsFound as $set) {
-            $string .= '<a href="https://www.eso-sets.com/set/'.$set->id.'" target="_blank" data-toggle="tooltip" data-html="true" title="'.$set->tooltip.'">'.$set->name.'</a>, ';
-        }
-
-        $string .= implode(', ', $setsNotFound);
-
-        if (', ' === substr($string, -2, 2)) {
-            $string = substr($string, 0, -2);
-        }
-
-        return $string;
     }
 }

@@ -1,7 +1,6 @@
 <?php
-
 /**
- * This file is part of the ESO Raidplanner project.
+ * This file is part of the ESO-Database project.
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 3
@@ -10,65 +9,126 @@
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  *
- * @see https://github.com/ESORaidplanner/ESORaidplanner
+ * @see https://eso-database.com
+ * Created by woeler
+ * Date: 12.09.18
+ * Time: 17:03
  */
 
 namespace App\Http\Controllers;
 
-use App\Event;
 use App\Guild;
-use App\LogEntry;
 use App\User;
+use App\Utility\Slugifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Input;
 
 class GuildController extends Controller
 {
-    /**
-     * @param Request $request
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
+    public function createView()
+    {
+        return view('guild.create');
+    }
+
+    public function detailView(string $slug)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        return view('guild.details', compact('guild'));
+    }
+
+    public function pastEventsView(string $slug)
+    {
+        /** @var Guild $guild */
+        $guild  = Guild::query()->where('slug', '=', $slug)->first();
+        $events = $guild->events()
+            ->where('start_date', '<', date('Y-m-d H:i:s'))
+            ->orderBy('start_date', 'desc')
+            ->paginate(30);
+
+        return view('guild.past_events', compact('guild', 'events'));
+    }
+
+    public function settingsView(string $slug)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        return view('guild.settings', compact('guild'));
+    }
+
+    public function deleteConfirmView(string $slug)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        return view('guild.delete_confirm', compact('guild'));
+    }
+
+    public function logsView(string $slug)
+    {
+        /** @var Guild $guild */
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+        $logs  = $guild->logs()->orderBy('created_at', 'desc')->paginate(30) ?? [];
+
+        return view('guild.logs', compact('guild', 'logs'));
+    }
+
+    public function membersView(string $slug)
+    {
+        /** @var Guild $guild */
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        return view('guild.members', compact('guild'));
+    }
+
+    public function applyView(string $slug)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        return view('guild.apply', compact('guild'));
+    }
+
+    public function pendingView(string $slug)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        return view('guild.pending', compact('guild'));
+    }
+
+    public function listView()
+    {
+        $guilds = Guild::query()
+            ->where('active', '=', 1)
+            ->orderBy('name')->get()->all();
+
+        return view('guild.list', compact('guilds'));
+    }
+
+    public function inactiveView(string $slug)
+    {
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+
+        return view('guild.deactivated', compact('guild'));
+    }
+
     public function create(Request $request)
     {
         $request->validate([
             'name'       => 'required',
-            'slug'       => new \App\Rules\GuildSlug(),
             'megaserver' => 'required',
             'platform'   => 'required',
         ]);
 
-        $check = Guild::query()->where('slug', '=', Input::get('slug'))->count();
+        $guild           = new Guild($request->all());
+        $guild->slug     = Slugifier::slugify($request->input('name'));
+        $guild->owner_id = Auth::id();
+        $guild->addAdmin(Auth::user());
+        $guild->save();
+        $guild->applyMember(Auth::user());
+        $guild->approveMember(Auth::user());
 
-        if (0 === $check) {
-            $guild             = new Guild($request->all());
-            $guild->admins     = json_encode([Auth::id()]);
-            $guild->owner_id   = Auth::id();
-            $guild->image      = 'default.png';
-
-            $guild->save();
-
-            DB::table('user_guilds')->insert([
-                'user_id'  => Auth::id(),
-                'guild_id' => $guild->id,
-                'status'   => 1,
-            ]);
-
-            $guild->logger->guildCreate($guild, Auth::user());
-
-            return redirect('g/'.$guild->slug);
-        }
-
-        return redirect('guild/create');
+        return redirect(route('guildDetailView', ['slug' => $guild->slug]));
     }
 
-    /**
-     * @param int $id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
     public function delete(string $slug)
     {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
@@ -77,223 +137,90 @@ class GuildController extends Controller
         return redirect('/');
     }
 
-    /**
-     * @param string $slug
-     * @param int    $id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function requestMembership(string $slug, int $id)
-    {
-        $guild = Guild::query()->find($id);
-
-        $guild->requestMembership(Auth::user());
-
-        return redirect('/');
-    }
-
-    /**
-     * @param string $slug
-     * @param int    $guild_id
-     * @param int    $user_id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function approveMembership(string $slug, int $guild_id, int $user_id)
-    {
-        $guild = Guild::query()->find($guild_id);
-
-        $user = User::query()->find($user_id);
-
-        $guild->approveMembership($user);
-
-        return redirect('/g/'.$guild->slug.'/members');
-    }
-
-    /**
-     * @param string $slug
-     * @param int    $guild_id
-     * @param int    $user_id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function removeMembership(string $slug, int $guild_id, int $user_id)
+    public function saveSettings(Request $request, string $slug)
     {
         /** @var Guild $guild */
-        $guild = Guild::query()->find($guild_id);
-        /** @var User $user */
-        $user = User::query()->find($user_id);
+        $guild                 = Guild::query()->where('slug', '=', $slug)->first();
+        $guild->discord_widget = $request->input('discord_widget') ?? null;
+        $guild->save();
 
-        if (!$guild->isAdmin(Auth::user())) {
-            return redirect('/g/'.$guild->slug);
-        }
-        if (!$guild->isOwner(Auth::user()) && $guild->isAdmin($user)) {
-            return redirect('/g/'.$guild->slug);
-        }
+        return redirect(route('guildSettingsView', ['slug' => $slug]));
+    }
 
-        $guild->removeMembership($user);
+    public function apply(string $slug)
+    {
+        /** @var Guild $guild */
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+        $guild->applyMember(Auth::user());
 
-        return redirect('/g/'.$guild->slug.'/members');
+        return redirect(route('guildDetailView', ['slug' => $slug]));
     }
 
     public function leave(string $slug)
     {
+        /** @var Guild $guild */
         $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        $guild->leave(Auth::user());
+        $guild->removeMember(Auth::user());
 
         return redirect('/');
     }
 
-    /**
-     * @param string $slug
-     * @param int    $user_id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function makeAdmin(string $slug, int $user_id)
+    public function approveMember(string $slug, int $user_id)
     {
+        /** @var Guild $guild */
         $guild = Guild::query()->where('slug', '=', $slug)->first();
+        $user  = User::query()->find($user_id);
+        $guild->approveMember($user);
 
-        $guild->makeAdmin(User::query()->find($user_id));
-
-        return redirect('/g/'.$slug.'/members');
+        return redirect(route('guildMembersView', ['slug' => $slug]));
     }
 
-    /**
-     * @param string $slug
-     * @param int    $user_id
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
+    public function removeMember(string $slug, int $user_id)
+    {
+        /** @var Guild $guild */
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+        $user  = User::query()->find($user_id);
+        $guild->removeMember($user);
+
+        return redirect(route('guildMembersView', ['slug' => $slug]));
+    }
+
+    public function addAdmin(string $slug, int $user_id)
+    {
+        /** @var Guild $guild */
+        $guild = Guild::query()->where('slug', '=', $slug)->first();
+        $user  = User::query()->find($user_id);
+        $guild->addAdmin($user);
+
+        return redirect(route('guildMembersView', ['slug' => $slug]));
+    }
+
     public function removeAdmin(string $slug, int $user_id)
     {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        $guild->removeAdmin(User::query()->find($user_id));
-
-        return redirect('/g/'.$slug.'/members');
-    }
-
-    /**
-     * @param $slug
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function detail($slug)
-    {
         /** @var Guild $guild */
-        $guild    = Guild::query()->where('slug', '=', $slug)->first();
-        $count    = Event::query()->where('guild_id', '=', $guild->id)->count();
-        $logcount = LogEntry::query()->where('guild_id', '=', $guild->id)->count();
-
-        return view('guild.guilddetail', compact('guild', 'count', 'logcount'));
-    }
-
-    public function logs(string $slug)
-    {
         $guild = Guild::query()->where('slug', '=', $slug)->first();
-        $logs  = LogEntry::query()->where('guild_id', '=', $guild->id)->orderBy('created_at', 'desc')->paginate(50);
+        $user  = User::query()->find($user_id);
+        $guild->removeAdmin($user);
 
-        return view('guild.logs', compact('guild', 'logs'));
+        return redirect(route('guildMembersView', ['slug' => $slug]));
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function listAll()
-    {
-        $guilds = Guild::query()->orderBy('name', 'asc')->get();
-
-        return view('guilds', compact('guilds'));
-    }
-
-    /**
-     * @param string $slug
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function settings(string $slug)
-    {
-        $guild
-            = Guild::query()->where('slug', '=', $slug)->first();
-
-        return view('guild.settings', compact('guild'));
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function deleteConfirm(string $slug)
-    {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        return view('guild.delete_confirm', compact('guild'));
-    }
-
-    /**
-     * @param string $slug
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function members(String $slug)
+    public function makeOwner(string $slug, int $user_id)
     {
         /** @var Guild $guild */
         $guild = Guild::query()->where('slug', '=', $slug)->first();
+        $user  = User::query()->find($user_id);
+        $guild->transferOwnership($user);
 
-        return view('guild.members', compact('guild'));
+        return redirect(route('guildDetailView', ['slug' => $slug]));
     }
 
-    /**
-     * @param string $slug
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function saveSettings(string $slug)
+    public function activate(string $slug)
     {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        $guild->discord_widget = Input::get('discord_widget') ?? null;
-
-        if (null !== $guild->discord_widget) {
-            $guild->discord_widget = preg_replace(
-                ['/width="\d+"/i'],
-                [sprintf('width="%d"', '100')],
-                $guild->discord_widget);
-            $guild->discord_widget = str_replace('"100"', '"100%"', $guild->discord_widget);
-        }
-
+        $guild         = Guild::query()->where('slug', '=', $slug)->first();
+        $guild->active = 1;
         $guild->save();
 
-        return redirect('/g/'.$slug.'/settings');
-    }
-
-    /**
-     * @param string $slug
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
-     */
-    public function pastEvents(string $slug)
-    {
-        /** @var Guild $guild */
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        return view('event.events', compact('guild'));
-    }
-
-    public function application(string $slug)
-    {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        return view('guild.guild_apply', compact('guild'));
-    }
-
-    public function applicationPending(string $slug)
-    {
-        $guild = Guild::query()->where('slug', '=', $slug)->first();
-
-        return view('guild.guild_awaiting_confirmation', compact('guild'));
+        return redirect(route('guildDetailView', ['slug' => $slug]));
     }
 }

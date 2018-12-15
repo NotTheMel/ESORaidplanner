@@ -19,7 +19,7 @@ class Signups extends Migration
             $table->integer('event_id');
             $table->integer('class_id');
             $table->integer('role_id');
-            $table->string('sets')->default('');
+            $table->json('sets')->nullable();
             $table->timestamps();
         });
     }

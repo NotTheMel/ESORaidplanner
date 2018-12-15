@@ -14,15 +14,24 @@ return [
     |
     */
 
+    'discord' => [
+        'client_id' => env('DISCORD_KEY'),
+        'client_secret' => env('DISCORD_SECRET'),
+        'redirect' => env('DISCORD_REDIRECT_URI')
+    ],
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),
     ],
-
+    'patreon' => [
+        'client_id' => env('PATREON_KEY'),
+        'client_secret' => env('PATREON_SECRET'),
+        'redirect' => env('PATREON_REDIRECT_URI')
+    ],
     'ses' => [
         'key' => env('SES_KEY'),
         'secret' => env('SES_SECRET'),
-        'region' => 'us-east-1',
+        'region' => env('SES_REGION', 'us-east-1'),
     ],
 
     'sparkpost' => [

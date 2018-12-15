@@ -19,20 +19,16 @@
                                     </ul>
                                 </div>
                             @endif
-                            {{ Form::open(array('url' => 'guild/create')) }}
+                            {{ Form::open(array('url' => route('guildCreate'), 'method' => 'post')) }}
 
                             Guild name:{!! Form::text('name', '', array('class' => 'form-control')) !!}<br>
 
-                            Guild slug (this will be your guild link. Only lowercase
-                            letters):{!! Form::text('slug', '', array('class' => 'form-control', 'pattern' => '[A-Za-z0-9]+')) !!}
+                            Guild
+                            megaserver:{!! Form::select('megaserver', \App\Utility\MegaServers::MEGASERVERS, null, array('class' => 'form-control')) !!}
                             <br>
 
                             Guild
-                            megaserver:{!! Form::select('megaserver', array('1' => 'EU', '2' => 'NA'), null, array('class' => 'form-control')) !!}
-                            <br>
-
-                            Guild
-                            Platform:{!! Form::select('platform', array('1' => 'PC/Mac', '2' => 'Playstation 4', '3' => 'XBOX One'), null, array('class' => 'form-control')) !!}
+                            Platform:{!! Form::select('platform', \App\Utility\Platforms::PLATFORMS, null, array('class' => 'form-control')) !!}
                             <br>
 
                             {!! Form::submit('Create Guild', ['class' => 'btn btn-info']) !!}<br>

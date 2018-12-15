@@ -1,7 +1,17 @@
 <?php
 
+namespace App;
+
+use App\Notification\Message\EventCreationMessage;
+use App\Notification\Message\EventDeletionMessage;
+use App\Notification\Message\PostSignupsMessage;
+use App\Notification\Message\ReminderMessage;
+use App\Notification\Notification;
+use App\Utility\GuildLogger;
+use App\Utility\UserDateHandler;
+
 /**
- * This file is part of the ESO Raidplanner project.
+ * This file is part of the ESO-Database project.
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 3
@@ -10,542 +20,350 @@
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  *
- * @see https://github.com/ESORaidplanner/ESORaidplanner
+ * @see https://eso-database.com
+ * Created by woeler
+ * Date: 12.09.18
+ * Time: 08:42
+ *
+ * @property \App\Guild                                             $guild
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Signup[] $signups
+ * @mixin \Eloquent
+ *
+ * @property int                             $id
+ * @property string                          $name
+ * @property string                          $description
+ * @property string                          $start_date
+ * @property int                             $guild_id
+ * @property int|null                        $parent_repeatable
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int                             $locked
+ * @property array                           $tags
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Event whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Event whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Event whereGuildId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Event whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Event whereLocked($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Event whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Event whereParentRepeatable($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Event whereStartDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Event whereTags($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Event whereUpdatedAt($value)
  */
-
-namespace App;
-
-use App\Hook\ConfirmedSignupsNotification;
-use App\Hook\EventCreationNotification;
-use App\Hook\NotificationHook;
-use App\Singleton\HookTypes;
-use App\Singleton\RoleTypes;
-use App\Singleton\SignupStatusses;
-use DateTime;
-use DateTimeZone;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-
-/**
- * Class Event.
- */
-class Event extends Model
+class Event extends \Illuminate\Database\Eloquent\Model
 {
-    const STATUS_LOCKED   = 1;
-    const STATUS_UNLOCKED = 0;
+    const EVENT_STATUS_OPEN = 0;
 
-    public $logger;
+    const EVENT_STATUS_LOCKED = 1;
 
     protected $fillable = [
         'name',
+        'guild_id',
         'description',
         'start_date',
-        'type',
-        'guild_id',
-        'locked',
         'tags',
     ];
 
+    protected $casts = [
+        'tags' => 'array',
+    ];
+
+    protected $logger;
+
     public function __construct(array $attributes = [])
     {
-        parent::__construct($attributes);
         $this->logger = new GuildLogger();
+        parent::__construct($attributes);
     }
 
+    /**
+     * Delete the event.
+     *
+     * @return bool|null
+     *
+     * @throws \Exception
+     */
     public function delete()
     {
-        Signup::query()->where('event_id', '=', $this->id)->delete();
+        $this->signups()->delete();
+        $this->sendDeletionNotifications();
 
         return parent::delete();
     }
 
     /**
-     * @return int
+     * Get all signups for the event.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function getTotalSignups(): int
+    public function signups()
     {
-        return DB::table('signups')
-            ->where('event_id', $this->id)
-            ->count();
+        return $this->hasMany('App\Signup');
     }
 
     /**
-     * @return string
+     * Get all signups for the event by role.
+     *
+     * @param int $role
+     *
+     * @return array
      */
-    public function getNiceDate(User $user = null): string
+    public function signupsByRole(int $role)
     {
-        $u    = $user ?? Auth::user();
-        $date = new DateTime($this->start_date);
-
-        $date->setTimezone(new DateTimeZone($u->timezone));
-
-        if (12 === $u->clock) {
-            return $date->format('F jS g:i a');
-        }
-
-        return $date->format('F jS H:i');
+        return $this->signups()->where('role_id', '=', $role)->get()->all() ?? [];
     }
 
     /**
-     * @return string
+     * Get all comments for the event.
+     *
+     * @return array
      */
-    public function getTypeName(): string
+    public function comments()
     {
-        if (1 === $this->type) {
-            return 'Trials';
-        } elseif (2 === $this->type) {
-            return 'Dungeons';
-        } elseif (3 === $this->type) {
-            return 'PvP';
-        } elseif (4 === $this->type) {
-            return 'Guild Meeting';
-        } elseif (999 === $this->type) {
-            return 'Other';
-        }
-
-        return 'Unknown';
+        return $this->hasMany('App\Comment')->orderBy(Comment::CREATED_AT, 'desc')->get()->all();
     }
 
     /**
-     * @return string
+     * Get the guild this event belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function getTypeImage()
+    public function guild()
     {
-        if (1 === $this->type) {
-            return asset('img/Header_Event_Trials.jpg');
-        } elseif (2 === $this->type) {
-            return 'Dungeons';
-        } elseif (3 === $this->type) {
-            return 'PvP';
-        } elseif (4 === $this->type) {
-            return 'Guild Meeting';
-        } elseif (999 === $this->type) {
-            return 'Other';
-        }
-
-        return 'Unknown';
+        return $this->belongsTo('App\Guild');
     }
 
     /**
+     * Get the event tags.
+     *
+     * @return array
+     */
+    public function tags(): array
+    {
+        return $this->tags ?? [];
+    }
+
+    public function startDate(string $timeZone = 'UTC'): \DateTime
+    {
+        return UserDateHandler::getDateTime(new \DateTime($this->start_date), $timeZone);
+    }
+
+    /**
+     * Check if the event is locked.
+     *
      * @return bool
      */
-    public function userIsSignedUp(int $user_id = null): bool
+    public function locked(): bool
     {
-        $result = Signup::query()
-            ->where('event_id', $this->id)
-            ->where('user_id', '=', $user_id ?? Auth::id())
-            ->count();
-
-        if (1 === $result) {
-            return true;
-        }
-
-        return false;
+        return self::EVENT_STATUS_LOCKED === $this->locked;
     }
 
     /**
-     * @param string $type
+     * Get a human readable date string based on user settings.
      *
-     * @return mixed
+     * @return string
      */
-    public function getUserSignup(string $type)
+    public function getUserHumanReadableDate($timezone = 'UTC', $clock = 24): string
     {
-        $result = Signup::query()
-            ->where('event_id', $this->id)
-            ->where('user_id', '=', Auth::id())
-            ->first();
+        return UserDateHandler::getUserHumanReadableDate(new \DateTime($this->start_date), $timezone, $clock);
+    }
 
-        return $result->$type;
+    public function lock(int $status)
+    {
+        $this->locked = $status;
+        $this->save();
     }
 
     /**
-     * @return Guild
+     * Sign a user up for this event.
+     *
+     * @param User  $user
+     * @param int   $class
+     * @param int   $role
+     * @param array $sets
      */
-    public function getGuild(): Guild
+    public function signup(User $user, int $class, int $role, array $sets = [])
     {
-        return Guild::query()->find($this->guild_id);
-    }
-
-    /**
-     * @return array
-     */
-    public function getSignups(int $status = 0): array
-    {
-        if (0 === $status) {
-            $signups = Signup::query()->where('event_id', '=', $this->id)->get()->all();
+        if ($this->isSignedUp($user)) {
+            $signup = $this->signups()
+                ->where('user_id', '=', $user->id)
+                ->first();
+            $signup->update([
+                'event_id' => $this->id,
+                'user_id'  => $user->id,
+                'class_id' => $class,
+                'role_id'  => $role,
+                'sets'     => $sets,
+            ]);
         } else {
-            $signups = Signup::query()->where('event_id', '=', $this->id)
-                ->where('status', '=', $status)->get()->all();
+            $signup = new Signup([
+                'event_id' => $this->id,
+                'user_id'  => $user->id,
+                'class_id' => $class,
+                'role_id'  => $role,
+                'sets'     => $sets,
+            ]);
+            $this->logger->eventSignup($this, $user);
         }
-
-        return $signups;
-    }
-
-    public function getSignupsOrderedByRole(int $status = 0): array
-    {
-        if (0 === $status) {
-            $signups = Signup::query()->where('event_id', '=', $this->id)
-                ->orderBy('role_id', 'asc')
-                ->get()->all();
-        } else {
-            $signups = Signup::query()->where('event_id', '=', $this->id)
-                ->where('status', '=', $status)
-                ->orderBy('role_id', 'asc')
-                ->get()->all();
-        }
-
-        return $signups;
-    }
-
-    public function getSignupsByRole(int $role_id): array
-    {
-        return Signup::query()
-            ->where('event_id', '=', $this->id)
-            ->where('role_id', '=', $role_id)
-            ->orderBy('created_at', 'asc')
-            ->get()->all() ?? [];
-    }
-
-    public function getComments(): array
-    {
-        return Comment::query()
-            ->where('event_id', '=', $this->id)
-            ->orderBy('created_at', 'desc')
-            ->get()->all() ?? [];
+        $signup->save();
     }
 
     /**
-     * @return array
+     * Sign a user up for this event using a character preset.
+     *
+     * @param User      $user
+     * @param Character $character
      */
-    public function getSignUpIds(): array
+    public function signupWithCharacter(User $user, Character $character)
     {
-        $signups = Signup::query()->where('event_id', '=', $this->id)->get();
-
-        $arr = [];
-
-        foreach ($signups as $signup) {
-            $arr[] = $signup->user_id;
-        }
-
-        return $arr;
-    }
-
-    /**
-     * @param User           $user
-     * @param int|null       $role_id
-     * @param int|null       $class_id
-     * @param array          $sets
-     * @param Character|null $character
-     */
-    public function signup(User $user, int $role_id = null, int $class_id = null, array $sets = [], Character $character = null)
-    {
-        if ($this->isLocked()) {
-            return;
-        }
-
-        Signup::query()->where('event_id', '=', $this->id)
-            ->where('user_id', '=', $user->id)
-            ->delete();
-
-        $sign           = new Signup();
-        $sign->user_id  = $user->id;
-        $sign->event_id = $this->id;
-
-        if (null !== $character) {
-            $sign->class_id     = $character->class;
-            $sign->role_id      = $character->role;
-            $sign->sets         = $character->sets;
-            $sign->character_id = $character->id;
+        if ($this->isSignedUp($user)) {
+            $signup = $this->signups()
+                ->where('user_id', '=', $user->id)
+                ->first();
+            $signup->update([
+                'event_id'     => $this->id,
+                'user_id'      => $user->id,
+                'class_id'     => $character->class,
+                'role_id'      => $character->role,
+                'sets'         => $character->sets(),
+                'character_id' => $character->id,
+            ]);
         } else {
-            $sign->class_id = $class_id;
-            $sign->role_id  = $role_id;
-
-            if (count($sets) > 0) {
-                $sign->sets = implode(', ', $sets);
-            } else {
-                $sign->sets = '';
-            }
+            $signup = new Signup([
+                'event_id'     => $this->id,
+                'user_id'      => $user->id,
+                'class_id'     => $character->class,
+                'role_id'      => $character->role,
+                'sets'         => $character->sets(),
+                'character_id' => $character->id,
+            ]);
+            $this->logger->eventSignup($this, $user);
         }
+        $signup->save();
+    }
 
-        $sign->save();
-
-        $this->logger->eventSignup($this, $user);
+    public function signupWithTeam(Team $team)
+    {
+        foreach ($team->users() as $user) {
+            $this->signup($user, $user->class_id, $user->role_id, json_decode($user->sets, true) ?? []);
+        }
     }
 
     /**
-     * @param Team $team
-     */
-    public function signupTeam(Team $team)
-    {
-        if ($team->guild_id === $this->guild_id) {
-            foreach ($team->getMembers() as $member) {
-                $count = Signup::query()->where('user_id', '=', $member->user_id)
-                    ->where('event_id', '=', $this->id)
-                    ->count();
-
-                if (0 === $count) {
-                    $sign = new Signup([
-                        'user_id'  => $member->user_id,
-                        'event_id' => $this->id,
-                        'class_id' => $member->class_id,
-                        'role_id'  => $member->role_id,
-                        'sets'     => $member->sets,
-                    ]);
-                    $sign->save();
-                }
-            }
-        }
-    }
-
-    public function signupOther(User $user, User $admin = null, int $role_id = null, int $class_id = null, array $sets = [], Character $character = null)
-    {
-        $admin = $admin ?? Auth::user();
-
-        Signup::query()->where('event_id', '=', $this->id)
-            ->where('user_id', '=', $user->id)
-            ->delete();
-
-        $sign           = new Signup();
-        $sign->user_id  = $user->id;
-        $sign->event_id = $this->id;
-
-        if (null !== $character) {
-            $sign->class_id     = $character->class;
-            $sign->role_id      = $character->role;
-            $sign->sets         = $character->sets;
-            $sign->character_id = $character->id;
-        } else {
-            $sign->class_id = $class_id;
-            $sign->role_id  = $role_id;
-
-            if (count($sets) > 0) {
-                $sign->sets = implode(', ', $sets);
-            } else {
-                $sign->sets = '';
-            }
-        }
-
-        $sign->save();
-
-        $this->logger->eventSignupOther($this, $admin, $user);
-    }
-
-    /**
+     * Sign a user off for this event.
+     *
      * @param User $user
      */
     public function signoff(User $user)
     {
-        if ($this->isLocked()) {
-            return;
-        }
-
-        Signup::query()->where('event_id', '=', $this->id)
+        Signup::query()
             ->where('user_id', '=', $user->id)
+            ->where('event_id', '=', $this->id)
             ->delete();
-
         $this->logger->eventSignoff($this, $user);
     }
 
     /**
-     * @param User      $user
-     * @param User|null $admin
+     * Check if the user is signed up for this event.
+     *
+     * @param User $user
+     *
+     * @return bool
      */
-    public function signoffOther(User $user, User $admin = null)
+    public function isSignedUp(User $user): bool
     {
-        $admin = $admin ?? Auth::user();
-
-        Signup::query()->where('event_id', '=', $this->id)
-            ->where('user_id', '=', $user->id)
-            ->delete();
-
-        $this->logger->eventSignoffOther($this, $admin, $user);
+        return 1 === $this->signups()
+                ->where('user_id', '=', $user->id)
+                ->count();
     }
 
-    /**
-     * @param User           $user
-     * @param int|null       $role_id
-     * @param int|null       $class_id
-     * @param array          $sets
-     * @param Character|null $character
-     */
-    public function editSignup(User $user, int $role_id = null, int $class_id = null, array $sets = [], Character $character = null)
+    public function getSignup(User $user): ?Signup
     {
-        if ($this->isLocked()) {
-            return;
-        }
-
-        $sign = Signup::query()->where('event_id', '=', $this->id)
+        return $this->signups()
             ->where('user_id', '=', $user->id)
             ->first();
-
-        if (null !== $character) {
-            $sign->class_id     = $character->class;
-            $sign->role_id      = $character->role;
-            $sign->sets         = $character->sets;
-            $sign->character_id = $character->id;
-        } else {
-            $sign->class_id = $class_id;
-            $sign->role_id  = $role_id;
-
-            if (count($sets) > 0) {
-                $sign->sets = implode(', ', $sets);
-            } else {
-                $sign->sets = '';
-            }
-            $sign->character_id = null;
-        }
-
-        $sign->save();
     }
 
-    public function callEventCreationHooks()
+    public function addComment(User $user, string $text)
     {
-        $hooks = EventCreationNotification::query()->where('call_type', '=', 1)->where('guild_id', '=', $this->guild_id)->get()->all();
+        $comment = new Comment([
+            'user_id'  => $user->id,
+            'event_id' => $this->id,
+            'text'     => $text,
+        ]);
+        $comment->save();
+    }
 
-        foreach ($hooks as $hook) {
-            if ($hook->matchesEventTags($this)) {
-                $hook->call($this);
-            }
+    public function updateComment(Comment $comment, string $text)
+    {
+        if ($comment->event_id === $this->id) {
+            $comment->text = $text;
+            $comment->save();
         }
     }
 
-    /**
-     * @param int $signup_id
-     * @param int $status
-     */
-    public function setSignupStatus(int $signup_id, int $status)
+    public function deleteComment(Comment $comment)
     {
-        $signup         = Signup::query()->find($signup_id);
-        $signup->status = $status;
-        $signup->save();
+        if ($comment->event_id === $this->id) {
+            $comment->delete();
+        }
     }
 
-    public function lock()
+    public function sendCreationNotifications()
     {
-        $this->locked = self::STATUS_LOCKED;
-        $this->save();
-    }
-
-    public function unlock()
-    {
-        $this->locked = self::STATUS_UNLOCKED;
-        $this->save();
-    }
-
-    public function isLocked(): bool
-    {
-        return 1 === $this->locked;
-    }
-
-    public function callPostSignupsHooks()
-    {
-        $hooks = ConfirmedSignupsNotification::query()->where('call_type', '=', HookTypes::CONFIRMED_SIGNUPS)
+        $notifications = Notification::query()
+            ->where('call_type', '=', EventCreationMessage::CALL_TYPE)
             ->where('guild_id', '=', $this->guild_id)
             ->get()->all();
 
-        /** @var ConfirmedSignupsNotification $hook */
-        foreach ($hooks as $hook) {
-            if ($hook->matchesEventTags($this)) {
-                $hook->call($this);
-            }
+        /** @var Notification $notification */
+        foreach ($notifications as $notification) {
+            $notification->send(['event' => $this]);
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getUtcTime(): string
+    public function sendDeletionNotifications()
     {
-        $dt = new DateTime($this->start_date);
-        $dt->setTimezone(new DateTimeZone('UTC'));
+        $notifications = Notification::query()
+            ->where('call_type', '=', EventDeletionMessage::CALL_TYPE)
+            ->where('guild_id', '=', $this->guild_id)
+            ->get()->all();
 
-        return $dt->format('Y-m-d H:i:s');
-    }
-
-    public function getUserStartDate(): DateTime
-    {
-        $start_date = new DateTime($this->start_date);
-        $start_date->setTimezone(new DateTimeZone(Auth::user()->timezone));
-
-        return $start_date;
-    }
-
-    public function buildDiscordEmbeds(): array
-    {
-        $data = [
-            'username'   => 'ESO Raidplanner',
-            'content'    => '',
-            'avatar_url' => 'https://esoraidplanner.com'.NotificationHook::AVATAR_URL,
-            'embeds'     => [[
-                'title'       => $this->name,
-                'description' => $this->description ?? '',
-                'url'         => 'https://esoraidplanner.com/g/'.$this->getGuild()->slug.'/event/'.$this->id,
-                'color'       => 9660137,
-                'author'      => [
-                    'name'     => 'ESO Raidplanner: '.$this->getGuild()->name,
-                    'url'      => 'https://esoraidplanner.com',
-                    'icon_url' => 'https://esoraidplanner.com/favicon/appicon.jpg',
-                ],
-                'fields' => [
-                    [
-                        'name'   => 'Tanks',
-                        'value'  => $this->getSignupsDiscordFormatted(RoleTypes::ROLE_TANK),
-                        'inline' => true,
-                    ],
-                    [
-                        'name'   => 'Healers',
-                        'value'  => $this->getSignupsDiscordFormatted(RoleTypes::ROLE_HEALER),
-                        'inline' => true,
-                    ],
-                    [
-                        'name'   => 'Magicka DD\'s',
-                        'value'  => $this->getSignupsDiscordFormatted(RoleTypes::ROLE_MAGICKA_DD),
-                        'inline' => true,
-                    ],
-                    [
-                        'name'   => 'Stamina DD\'s',
-                        'value'  => $this->getSignupsDiscordFormatted(RoleTypes::ROLE_STAMINA_DD),
-                        'inline' => true,
-                    ],
-                    [
-                        'name'   => 'Legend',
-                        'value'  => '✅ = Confirmed, ⚠️ = Backup, ❔ = No status',
-                        'inline' => false,
-                    ],
-                ],
-                'footer' => [
-                    'text'     => 'ESO Raidplanner by Woeler',
-                    'icon_url' => 'https://esoraidplanner.com/favicon/appicon.jpg',
-                ],
-            ]],
-        ];
-
-        return $data;
-    }
-
-    private function getSignupsDiscordFormatted(int $role_id): string
-    {
-        $signs  = $this->getSignupsByRole($role_id);
-        $return = '';
-
-        foreach ($signs as $sign) {
-            $u = User::query()->find($sign->user_id);
-            if (SignupStatusses::STATUS_CONFIRMED === $sign->status) {
-                $return .= '✅ ';
-            } elseif (SignupStatusses::STATUS_BACKUP === $sign->status) {
-                $return .= '⚠️ ';
-            } else {
-                $return .= '❔ ';
-            }
-            $return .= $u->name.PHP_EOL;
+        /** @var Notification $notification */
+        foreach ($notifications as $notification) {
+            $notification->send(['event' => $this]);
         }
-        $return = rtrim($return, PHP_EOL);
+    }
 
-        if ('' === $return) {
-            $return = 'None';
+    public function sendSignupsNotifications()
+    {
+        $notifications = Notification::query()
+            ->where('call_type', '=', PostSignupsMessage::CALL_TYPE)
+            ->where('guild_id', '=', $this->guild_id)
+            ->get()->all();
+
+        /** @var Notification $notification */
+        foreach ($notifications as $notification) {
+            $notification->send(['event' => $this]);
         }
+    }
 
-        return $return;
+    public function sendReminderNotifications()
+    {
+        $notifications = Notification::query()
+            ->where('call_type', '=', ReminderMessage::CALL_TYPE)
+            ->where('guild_id', '=', $this->guild_id)
+            ->get()->all();
+
+        /** @var Notification $notification */
+        foreach ($notifications as $notification) {
+            $notification->send(['event' => $this]);
+        }
+    }
+
+    public function getViewRoute(): string
+    {
+        return route('eventDetailView', ['slug' => $this->guild->slug, 'event_id' => $this->id]);
     }
 }

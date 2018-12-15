@@ -8,7 +8,7 @@
                     <div class="card">
                         <div class="header">
                             <h4 class="title">Settings for {{ $guild->name }}</h4>
-                            <p class="category">{{ $guild->getPlatform() }} - {{ $guild->getMegaserver() }}</p>
+                            <p class="category">{{ $guild->platform() }} - {{ $guild->megaserver() }}</p>
                         </div>
                         <div class="content">
                             {{ Form::open(array('url' => '/g/' . $guild->slug . '/settings')) }}
@@ -19,14 +19,22 @@
                             {!! Form::submit('Save', ['class' => 'btn btn-success']) !!}
                             {!! Form::close() !!}
                             {{ Form::close() }}
-
-                            @if ($guild->isOwner(Auth::user()))
-                                <br><br><br><br><a href="{{ '/g/'.$guild->slug.'/delete' }}">
-                                    <button type="button" class="btn btn-danger">Delete Guild</button>
-                                </a>
-                            @endif
                         </div>
                     </div>
+
+                    @if ($guild->isOwner(Auth::user()))
+                        <div class="card">
+                            <div class="header">
+                                <h4 class="title">Delete{{ $guild->name }}</h4>
+                                <p class="category">{{ $guild->platform() }} - {{ $guild->megaserver() }}</p>
+                            </div>
+                            <div class="content">
+                                <a href="/g/{{ $guild->slug }}/delete">
+                                    <button type="button" class="btn btn-danger">Delete Guild</button>
+                                </a>
+                            </div>
+                        </div>
+                    @endif
 
                     <div class="card">
                         <div class="header">
@@ -39,12 +47,26 @@
                                 </div>
                             @else
                                 <div class="alert alert-danger">
-                                    <p>The Discord bot is not connected to your guild. Add the Discord bot by clicking the button below. Once the bot is added type '!setup' in the channel you want the bot to function in (make sure the bot has read/write/embed permissions in that channel!).</p>
+                                    <p>The Discord bot is not connected to your guild. Add the Discord bot by clicking
+                                        the button below. Once the bot is added type '!setup' in the channel you want
+                                        the bot to function in (make sure the bot has read/write/embed permissions in
+                                        that channel!).</p>
                                 </div>
-                                <a href="https://discordapp.com/oauth2/authorize?client_id=479385645224165406&scope=bot&permissions=215040" target="_blank">
+                                <a href="https://discordapp.com/oauth2/authorize?client_id=479385645224165406&scope=bot&permissions=215040"
+                                   target="_blank">
                                     <button type="button" class="btn btn-success">Add the Discord bot!</button>
                                 </a>
                             @endif
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="header">
+                            <h4 class="title">iCal link</h4>
+                        </div>
+                        <div class="content">
+                            Add the events of this guild to your favorite calendar with this iCal link<br>
+                            {!! Form::text('ical', env('APP_URL').'/api/ical/guild/'.$guild->createIcalUid(Auth::user()), array('class' => 'form-control', 'readonly')) !!}
                         </div>
                     </div>
 
@@ -64,7 +86,7 @@
                                 <th>Interval</th>
                                 </thead>
                                 <tbody>
-                                @foreach($guild->getRepeatableEvents() as $repeatable)
+                                @foreach($guild->repeatableEvents()->orderBy('name')->get()->all() as $repeatable)
                                     <tr>
                                         <td>{{ $repeatable->name }}</td>
                                         <td>{{ $repeatable->getRepetitionString() }}</td>
@@ -91,49 +113,51 @@
                     </div>
                 </div>
 
-                @if ($guild->isAdmin(Auth::user()) || Auth::user()->global_admin === 1)
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="header">
-                                <h4 class="title">Membership requests</h4>
-                                <p class="category"></p>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="header">
+                            <div class="pull-right">
+                                <a href="{{ route('notificationMessageTypeSelectView', ['slug' => $guild->slug]) }}">
+                                    <button class="btn btn-success" type="button">Create new</button>
+                                </a>
                             </div>
-                            <div class="content table-responsive table-full-width">
-                                <table class="table  table-striped">
-                                    <thead>
-                                    <th>Name</th>
-                                    <th>Role</th>
-                                    </thead>
-                                    <tbody>
-                                    @foreach ($guild->getPendingMembers() as $member)
-                                        <tr>
-                                            <td>{{ $guild->getMemberName($member->id) }}</td>
-                                            <td>Membership pending</td>
-                                            @if ($guild->isAdmin(Auth::user()) || Auth::user()->global_admin === 1)
-                                                <td>
-                                                    {{ Form::open(array('url' => '/g/' . $guild->slug . '/member/approve/'.$guild->id.'/'.$member->id)) }}
-                                                    {!! Form::open([]) !!}
-                                                    {!! Form::submit('Approve', ['class' => 'btn btn-success']) !!}
+                            <h4 class="title">Configured Notifications</h4>
+                            <p class="category"></p>
+                        </div>
+                        <div class="content table-responsive table-full-width">
+                            <table class="table  table-striped">
+                                <thead>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>System</th>
+                                </thead>
+                                <tbody>
+                                @foreach ($guild->notifications()->get()->all() as $notification)
+                                    <tr>
+                                        <td>
+                                                {{ $notification->name }}
+                                            </td>
+                                        <td>{{ $notification->getMessageTypeConfig()['name'] }}</td>
+                                        <td>{{ $notification->getSystemName() }}</td>
+                                        <td>
+                                            <a title="Send test message" href="{{ route('notificationSendTest', ['slug' => $guild->slug, 'notification_id' => $notification->id]) }}">
+                                                <i class="fa fa-envelope"></i>
+                                            </a>
+                                            <a title="Edit" href="{{ route('notificationUpdateView', ['slug' => $guild->slug, 'notification_id' => $notification->id]) }}">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a title="Delete" href="{{ route('notificationDelete', ['slug' => $guild->slug, 'notification_id' => $notification->id]) }}">
+                                                <i class="fa fa-ban"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
 
-                                                    {!! Form::close() !!}
-                                                    {{ Form::close() }}
-                                                    {{ Form::open(array('url' => '/g/' . $guild->slug . '/member/remove/'.$guild->id.'/'.$member->id)) }}
-                                                    {!! Form::open([]) !!}
-                                                    {!! Form::submit('Remove', ['class' => 'btn btn-danger']) !!}
-
-                                                    {!! Form::close() !!}
-                                                    {{ Form::close() }}
-                                                </td>
-                                            @endif
-                                        </tr>
-                                    @endforeach
-                                    </tbody>
-                                </table>
-
-                            </div>
                         </div>
                     </div>
-                @endif
+                </div>
 
             </div>
 

@@ -15,24 +15,30 @@ addons:
 
 dist: trusty
 
-sudo: required
-
 before_script:
   - cp .env.travis .env
-  - mysql -e 'create database testing_db;'
+  - mysql -e 'create database homestead_test;'
   - composer self-update
   - composer install --no-interaction
   - php artisan key:generate
-  - php artisan migrate --seed
+  - php artisan migrate
+  - php artisan db:seed
 
 before_install:
   - phpenv config-rm xdebug.ini || return
 
 script:
-  - bin/phpunit
-  # Check if the code standards weren't broken.
-  # Run it only on PHP 7.2 which should be the fastest. No need to run it for all PHP versions
-  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.2" ]]; then bin/php-cs-fixer fix -v --dry-run --diff; fi
+  - vendor/bin/phpunit
 
 notifications:
   email: false
+
+after_success:
+  - wget https://raw.githubusercontent.com/Woeler/discord-travis/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh success $WEBHOOK_URL
+
+after_failure:
+  - wget https://raw.githubusercontent.com/Woeler/discord-travis/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh failure $WEBHOOK_URL
