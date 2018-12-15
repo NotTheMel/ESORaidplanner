@@ -38,7 +38,7 @@ class CharacterController
         $character          = new Character($request->except(['sets']));
         $character->user_id = Auth::id();
         $character->public  = $request->input('public') ?? 0;
-        $character->sets    = json_encode($request->input('sets') ?? []);
+        $character->sets    = $request->input('sets') ?? [];
         $character->save();
 
         return redirect(route('userCharacterList'));
@@ -52,7 +52,7 @@ class CharacterController
             ->first();
         $character->update($request->except(['sets']));
         $character->public = $request->input('public') ?? 0;
-        $character->sets   = json_encode($request->input('sets') ?? []);
+        $character->sets   = $request->input('sets') ?? [];
         $character->save();
 
         return redirect(route('userCharacterList'));
