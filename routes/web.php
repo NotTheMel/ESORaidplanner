@@ -23,6 +23,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/user/account-settings', 'UserController@accountSettingsView')->name('userAccountSettingsView');
     Route::post('/user/account-settings', 'UserController@updateAccountSettings')->name('userUpdateAccountSettings');
     Route::get('/user/profile-settings', 'UserController@profileSettingsView')->name('userProfileSettingsView');
+    Route::get('/user/profile/nightmode/{mode}', 'UserController@setNightMode');
     Route::post('/user/profile-settings', 'UserController@updateProfileSettings')->name('userUpdateProfileSettings');
     Route::get('/user/avatar', 'UserController@avatarView')->name('userAvatarView');
     Route::post('/user/avatar', 'UserController@updateAvatar')->name('userUpdateAvatar');
