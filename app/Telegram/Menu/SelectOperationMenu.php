@@ -15,11 +15,12 @@
 
 namespace App\Telegram\Menu;
 
-use App\DataMapper;
 use App\Telegram\Api\EsoRaidPlannerAPI;
 use App\Telegram\Api\TelegramAPI;
 use App\Telegram\Button\Button;
 use App\Telegram\Button\GoBackButton;
+use App\Utility\MegaServers;
+use App\Utility\Platforms;
 
 class SelectOperationMenu extends Menu
 {
@@ -34,7 +35,7 @@ class SelectOperationMenu extends Menu
     {
         $guild = EsoRaidPlannerAPI::getGuild(TelegramAPI::$username, TelegramAPI::getGuildId());
 
-        $this->message[] = 'Welcome to '.$guild->name.' - '.DataMapper::getPlatformName($guild->platform).' '.DataMapper::getMegaserverName($guild->megaserver).PHP_EOL.PHP_EOL.'What would you like to do?';
+        $this->message[] = 'Welcome to '.$guild->name.' - '.Platforms::PLATFORMS[$guild->platform].' '.MegaServers::MEGASERVERS[$guild->megaserver].PHP_EOL.PHP_EOL.'What would you like to do?';
 
         $this->buttons = [
             [new ShowEventsButton('Show Events')],

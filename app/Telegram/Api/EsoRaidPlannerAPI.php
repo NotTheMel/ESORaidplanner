@@ -284,9 +284,9 @@ class EsoRaidPlannerAPI
         $arr['role']  = $role;
         $arr['class'] = $class;
         if (!empty($supportSets)) {
-            $arr['sets'] = $supportSets;
+            $arr['sets'] = explode(',', $supportSets);
         } else {
-            $arr['sets'] = '';
+            $arr['sets'] = [];
         }
 
         $arr['user_id'] = $user->id;

@@ -15,10 +15,10 @@
 
 namespace App\Telegram\Menu;
 
-use App\Singleton\ClassTypes;
 use App\Telegram\Api\EsoRaidPlannerAPI;
 use App\Telegram\Api\TelegramAPI;
 use App\Telegram\Button\Button;
+use App\Utility\Classes;
 
 class SignupConfirmationMenu extends Menu
 {
@@ -48,7 +48,7 @@ class SignupConfirmationMenu extends Menu
             }
 
             if (!empty($preset->class)) {
-                $message .= 'Class: '.ClassTypes::getClassName($preset->class).PHP_EOL;
+                $message .= 'Class: '.Classes::CLASSES[$preset->class].PHP_EOL;
             } else {
                 $message .= 'Class: not specified'.PHP_EOL;
             }

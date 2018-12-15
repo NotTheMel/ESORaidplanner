@@ -48,4 +48,24 @@ class Roles
                 return '';
         }
     }
+
+    public static function getRoleIconTelegram(int $role_id): string
+    {
+        switch ($role_id) {
+            case self::TANK:
+                return '🔰';
+
+            case self::HEALER:
+                return '⛑';
+
+            case self::STAMINA_DD:
+                return '⚔';
+
+            case self::MAGICKA_DD:
+                return '🔮';
+
+            default:
+                return '';
+        }
+    }
 }

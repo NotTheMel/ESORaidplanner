@@ -15,13 +15,13 @@
 
 namespace App\Telegram\Menu;
 
-use App\Singleton\ClassTypes;
-use App\Singleton\RoleTypes;
 use App\Telegram\Api\EsoRaidPlannerAPI;
 use App\Telegram\Api\TelegramAPI;
 use App\Telegram\Button\Button;
 use App\Telegram\Button\GoBackButton;
 use App\Telegram\Button\RefreshButton;
+use App\Utility\Classes;
+use App\Utility\Roles;
 use DateTime;
 use DateTimeZone;
 
@@ -122,9 +122,9 @@ class EventItemButton extends Button
 
             foreach ($signups as $key => $signup) {
                 $profile = EsoRaidPlannerAPI::getProfileById($signup->user_id);
-                $icon    = RoleTypes::getRoleIcon($signup->role_id);
+                $icon    = Roles::getRoleIconTelegram($signup->role_id);
 
-                $signupsFormatted .= ($key + 1).') '.$icon.' '.$profile->name.' - '.ClassTypes::getClassName($signup->class_id).PHP_EOL;
+                $signupsFormatted .= ($key + 1).') '.$icon.' '.$profile->name.' - '.Classes::CLASSES[$signup->class_id].PHP_EOL;
 
                 if (!empty($signup->sets)) {
                     $supportFormatted .= ' - '.$profile->name.': '.$signup->sets.PHP_EOL;

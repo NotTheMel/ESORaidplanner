@@ -15,13 +15,12 @@
 
 namespace App\Telegram\Menu;
 
-use App\Singleton\ClassTypes;
-use App\Singleton\RoleTypes;
 use App\Telegram\Api\EsoRaidPlannerAPI;
 use App\Telegram\Api\TelegramAPI;
 use App\Telegram\Button\Button;
 use App\Telegram\Button\GoBackButton;
 use App\Telegram\Button\RefreshButton;
+use App\Utility\Classes;
 
 class SelectPresetMenu extends Menu
 {
@@ -317,7 +316,9 @@ class ClassButton extends Button
     {
         $class = $this->buttonText;
 
-        TelegramAPI::setClass(ClassTypes::getClassId($class));
+        $classes = array_flip(Classes::CLASSES);
+
+        TelegramAPI::setClass($classes[$class]);
 
         return new EnterSupportSetsMenu();
     }
