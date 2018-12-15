@@ -92,4 +92,12 @@ class UserController extends Controller
 
         return redirect(route('userAvatarView'));
     }
+
+    public function setNightMode(Request $request, int $mode)
+    {
+        Auth::user()->nightmode = $mode;
+        Auth::user()->save();
+
+        return redirect($request->get('url'));
+    }
 }

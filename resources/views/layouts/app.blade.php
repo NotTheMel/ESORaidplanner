@@ -402,9 +402,9 @@
 <script>
     function nightmode(checkboxElem) {
         if (checkboxElem.checked) {
-            window.location.href = "{{ env('APP_URL') . '/profile/nightmode/1?url=' . $_SERVER['REQUEST_URI'] }}";
+            window.location.href = "{{ env('APP_URL') . '/user/profile/nightmode/1?url=' . $_SERVER['REQUEST_URI'] }}";
         } else {
-            window.location.href = "{{ env('APP_URL') . '/profile/nightmode/0?url=' . $_SERVER['REQUEST_URI'] }}";
+            window.location.href = "{{ env('APP_URL') . '/user/profile/nightmode/0?url=' . $_SERVER['REQUEST_URI'] }}";
         }
     }
 </script>
