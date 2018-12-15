@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('trigger:dailies')->everyMinute();
         $schedule->command('trigger:reminders')->everyMinute();
+        $schedule->command('repeatables:create')->everyFiveMinutes();
         $schedule->command('fetch:sets')->dailyAt('01:00');
         $schedule->command('instance:clean')->dailyAt('02:00');
     }
