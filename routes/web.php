@@ -13,6 +13,7 @@
 
 Route::get('/login/discord', 'Auth\LoginController@redirectToProvider')->name('discordAuth');
 Route::get('/login/discord/callback', 'Auth\LoginController@handleProviderCallback');
+Route::get('/news/{article_id}', 'HomeController@showNews');
 
 Auth::routes();
 
