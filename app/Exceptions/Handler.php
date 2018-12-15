@@ -4,7 +4,6 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Woeler\DiscordPhp\Message\DiscordEmbedsMessage;
 use Woeler\DiscordPhp\Webhook\DiscordWebhook;
 
@@ -22,7 +21,7 @@ class Handler extends ExceptionHandler
         \Illuminate\Database\Eloquent\ModelNotFoundException::class,
         \Illuminate\Session\TokenMismatchException::class,
         \Illuminate\Validation\ValidationException::class,
-        NotFoundHttpException::class,
+        \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class,
     ];
 
     /**
@@ -42,6 +41,10 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
+        if (!$this->shouldReport($exception)) {
+            return;
+        }
+
         $message = new DiscordEmbedsMessage();
         $message->setTitle('New '.get_class($exception));
         $message->setDescription('```'.$exception->getMessage().'```');
@@ -52,7 +55,6 @@ class Handler extends ExceptionHandler
         try {
             $hook->send();
         } catch (Exception $e) {
-
         }
 
         parent::report($exception);
