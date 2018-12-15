@@ -53,9 +53,9 @@
                                 <div class="stats"><i class="fa fa-calendar-o"></i><!-- react-text: 248 -->
                                     <!-- /react-text --><!-- react-text: 249 --><a
                                             href="{{ '/g/' . $guild->slug . '/members'}}">Go to Members list</a>
-                                    @if($guild->isAdmin(Auth::user()))
-                                        or <a href="{{ '/g/' . $guild->slug . '/teams'}}">Teams list</a>
-                                @endif
+                                    {{--@if($guild->isAdmin(Auth::user()))--}}
+                                        {{--or <a href="{{ '/g/' . $guild->slug . '/teams'}}">Teams list</a>--}}
+                                {{--@endif--}}
                                 <!-- /react-text --></div>
                             </div>
                         </div>
