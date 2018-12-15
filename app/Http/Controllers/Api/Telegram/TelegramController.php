@@ -52,7 +52,7 @@ class TelegramController extends Controller
                 TelegramAPI::reply($message, null);
                 exit;
             }
-            $user = User::query()->where('telegram_username', '=', TelegramAPI::$username)->first();
+            $user   = User::query()->where('telegram_username', '=', TelegramAPI::$username)->first();
             $menuId = TelegramAPI::getMenuId();
             if (0 === $menuId || null === $menuId) {
                 TelegramAPI::addUser();
