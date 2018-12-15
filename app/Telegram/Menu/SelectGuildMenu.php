@@ -15,11 +15,12 @@
 
 namespace App\Telegram\Menu;
 
-use App\DataMapper;
 use App\Telegram\Api\EsoRaidPlannerAPI;
 use App\Telegram\Api\TelegramAPI;
 use App\Telegram\Button\Button;
 use App\Telegram\Button\RefreshButton;
+use App\Utility\MegaServers;
+use App\Utility\Platforms;
 
 class SelectGuildMenu extends Menu
 {
@@ -40,7 +41,7 @@ class SelectGuildMenu extends Menu
             $this->message[] = PHP_EOL.'Please select a Guild.';
 
             foreach ($guilds as $guild) {
-                $buttonText = DataMapper::getPlatformShort($guild->platform).' '.DataMapper::getMegaserverName($guild->megaserver).' - '.$guild->name;
+                $buttonText = Platforms::PLATFORMS[$guild->platform].' '.MegaServers::MEGASERVERS[$guild->megaserver].' - '.$guild->name;
                 $buttonData = ['guild' => $guild];
 
                 $guildItemButton = new GuildItemButton($buttonText, $buttonData);
