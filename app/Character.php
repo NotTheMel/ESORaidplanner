@@ -96,7 +96,7 @@ class Character extends Model
 
     public function setsStringFormatted(): string
     {
-        return implode(', ', $this->sets());
+        return implode(', ', $this->sets ?? []);
     }
 
     public function isPublic(): bool
