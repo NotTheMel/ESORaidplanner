@@ -19,7 +19,7 @@
                             </div>
                         @endif
                         <div class="content">
-                            {{ Form::open(array('url' => '/g/' . $guild->slug . '/event/create')) }}
+                            {{ Form::open(array('url' => route('eventUpdate', ['slug' => $guild->slug, 'event_id' => $event->id]))) }}
 
                             Event name:{!! Form::text('name', $event->name, array('class' => 'form-control')) !!}<br>
 
