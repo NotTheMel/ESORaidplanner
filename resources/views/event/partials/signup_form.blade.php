@@ -66,14 +66,14 @@
     @if(!$event->isSignedUp(Auth::user()))
         <div class="card">
             <div class="header">
-                <h4 class="title">Sign off</h4>
-            </div>
-            <div class="content">
-                <div class="col-md-12 text-center">
+                <div class="pull-right">
                     <a href="{{ '/g/' . $guild->slug . '/event/' . $event->id . '/signoff'}}">
                         <button type="button" class="btn btn-danger">Sign off</button>
                     </a>
                 </div>
+                <h4 class="title">Sign off</h4>
+            </div>
+            <div class="content">
             </div>
         </div>
     @endif
