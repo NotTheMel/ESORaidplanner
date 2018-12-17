@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    @if(!$event->isSignedUp(Auth::user()))
+    @if($event->isSignedUp(Auth::user()))
         <div class="card">
             <div class="header">
                 <div class="pull-right">
