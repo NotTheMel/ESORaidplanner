@@ -63,7 +63,21 @@ class PostSignupsMessage extends AbstractNotificationMessage
 
     protected function buildText(): string
     {
-        // TODO: Implement buildText() method.
-        return '';
+        /** @var Event $event */
+        $event   = $this->subjects['event'];
+        $message = 'Roster for '.$event->name.PHP_EOL;
+        foreach (Roles::ROLES as $role_id => $role_name) {
+            if (empty($event->signupsByRole($role_id))) {
+                continue;
+            }
+            $message .= $role_name.PHP_EOL;
+            /** @var Signup $signup */
+            foreach ($event->signupsByRole($role_id) as $signup) {
+                $message .= $signup->getStatusIcon().' '.$signup->user->name.PHP_EOL;
+            }
+            $message .= PHP_EOL;
+        }
+
+        return $message;
     }
 }
