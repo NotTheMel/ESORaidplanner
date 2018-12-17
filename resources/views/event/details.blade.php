@@ -16,7 +16,7 @@
                                     <a title="Edit" href="{{ '/g/' . $guild->slug . '/event/update/' . $event->id }}">
                                         <i class="fa fa-edit fa-2x fa-fw"></i>
                                     </a>
-                                    <a title="Edit" href="{{ '/g/' . $guild->slug . '/event/postsignups/' . $event->id }}">
+                                    <a title="Post signups" href="{{ '/g/' . $guild->slug . '/event/postsignups/' . $event->id }}">
                                         <i class="fa fa-envelope fa-2x fa-fw"></i>
                                     </a>
                                     @if($event->locked())
