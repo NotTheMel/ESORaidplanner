@@ -300,10 +300,10 @@ class Guild extends Model
      */
     public function isPendingMember(User $user): bool
     {
-        return 0 === DB::table(self::X_REF_USERS)
+        return 1 === DB::table(self::X_REF_USERS)
                 ->where('user_id', '=', $user->id)
                 ->where('guild_id', '=', $this->id)
-                ->where('status', '>', self::MEMBERSHIP_STATUS_PENDING)
+                ->where('status', '=', self::MEMBERSHIP_STATUS_PENDING)
                 ->count();
     }
 
