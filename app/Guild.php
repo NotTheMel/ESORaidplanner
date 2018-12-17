@@ -211,6 +211,16 @@ class Guild extends Model
         return $query->orderBy('users.name')->get()->all();
     }
 
+    public function members()
+    {
+        return User::query()
+            ->select('users.*')
+            ->join(self::X_REF_USERS, 'users.id', self::X_REF_USERS.'.user_id')
+            ->where(self::X_REF_USERS.'.guild_id', '=', $this->id)
+                ->orderBy('users.name')
+            ->pluck('users.name', 'users.id') ?? [];
+    }
+
     /**
      * Get the guild megaserver.
      *
