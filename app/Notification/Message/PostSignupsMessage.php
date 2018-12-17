@@ -68,7 +68,7 @@ class PostSignupsMessage extends AbstractNotificationMessage
 
         /** @var Event $event */
         $event   = $this->subjects['event'];
-        $message .= 'Roster for '.$event->name.PHP_EOL;
+        $message .= PHP_EOL;
         foreach (Roles::ROLES as $role_id => $role_name) {
             if (empty($event->signupsByRole($role_id))) {
                 continue;
