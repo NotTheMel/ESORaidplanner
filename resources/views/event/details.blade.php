@@ -16,7 +16,8 @@
                                     <a title="Edit" href="{{ '/g/' . $guild->slug . '/event/update/' . $event->id }}">
                                         <i class="fa fa-edit fa-2x fa-fw"></i>
                                     </a>
-                                    <a title="Edit" href="{{ '/g/' . $guild->slug . '/event/postsignups/' . $event->id }}">
+                                    <a title="Post signups"
+                                       href="{{ '/g/' . $guild->slug . '/event/postsignups/' . $event->id }}">
                                         <i class="fa fa-envelope fa-2x fa-fw"></i>
                                     </a>
                                     @if($event->locked())
@@ -47,7 +48,7 @@
                             <b>Starts:</b> {{ $event->getUserHumanReadableDate() }}<br>
                             <b>Total players signed up:</b> {{ $event->signups()->count() }}<br>
                             @if($guild->isAdmin(Auth::user()))
-                                    <b>Tags:</b>
+                                <b>Tags:</b>
                                 @foreach($event->tags() as $tag)
                                     <span class="badge">{{ $tag }}</span>
                                 @endforeach
@@ -59,6 +60,10 @@
                         </div>
 
                         @include('event.partials.signup_list')
+
+                        @if($guild->isAdmin(Auth::user()))
+                            @include('event.partials.admin_signup')
+                        @endif
 
                     </div>
                 </div>
