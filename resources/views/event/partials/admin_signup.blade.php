@@ -20,7 +20,7 @@
             {!! Form::select('sets[]', \App\Set::query()->pluck('name', 'name'), $signup->getSets() ?? [], array('class' => 'chosen-select form-control', 'multiple')) !!}
         </div>
         <div class="col-md-2">
-            {!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
+            <br>{!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
         </div>
     </div>
     {!! Form::close() !!}
