@@ -7,28 +7,26 @@
             up
             faster?<br><br>
         @else
-            <br><br><b>Use one of your presets to sign up</b><br>
+            <b>Use one of your presets to sign up</b><br>
             {{ Form::open(array('url' => '/g/' . $guild->slug . '/event/'.$event->id.'/signup')) }}
             <div class="row">
-                <div class="col-md-10">
+                <div class="col-md-12">
                     Character preset
                     {!! Form::select('character', Auth::user()->characters()->pluck('name', 'id'), $signup->character_id, array('class' => 'form-control')) !!}
-                    <br>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-12 text-center">
                     @if(!$event->isSignedUp(Auth::user()))
-                        <br>{!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
+                        {!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
                     @else
-                        <br>{!! Form::submit('Save changes', ['class' => 'btn btn-info']) !!}
+                        {!! Form::submit('Save changes', ['class' => 'btn btn-info']) !!}
                     @endif
-                    <br>
                 </div>
             </div>
             {{ Form::close() }}
             <b>Or sign up using a custom setup</b><br>
         @endif
+        {{ Form::open(array('url' => '/g/' . $guild->slug . '/event/'.$event->id.'/signup')) }}
         <div class="row">
-            {{ Form::open(array('url' => '/g/' . $guild->slug . '/event/'.$event->id.'/signup')) }}
             <div class="col-md-12">
                 Class
                 {!! Form::select('class', \App\Utility\Classes::CLASSES, $signup->class_id, ['class' => 'form-control']) !!}
@@ -41,7 +39,7 @@
                 Supportive sets<br>
                 {!! Form::select('sets[]', \App\Set::query()->pluck('name', 'name'), $signup->getSets() ?? [], array('class' => 'chosen-select form-control', 'multiple')) !!}
             </div>
-            <div class="col-md-12">
+            <div class="col-md-12 text-center">
                 @if(!$event->isSignedUp(Auth::user()))
                     <br>{!! Form::submit('Sign up', ['class' => 'btn btn-info']) !!}
                 @else
@@ -49,10 +47,11 @@
                 @endif
                 <br>
             </div>
-            {!! Form::close() !!}
         </div>
+        {!! Form::close() !!}
 
-        <div class="col-md-12">
+
+        <div class="col-md-12 text-center">
             <a href="{{ '/g/' . $guild->slug . '/event/' . $event->id . '/signoff'}}">
                 <button type="button" class="btn btn-danger">Sign off</button>
             </a>
