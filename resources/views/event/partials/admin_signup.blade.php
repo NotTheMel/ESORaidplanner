@@ -2,7 +2,7 @@
 {{ Form::open(array('url' => '/g/' . $guild->slug . '/event/'.$event->id.'/signup')) }}
 <div class="row">
     <div class="col-md-12">
-        {!! Form::select('user', $guild->members()->orderBy('name')->pluck('name', 'id'), null, ['class' => 'form-control']) !!}
+        {!! Form::select('user', $guild->members(), null, ['class' => 'form-control']) !!}
     </div>
 </div>
 <div class="row">
