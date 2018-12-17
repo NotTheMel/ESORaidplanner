@@ -67,9 +67,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <div class="card">
-                        @include('event.partials.signup_form')
-                    </div>
+                    @include('event.partials.signup_form')
                     <div class="card">
                         @include('event.partials.comments')
                     </div>
