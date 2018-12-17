@@ -489,7 +489,7 @@ class Guild extends Model
     {
         $notifications = Notification::query()
             ->where('call_type', '=', GuildApplicationMessage::CALL_TYPE)
-            ->where('guild_id', '=', $this->guild_id)
+            ->where('guild_id', '=', $this->id)
             ->get()->all();
 
         /** @var Notification $notification */
