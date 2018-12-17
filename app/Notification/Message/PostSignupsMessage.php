@@ -63,9 +63,11 @@ class PostSignupsMessage extends AbstractNotificationMessage
 
     protected function buildText(): string
     {
+        $message = str_replace(['{EVENT_NAME}', '{EVENT_DESCRIPTION}', '{EVENT_NUM_SIGNUPS}', '{EVENT_URL}'], [$this->subjects['event']->name, $this->subjects['event']->description, $this->subjects['event']->signups()->count(), $this->subjects['event']->getViewRoute()], $this->text ?? '').PHP_EOL;
+
         /** @var Event $event */
         $event   = $this->subjects['event'];
-        $message = 'Roster for '.$event->name.PHP_EOL;
+        $message .= 'Roster for '.$event->name.PHP_EOL;
         foreach (Roles::ROLES as $role_id => $role_name) {
             if (empty($event->signupsByRole($role_id))) {
                 continue;

@@ -161,16 +161,6 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>{CONFIRMED_SIGNUPS}</td>
-                                            <td>Will be replaced by a list of all confirmed signups (name, role, class).
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>{BACKUP_SIGNUPS}</td>
-                                            <td>Will be replaced by a list of all backup signups (name, role, class).
-                                            </td>
-                                        </tr>
-                                        <tr>
                                             <td>{GUILD_NAME}</td>
                                             <td>Name of the guild.
                                             </td>
