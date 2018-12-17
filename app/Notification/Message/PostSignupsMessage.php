@@ -35,6 +35,7 @@ class PostSignupsMessage extends AbstractNotificationMessage
         $embeds->setUsername('ESO Raidplanner');
         $embeds->setAvatar('https://esoraidplanner.com'.AbstractNotificationSystem::AVATAR_URL);
         $embeds->setTitle('Event '.$this->subjects['event']->name.' roster');
+        $embeds->setDescription($this->subjects['event']->description ?? '');
         $embeds->setUrl($this->subjects['event']->getViewRoute());
         $embeds->setColor(9660137);
         $embeds->setAuthorName('ESO Raidplanner');

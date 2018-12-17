@@ -118,7 +118,7 @@
                                 Message to be sent:<br>
                                 In the message you can use shortcodes that will be replaced by the actual values. See
                                 the
-                                list of shortcodes below.<br>
+                                list of shortcodes below.(this is not used when you use fancy Discord messages)<br>
                                 {!! Form::textarea('message', $notification->message, ['class' => 'form-control', 'required']) !!}
                                 <br>
                             @endif
