@@ -86,6 +86,9 @@ class DiscordController extends Controller
             ->where('discord_id', '=', $request->input('discord_user_id'))
             ->first();
 
+        Log::info('class'.$request->input('class'));
+        Log::info('Role'.$request->input('role'));
+
         if (empty($request->input('event_id'))) {
             return response($user->getDiscordMention().', You did not specify an event id.', Response::HTTP_BAD_REQUEST);
         }
