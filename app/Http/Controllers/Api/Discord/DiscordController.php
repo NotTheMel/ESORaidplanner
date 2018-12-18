@@ -30,6 +30,9 @@ use App\Utility\GuildLogger;
 use App\Utility\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
+use Woeler\DiscordPhp\Message\DiscordTextMessage;
+use Woeler\DiscordPhp\Webhook\DiscordWebhook;
 
 class DiscordController extends Controller
 {
@@ -97,8 +100,8 @@ class DiscordController extends Controller
             if (empty($request->input('class')) || empty($request->input('role'))) {
                 return response($user->getDiscordMention().', You did not specify a class and/or role.', Response::HTTP_BAD_REQUEST);
             }
-            $class = $request->input('class');
-            $role  = $request->input('role');
+            $class = (int)$request->input('class');
+            $role  = (int)$request->input('role');
             $sets  = [];
         }
 
@@ -107,13 +110,13 @@ class DiscordController extends Controller
 
         if (!$event->isSignedUp($user)) {
             if (empty($character)) {
-                $event->signup($user, $role, $class, $sets);
+                $event->signup($user, $class, $role, $sets);
             } else {
                 $event->signupWithCharacter($user, $character);
             }
         } else {
             if (empty($character)) {
-                $event->signup($user, $role, $class, $sets);
+                $event->signup($user, $class, $role, $sets);
             } else {
                 $event->signupWithCharacter($user, $character);
             }

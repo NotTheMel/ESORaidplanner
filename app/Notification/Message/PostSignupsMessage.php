@@ -35,6 +35,7 @@ class PostSignupsMessage extends AbstractNotificationMessage
         $embeds->setUsername('ESO Raidplanner');
         $embeds->setAvatar('https://esoraidplanner.com'.AbstractNotificationSystem::AVATAR_URL);
         $embeds->setTitle('Event '.$this->subjects['event']->name.' roster');
+        $embeds->setDescription(str_replace(['{EVENT_NAME}', '{EVENT_DESCRIPTION}', '{EVENT_NUM_SIGNUPS}', '{EVENT_URL}'], [$this->subjects['event']->name, $this->subjects['event']->description, $this->subjects['event']->signups()->count(), $this->subjects['event']->getViewRoute()], $this->text ?? ''));
         $embeds->setUrl($this->subjects['event']->getViewRoute());
         $embeds->setColor(9660137);
         $embeds->setAuthorName('ESO Raidplanner');
@@ -63,9 +64,11 @@ class PostSignupsMessage extends AbstractNotificationMessage
 
     protected function buildText(): string
     {
+        $message = str_replace(['{EVENT_NAME}', '{EVENT_DESCRIPTION}', '{EVENT_NUM_SIGNUPS}', '{EVENT_URL}'], [$this->subjects['event']->name, $this->subjects['event']->description, $this->subjects['event']->signups()->count(), $this->subjects['event']->getViewRoute()], $this->text ?? '').PHP_EOL;
+
         /** @var Event $event */
         $event   = $this->subjects['event'];
-        $message = 'Roster for '.$event->name.PHP_EOL;
+        $message .= PHP_EOL;
         foreach (Roles::ROLES as $role_id => $role_name) {
             if (empty($event->signupsByRole($role_id))) {
                 continue;

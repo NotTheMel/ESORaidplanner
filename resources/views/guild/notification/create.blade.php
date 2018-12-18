@@ -112,7 +112,7 @@
                                 Message to be sent:<br>
                                 In the message you can use shortcodes that will be replaced by the actual values. See
                                 the
-                                list of shortcodes below.<br>
+                                list of shortcodes below. (this is not used when you use fancy Discord messages)<br>
                                 {!! Form::textarea('message', '', ['class' => 'form-control', 'required']) !!}<br>
                             @endif
 
@@ -150,16 +150,6 @@
                                             <td>Will be replaced by the total number of members that have signed up for
                                                 the
                                                 event.
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>{CONFIRMED_SIGNUPS}</td>
-                                            <td>Will be replaced by a list of all confirmed signups (name, role, class).
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>{BACKUP_SIGNUPS}</td>
-                                            <td>Will be replaced by a list of all backup signups (name, role, class).
                                             </td>
                                         </tr>
                                         <tr>

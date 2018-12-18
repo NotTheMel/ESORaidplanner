@@ -300,10 +300,10 @@ class Guild extends Model
      */
     public function isPendingMember(User $user): bool
     {
-        return 0 === DB::table(self::X_REF_USERS)
+        return 1 === DB::table(self::X_REF_USERS)
                 ->where('user_id', '=', $user->id)
                 ->where('guild_id', '=', $this->id)
-                ->where('status', '>', self::MEMBERSHIP_STATUS_PENDING)
+                ->where('status', '=', self::MEMBERSHIP_STATUS_PENDING)
                 ->count();
     }
 
@@ -322,7 +322,7 @@ class Guild extends Model
                 'created_at' => date('Y-m-d H:i:s'),
             ]);
 
-        $this->sendMemberAppliedNotifications($user);
+        //$this->sendMemberAppliedNotifications($user);
         $this->logger->guildRequestMembership($this, $user);
     }
 
@@ -489,7 +489,7 @@ class Guild extends Model
     {
         $notifications = Notification::query()
             ->where('call_type', '=', GuildApplicationMessage::CALL_TYPE)
-            ->where('guild_id', '=', $this->guild_id)
+            ->where('guild_id', '=', $this->id)
             ->get()->all();
 
         /** @var Notification $notification */
