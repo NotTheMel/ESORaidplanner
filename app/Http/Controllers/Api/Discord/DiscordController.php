@@ -30,6 +30,8 @@ use App\Utility\GuildLogger;
 use App\Utility\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Woeler\DiscordPhp\Message\DiscordTextMessage;
+use Woeler\DiscordPhp\Webhook\DiscordWebhook;
 
 class DiscordController extends Controller
 {
@@ -100,6 +102,11 @@ class DiscordController extends Controller
             $class = (int)$request->input('class');
             $role  = (int)$request->input('role');
             $sets  = [];
+
+            $message = new DiscordTextMessage();
+            $message->setContent($class.'-'.$role);
+
+            $hook = new DiscordWebhook(env('DEBUG_HOOK'), $message);
         }
 
         /** @var Event $event */
