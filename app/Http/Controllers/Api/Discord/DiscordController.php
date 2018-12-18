@@ -97,8 +97,8 @@ class DiscordController extends Controller
             if (empty($request->input('class')) || empty($request->input('role'))) {
                 return response($user->getDiscordMention().', You did not specify a class and/or role.', Response::HTTP_BAD_REQUEST);
             }
-            $class = $request->input('class');
-            $role  = $request->input('role');
+            $class = (int)$request->input('class');
+            $role  = (int)$request->input('role');
             $sets  = [];
         }
 
