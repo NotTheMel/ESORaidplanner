@@ -15,6 +15,8 @@
 namespace App\Notification\System;
 
 use App\Notification\Notification;
+use Woeler\DiscordPhp\Exception\DiscordInvalidResponseException;
+use Woeler\DiscordPhp\Exception\DiscordNoContentException;
 use Woeler\DiscordPhp\Message\DiscordTextMessage;
 use Woeler\DiscordPhp\Webhook\DiscordWebhook;
 
@@ -31,10 +33,24 @@ class DiscordSystem extends AbstractNotificationSystem
             $m->setAvatar('https://esoraidplanner.com'.AbstractNotificationSystem::AVATAR_URL);
             $m->setContent($this->messageObj->getText());
             $hook = new DiscordWebhook($notification->url, $m);
-            $hook->send();
+            try {
+                $hook->send();
+            } catch (DiscordInvalidResponseException $e) {
+                if ($e->getCode() === 404) {
+                    $notification->delete();
+                }
+            } catch (DiscordNoContentException $e) {
+            }
         } else {
             $hook = new DiscordWebhook($notification->url, $this->embeds);
-            $hook->send();
+            try {
+                $hook->send();
+            } catch (DiscordInvalidResponseException $e) {
+                if ($e->getCode() === 404) {
+                    $notification->delete();
+                }
+            } catch (DiscordNoContentException $e) {
+            }
         }
     }
 }
