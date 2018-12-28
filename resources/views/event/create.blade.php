@@ -23,11 +23,11 @@
 
                             Event name:{!! Form::text('name', '', array('class' => 'form-control')) !!}<br>
 
-                            @if(count($guild->teams()->get()->all()) > 0)
-                                Sign up
-                                team:{!! Form::select('team_id', $guild->teams()->pluck('name', 'id'), '', array('class' => 'form-control')) !!}
-                                <br>
-                            @endif
+                            {{--@if(count($guild->teams()->get()->all()) > 0)--}}
+                                {{--Sign up--}}
+                                {{--team:{!! Form::select('team_id', $guild->teams()->pluck('name', 'id'), '', array('class' => 'form-control')) !!}--}}
+                                {{--<br>--}}
+                            {{--@endif--}}
 
                             <div class="col-md-4">
                                 <div class="form-group">
