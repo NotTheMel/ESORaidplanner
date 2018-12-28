@@ -149,7 +149,9 @@ class DiscordController extends Controller
     public function listEvents(Request $request)
     {
         /** @var Guild $guild */
-        $guild = Guild::query()->where('discord_id', '=', $request->input('discord_server_id'))->first();
+        $guild = Guild::query()
+            ->where('discord_id', '=', $request->input('discord_server_id'))
+            ->first();
         $user  = User::query()
             ->whereNotNull('discord_id')
             ->where('discord_id', '=', $request->input('discord_user_id'))
