@@ -135,7 +135,9 @@ class User extends Authenticatable
             ->where(Guild::X_REF_USERS.'.user_id', '=', $this->id)
             ->whereJsonContains('guilds.admins', $this->id)
             ->orWhere(Guild::X_REF_USERS.'.user_id', '=', $this->id)
-            ->where('guilds.admins', 'LIKE', '"'.$this->id.'"')
+            ->where('guilds.admins', 'LIKE', $this->id.',')
+            ->orWhere(Guild::X_REF_USERS.'.user_id', '=', $this->id)
+            ->where('guilds.admins', 'LIKE', $this->id.'}')
             ->orderBy('guilds.name')
             ->get()->all();
     }
