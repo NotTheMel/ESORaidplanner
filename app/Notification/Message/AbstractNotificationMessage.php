@@ -71,6 +71,13 @@ abstract class AbstractNotificationMessage
 
     protected function matchesTags(array $tags1, array $tags2): bool
     {
+        if (($key = array_search('', $tags1)) !== false) {
+            unset($tags1[$key]);
+        }
+        if (($key = array_search('', $tags2)) !== false) {
+            unset($tags2[$key]);
+        }
+
         if (empty($tags1) && empty($tags2)) {
             return true;
         }

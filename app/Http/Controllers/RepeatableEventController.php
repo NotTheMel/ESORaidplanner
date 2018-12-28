@@ -75,6 +75,7 @@ class RepeatableEventController extends Controller
 
         $event->parent_repeatable = $repeatable->id;
         $event->save();
+        $event->sendCreationNotifications();
 
         return redirect(route('guildSettingsView', ['slug' => $slug]));
     }
