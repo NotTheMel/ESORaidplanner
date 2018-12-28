@@ -66,7 +66,7 @@ class DiscordController extends Controller
         /** @var Guild $guild */
         $guild = Guild::query()->find($request->input('guild_id'));
 
-        if (!$guild->isAdmin($user)) {
+        if (null === $guild || !$guild->isAdmin($user)) {
             return response($user->getDiscordMention().', You are not an admin of this guild.', Response::HTTP_UNAUTHORIZED);
         }
 
