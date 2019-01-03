@@ -36,7 +36,7 @@ class DiscordSystem extends AbstractNotificationSystem
             try {
                 $hook->send();
             } catch (DiscordInvalidResponseException $e) {
-                if ($e->getCode() === 404) {
+                if (404 === $e->getCode()) {
                     $notification->delete();
                 }
             } catch (DiscordNoContentException $e) {
@@ -46,7 +46,7 @@ class DiscordSystem extends AbstractNotificationSystem
             try {
                 $hook->send();
             } catch (DiscordInvalidResponseException $e) {
-                if ($e->getCode() === 404) {
+                if (404 === $e->getCode()) {
                     $notification->delete();
                 }
             } catch (DiscordNoContentException $e) {

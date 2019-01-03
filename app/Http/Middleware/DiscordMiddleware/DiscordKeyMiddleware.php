@@ -38,7 +38,6 @@ class DiscordKeyMiddleware
                 ->whereNotNull('discord_handle')
                 ->where('discord_handle', '=', $user_id)
                 ->first();
-            Log::info($user_id);
             if (null === $user) {
                 return response(DiscordBotMessages::makeMention($user_discord_long).', I do not know you. Make sure to set your Discord handle in your ESO Raidplanner profile. Your Discord handle is `'.$user_id.'`. Please go here and set your handle: https://esoraidplanner.com/user/account-settings', Response::HTTP_BAD_REQUEST);
             }
