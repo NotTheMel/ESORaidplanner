@@ -79,7 +79,7 @@
                             {!! Form::text('tags', '', ['class' => 'form-control']) !!}<br><br>
                             Description:{!! Form::textarea('description', '', array('class' => 'form-control')) !!}<br>
                             Repeat this event{!! Form::select('interval', ['DAILY' => 'Daily', 'WEEKLY' => 'Weekly', 'MONTHLY' => 'Monthly'], null, array('class' => 'form-control', 'required')) !!}<br>
-                            How many events should be created in advance? (max 10):{!! Form::number('max_create_ahead', '', array('min' => '0', 'max' => '10', 'class' => 'form-control', 'required')) !!}
+                            How many events should be created in advance? (max 10):{!! Form::number('max_create_ahead', '1', array('min' => '1', 'max' => '10', 'class' => 'form-control', 'required')) !!}
 
                             {!! Form::submit('Create Repeatable Event', ['class' => 'btn btn-info']) !!}<br>
 

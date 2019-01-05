@@ -6,7 +6,6 @@ use App\User;
 use App\Utility\DiscordBotMessages;
 use Closure;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 
 class DiscordKeyMiddleware
 {
