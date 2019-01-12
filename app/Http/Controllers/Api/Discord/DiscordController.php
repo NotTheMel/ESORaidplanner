@@ -265,7 +265,7 @@ class DiscordController extends Controller
             'embeds'     => [[
                 'title'       => $event->name,
                 'description' => $event->description ?? '',
-                'url'         => 'https://esoraidplanner.com/g/'.$event->guild->slug.'/event/'.$event->id,
+                'url'         => 'https://esoraidplanner.com/g/'.$event->guild->slug.'/event/view/'.$event->id,
                 'color'       => 9660137,
                 'author'      => [
                     'name'     => 'ESO Raidplanner: '.$event->guild->name,
