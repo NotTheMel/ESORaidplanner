@@ -322,7 +322,7 @@ class Guild extends Model
                 'created_at' => date('Y-m-d H:i:s'),
             ]);
 
-        //$this->sendMemberAppliedNotifications($user);
+        $this->sendMemberAppliedNotifications($user);
         $this->logger->guildRequestMembership($this, $user);
     }
 
