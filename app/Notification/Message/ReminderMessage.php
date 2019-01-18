@@ -32,7 +32,7 @@ class ReminderMessage extends AbstractNotificationMessage
             return false;
         }
 
-        $alreadySent = 0 !== DB::table('hook_calls')->where([
+        $alreadySent = 0 !== DB::table('hookcalls')->where([
                 'hook_id'  => $notification->id,
                 'event_id' => $this->subjects['event']->id,
             ])->count();
@@ -62,7 +62,7 @@ class ReminderMessage extends AbstractNotificationMessage
 
     public function wasCalled(Notification $notification)
     {
-        DB::table('hook_calls')->insert([
+        DB::table('hookcalls')->insert([
             'hook_id'    => $notification->id,
             'event_id'   => $this->subjects['event']->id,
             'created_at' => date('Y-m-d H:i:s'),

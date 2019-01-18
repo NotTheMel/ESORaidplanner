@@ -70,10 +70,18 @@ class RepeatableEventController extends Controller
         $repeatable->start_date        = $first_date->format('Y-m-d H:i:s');
         $repeatable->tags              = TagHandler::stringToArray($request->input('tags') ?? '');
         $repeatable->guild_id          = $guild->id;
+        if (empty($request->input('max_create_ahead'))) {
+            $repeatable->max_create_ahead = 1;
+        } else {
+            $repeatable->max_create_ahead = $request->input('max_create_ahead');
+        }
         $repeatable->save();
 
         $event->parent_repeatable = $repeatable->id;
         $event->save();
+        $event->sendCreationNotifications();
+
+        return redirect(route('guildSettingsView', ['slug' => $slug]));
     }
 
     public function update(string $slug, int $repeatable_id)

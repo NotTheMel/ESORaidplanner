@@ -53,12 +53,12 @@ class CreateRepeatableEventsCommand extends Command
             $timezone  = $repeatable->timezone;
             $startDate = new \DateTime($repeatable->latest_event_date, new \DateTimeZone(env('DEFAULT_TIMEZONE')));
             $startDate->setTimezone(new \DateTimeZone($timezone));
-            $rule = new \Recurr\Rule('FREQ='.$repeatable->interval.';COUNT='.$repeatable->max_create_ahead, $startDate, null, $timezone);
+            $rule = new \Recurr\Rule('FREQ='.$repeatable->interval.';COUNT='.($repeatable->max_create_ahead + 1), $startDate, null, $timezone);
 
             $transformer = new \Recurr\Transformer\ArrayTransformer();
             $dates       = $transformer->transform($rule);
 
-            $gate_time = new \DateTime('@'.strtotime('+'.$repeatable->max_create_ahead.' '.$this->intervalMap[$repeatable->interval]), new \DateTimeZone(env('DEFAULT_TIMEZONE')));
+            $gate_time = new \DateTime('@'.strtotime('+'.($repeatable->max_create_ahead + 1).' '.$this->intervalMap[$repeatable->interval]), new \DateTimeZone(env('DEFAULT_TIMEZONE')));
 
             foreach ($dates as $date) {
                 $start = $date->getStart();

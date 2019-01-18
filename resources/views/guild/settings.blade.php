@@ -91,9 +91,9 @@
                                         <td>{{ $repeatable->name }}</td>
                                         <td>{{ $repeatable->getRepetitionString() }}</td>
                                         <td>
-                                            <a href="{{ '/g/' . $guild->slug . '/repeatable/edit/' . $repeatable->id }}">
-                                                <button type="button" class="btn btn-info">Edit</button>
-                                            </a>
+                                            {{--<a href="{{ '/g/' . $guild->slug . '/repeatable/edit/' . $repeatable->id }}">--}}
+                                                {{--<button type="button" class="btn btn-info">Edit</button>--}}
+                                            {{--</a>--}}
                                             <a href="{{ '/g/' . $guild->slug . '/repeatable/delete/' . $repeatable->id }}">
                                                 <button type="button" class="btn btn-danger">Delete</button>
                                             </a>

@@ -243,7 +243,7 @@
                                 </label>
                             </li>
                             <li>
-                                <a href="/profile/menu">
+                                <a href="/user/account-settings">
                                     <p>Account</p>
                                 </a>
                             </li>
@@ -272,31 +272,31 @@
             <div class="container-fluid">
                 <nav class="pull-left">
                     <ul>
-                        <li>
-                            <a href="/about">
-                                About
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/faq">
-                                FAQ
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/changelog">
-                                Changelog
-                            </a>
-                        </li>
+                        {{--<li>--}}
+                            {{--<a href="/about">--}}
+                                {{--About--}}
+                            {{--</a>--}}
+                        {{--</li>--}}
+                        {{--<li>--}}
+                            {{--<a href="/faq">--}}
+                                {{--FAQ--}}
+                            {{--</a>--}}
+                        {{--</li>--}}
+                        {{--<li>--}}
+                            {{--<a href="/changelog">--}}
+                                {{--Changelog--}}
+                            {{--</a>--}}
+                        {{--</li>--}}
                         <li>
                             <a href="https://github.com/ESORaidplanner/ESORaidplanner" target="_blank">
                                 Contribute
                             </a>
                         </li>
-                        <li>
-                            <a href="/termsofuse">
-                                Terms of Use
-                            </a>
-                        </li>
+                        {{--<li>--}}
+                            {{--<a href="/termsofuse">--}}
+                                {{--Terms of Use--}}
+                            {{--</a>--}}
+                        {{--</li>--}}
                         <li>
                             <a href="https://patreon.com/woeler" target="_blank">
                                 Support ESO Raidplanner

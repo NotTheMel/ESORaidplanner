@@ -47,6 +47,7 @@ class EventCreationMessage extends AbstractNotificationMessage
         $embeds->setAvatar('https://esoraidplanner.com'.AbstractNotificationSystem::AVATAR_URL);
         $embeds->setTitle('Event '.$this->subjects['event']->name.' has been created');
         $embeds->setUrl($this->subjects['event']->getViewRoute());
+        $embeds->setDescription($this->subjects['event']->description ?? '');
         $embeds->setColor(9660137);
         $embeds->setAuthorName('ESO Raidplanner');
         $embeds->setAuthorIcon('https://esoraidplanner.com/favicon/appicon.jpg');

@@ -25,7 +25,7 @@ class DiscordMiddleware
         $event_id          = $request->input('event_id') ?? null;
 
         /** @var Guild $guild */
-        $guild = Guild::query()->where('discord_id', '=', $guild_id)->first();
+        $guild = Guild::query()->where('discord_id', '=', $guild_id)->whereNotNull('discord_id')->first();
         $user  = User::query()->where('discord_id', '=', $user_discord_long)->first();
 
         if (null === $guild) {
@@ -38,7 +38,7 @@ class DiscordMiddleware
             /** @var Event $event */
             $event = Event::query()->find($event_id);
             if (null === $event || $event->guild_id !== $guild->id) {
-                return response($user->getDiscordMention().', the event you are trying to sign up for does not exist');
+                return response($user->getDiscordMention().', the event you are trying to sign up/off for does not exist');
             }
         }
 

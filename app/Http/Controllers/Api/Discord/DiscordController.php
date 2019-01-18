@@ -30,9 +30,6 @@ use App\Utility\GuildLogger;
 use App\Utility\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
-use Woeler\DiscordPhp\Message\DiscordTextMessage;
-use Woeler\DiscordPhp\Webhook\DiscordWebhook;
 
 class DiscordController extends Controller
 {
@@ -66,7 +63,7 @@ class DiscordController extends Controller
         /** @var Guild $guild */
         $guild = Guild::query()->find($request->input('guild_id'));
 
-        if (!$guild->isAdmin($user)) {
+        if (null === $guild || !$guild->isAdmin($user)) {
             return response($user->getDiscordMention().', You are not an admin of this guild.', Response::HTTP_UNAUTHORIZED);
         }
 
@@ -100,8 +97,8 @@ class DiscordController extends Controller
             if (empty($request->input('class')) || empty($request->input('role'))) {
                 return response($user->getDiscordMention().', You did not specify a class and/or role.', Response::HTTP_BAD_REQUEST);
             }
-            $class = (int)$request->input('class');
-            $role  = (int)$request->input('role');
+            $class = (int) $request->input('class');
+            $role  = (int) $request->input('role');
             $sets  = [];
         }
 
@@ -149,7 +146,9 @@ class DiscordController extends Controller
     public function listEvents(Request $request)
     {
         /** @var Guild $guild */
-        $guild = Guild::query()->where('discord_id', '=', $request->input('discord_server_id'))->first();
+        $guild = Guild::query()
+            ->where('discord_id', '=', $request->input('discord_server_id'))
+            ->first();
         $user  = User::query()
             ->whereNotNull('discord_id')
             ->where('discord_id', '=', $request->input('discord_user_id'))
@@ -266,7 +265,7 @@ class DiscordController extends Controller
             'embeds'     => [[
                 'title'       => $event->name,
                 'description' => $event->description ?? '',
-                'url'         => 'https://esoraidplanner.com/g/'.$event->guild->slug.'/event/'.$event->id,
+                'url'         => 'https://esoraidplanner.com/g/'.$event->guild->slug.'/event/view/'.$event->id,
                 'color'       => 9660137,
                 'author'      => [
                     'name'     => 'ESO Raidplanner: '.$event->guild->name,

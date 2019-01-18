@@ -76,7 +76,7 @@ class RepeatableEvent extends Model
 
     public function getRepetitionString(): string
     {
-        $dt = new DateTime($this->latestEvent()->start_date);
+        $dt = new DateTime($this->latest_event_date);
         $dt->setTimezone(new DateTimeZone(Auth::user()->timezone));
 
         return $dt->format('l').' '.EventTimeIntervals::INTERVALS[$this->interval];
