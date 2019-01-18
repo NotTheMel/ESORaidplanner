@@ -243,7 +243,7 @@
                                 </label>
                             </li>
                             <li>
-                                <a href="/profile/menu">
+                                <a href="/user/account-settings">
                                     <p>Account</p>
                                 </a>
                             </li>
