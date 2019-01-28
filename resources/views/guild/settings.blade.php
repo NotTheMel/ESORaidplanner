@@ -44,11 +44,11 @@
                             @if($guild->hasDiscordBot())
                                 <div class="alert alert-success">
                                     <p>The Discord bot is connected to your guild.</p>
-                                    <a href="{{ route('guildDisconnectDiscordBot', ['slug' => $guild->slug]) }}"
-                                       target="_blank">
-                                        <button type="button" class="btn btn-success">Disconnect Discord bot!</button>
-                                    </a>
                                 </div>
+                                <a href="{{ route('guildDisconnectDiscordBot', ['slug' => $guild->slug]) }}"
+                                   target="_blank">
+                                    <button type="button" class="btn btn-danger">Disconnect Discord bot!</button>
+                                </a>
                             @else
                                 <div class="alert alert-danger">
                                     <p>The Discord bot is not connected to your guild. Add the Discord bot by clicking
