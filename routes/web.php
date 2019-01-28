@@ -68,6 +68,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::get('/g/{slug}/settings', 'GuildController@settingsView')->name('guildSettingsView');
             Route::get('/g/{slug}/members', 'GuildController@membersView')->name('guildMembersView');
             Route::post('/g/{slug}/settings', 'GuildController@saveSettings')->name('guildSaveSettings');
+            Route::get('/g/{slug}/settings/removebot', 'GuildController@disconnectDiscordBot')->name('guildDisconnectDiscordBot');
             Route::get('/g/{slug}/member/approve/{user_id}', 'GuildController@approveMember')->name('guildApproveMember');
             Route::get('/g/{slug}/member/remove/{user_id}', 'GuildController@removeMember')->name('guildRemoveMember');
 

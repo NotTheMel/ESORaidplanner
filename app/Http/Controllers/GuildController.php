@@ -223,4 +223,14 @@ class GuildController extends Controller
 
         return redirect(route('guildDetailView', ['slug' => $slug]));
     }
+
+    public function disconnectDiscordBot(string $slug)
+    {
+        $guild                     = Guild::query()->where('slug', '=', $slug)->first();
+        $guild->discord_id         = null;
+        $guild->discord_channel_id = null;
+        $guild->save();
+
+        return redirect(route('guildSettingsView', ['slug' => $slug]));
+    }
 }
