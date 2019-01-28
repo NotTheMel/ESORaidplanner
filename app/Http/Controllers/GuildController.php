@@ -119,7 +119,7 @@ class GuildController extends Controller
         ]);
 
         $guild           = new Guild($request->all());
-        $guild->slug     = Slugifier::slugify($request->input('name'));
+        $guild->slug     = Slugifier::uniqueGuildSlug($request->input('name'));
         $guild->owner_id = Auth::id();
         $guild->addAdmin(Auth::user());
         $guild->save();

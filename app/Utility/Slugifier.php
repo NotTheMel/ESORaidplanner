@@ -17,12 +17,29 @@
 
 namespace App\Utility;
 
+use App\Guild;
+
 class Slugifier
 {
-    public static function slugify(string $string)
+    public static function slugify(string $string): string
     {
         $string = strtolower(str_replace('\'', '', $string));
 
         return preg_replace('/[^A-Za-z0-9-]+/', '-', $string);
+    }
+
+    public static function uniqueGuildSlug(string $string): string
+    {
+        $slug = self::slugify($string);
+
+        $exists = Guild::query()
+            ->where('slug', '=', $slug)
+            ->count();
+
+        if (0 !== $exists) {
+            $slug = $slug.'-'.rand(1, 10000);
+        }
+
+        return $slug;
     }
 }
