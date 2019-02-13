@@ -47,11 +47,14 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/g/{slug}/apply', 'GuildController@apply')->name('guildApply');
         Route::get('/g/{slug}/pending', 'GuildController@pendingView')->name('guildPendingView');
     });
+    
+    Route::group(['middleware' => ['guild.member']], function () {
+        Route::get('/g/{slug}/member/leave', 'GuildController@leave')->name('guildLeave');
+    });
 
     Route::group(['middleware' => ['guild.member', 'guild.active']], function () {
         Route::get('/g/{slug}', 'GuildController@detailView')->name('guildDetailView');
         Route::get('/g/{slug}/pastevents', 'GuildController@pastEventsView')->name('guildPastEventsView');
-        Route::get('/g/{slug}/member/leave', 'GuildController@leave')->name('guildLeave');
 
         Route::post('/g/{slug}/event/{event_id}/signup', 'EventController@signup')->name('eventSignup');
         Route::get('/g/{slug}/event/{event_id}/signoff', 'EventController@signoff')->name('eventSignoff');
