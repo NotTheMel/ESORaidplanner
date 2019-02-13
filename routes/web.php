@@ -46,6 +46,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/g/{slug}/apply', 'GuildController@applyView')->name('guildApplyView');
         Route::post('/g/{slug}/apply', 'GuildController@apply')->name('guildApply');
         Route::get('/g/{slug}/pending', 'GuildController@pendingView')->name('guildPendingView');
+    });
+    
+    Route::group(['middleware' => ['guild.member']], function () {
         Route::get('/g/{slug}/member/leave', 'GuildController@leave')->name('guildLeave');
     });
 
