@@ -81,14 +81,14 @@ class CreateRepeatableEventsCommand extends Command
                     $new_event->guild_id          = $repeatable->guild_id;
                     $new_event->parent_repeatable = $repeatable->id;
                     $new_event->tags              = $repeatable->tags ?? [];
+                    $new_event->save();
                     try {
                         $new_event->sendCreationNotifications();
                     } catch (DiscordInvalidResponseException $e) {
-                        if (404 !== $e->getCode()) {
-                            break;
-                        }
+//                        if (404 !== $e->getCode()) {
+//
+//                        }
                     }
-                    $new_event->save();
                     $start->setTimezone(new \DateTimeZone(env('DEFAULT_TIMEZONE')));
                     $repeatable->latest_event      = $new_event->id;
                     $repeatable->latest_event_date = $start->format('Y-m-d H:i:s');
