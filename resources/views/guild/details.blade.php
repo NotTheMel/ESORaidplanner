@@ -50,13 +50,13 @@
                             </div>
                             <div class="footer">
                                 <hr>
-                                <div class="stats"><i class="fa fa-calendar-o"></i><!-- react-text: 248 -->
-                                    <!-- /react-text --><!-- react-text: 249 --><a
-                                            href="{{ '/g/' . $guild->slug . '/members'}}">Go to Members list</a>
-                                    {{--@if($guild->isAdmin(Auth::user()))--}}
-                                        {{--or <a href="{{ '/g/' . $guild->slug . '/teams'}}">Teams list</a>--}}
-                                {{--@endif--}}
-                                <!-- /react-text --></div>
+                                <div class="stats"><i class="fa fa-calendar-o"></i>
+                                    @if ($guild->isAdmin(Auth::user()))
+                                        <a href="{{ '/g/' . $guild->slug . '/members' }}">Go to Members list</a>
+                                    @else
+                                        <s>Go to Members list</s>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -70,7 +70,8 @@
                                                 class="fa fa-calendar fa-3x"></i></div>
                                 </div>
                                 <div class="col-xs-7">
-                                    <div class="numbers"><p>Total Events</p><!-- react-text: 260 -->{{ \count($guild->events) }}
+                                    <div class="numbers"><p>Total Events</p>
+                                        <!-- react-text: 260 -->{{ \count($guild->events) }}
                                         ({{ count($guild->upcomingEvents()) }} upcoming)<!-- /react-text -->
                                     </div>
                                 </div>
