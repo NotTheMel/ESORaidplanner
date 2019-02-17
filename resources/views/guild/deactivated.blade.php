@@ -20,6 +20,12 @@
                                 <a href="{{ route('guildActivate', ['slug' => $guild->slug]) }}">
                                     <button class="btn btn-success">Reactivate</button>
                                 </a>
+                                <br>
+                            @endif
+                            @if(!$guild->isOwner(Auth::user()))
+                                <a href="{{ '/g/' . $guild->slug . '/member/leave' }}">
+                                    <button type="button" class="btn btn-danger">Leave guild</button>
+                                </a>
                             @endif
                         </div>
                     </div>

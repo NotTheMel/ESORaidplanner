@@ -35,6 +35,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/user/characters/update/{character_id}', 'CharacterController@updateView')->name('characterUpdateView');
     Route::get('/user/characters/delete/{character_id}', 'CharacterController@delete')->name('characterDelete');
     Route::get('/user/ical', 'UserController@icalView')->name('userIcalView');
+    Route::get('/user/guilds', 'UserController@guildsView')->name('userGuildsView');
 
     Route::get('/guilds', 'GuildController@listView');
     Route::get('/guild/create', 'GuildController@createView')->name('guildCreateView');

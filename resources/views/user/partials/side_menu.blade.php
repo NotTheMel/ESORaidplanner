@@ -9,7 +9,8 @@
                 <li><a href="/user/account-settings">Account Settings</a></li>
                 <li><a href="/user/profile-settings">Public Profile</a></li>
                 <li><a href="/user/characters">Character Presets</a></li>
-                <li><a href="/user/membership">Membership (Patreon)</a></li>
+                <li><a href="{{ route('userGuildsView') }}">Guilds</a></li>
+                {{--<li><a href="/user/membership">Membership (Patreon)</a></li>--}}
                 <li><a href="/user/ical">Personal Calendar (iCal)</a></li>
             </ul>
         </div>
