@@ -9,11 +9,6 @@
             <div class="col-md-9">
                 <div class="card">
                     <div class="header">
-                        <div class="pull-right">
-                            <a href="{{ route('characterCreateView') }}">
-                                <button type="button" class="btn btn-success">Create new preset</button>
-                            </a>
-                        </div>
                         <h4 class="title">Guilds for {{ Auth::user()->name }}</h4>
                     </div>
                     <div class="content">
