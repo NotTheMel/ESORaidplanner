@@ -119,7 +119,7 @@ class GuildController extends Controller
         ]);
 
         $guild           = new Guild($request->all());
-        $guild->slug     = Slugifier::slugify($request->input('name'));
+        $guild->slug     = Slugifier::uniqueGuildSlug($request->input('name'));
         $guild->owner_id = Auth::id();
         $guild->addAdmin(Auth::user());
         $guild->save();
@@ -222,5 +222,15 @@ class GuildController extends Controller
         $guild->save();
 
         return redirect(route('guildDetailView', ['slug' => $slug]));
+    }
+
+    public function disconnectDiscordBot(string $slug)
+    {
+        $guild                     = Guild::query()->where('slug', '=', $slug)->first();
+        $guild->discord_id         = null;
+        $guild->discord_channel_id = null;
+        $guild->save();
+
+        return redirect(route('guildSettingsView', ['slug' => $slug]));
     }
 }

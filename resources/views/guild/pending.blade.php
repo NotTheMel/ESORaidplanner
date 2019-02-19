@@ -13,7 +13,10 @@
                         </div>
                         <div class="content">
                             You are not a member of {{ $guild->name }}.<br>
-                            You have requested membership to this guild. This request is pending.
+                            You have requested membership to this guild. This request is pending.<br>
+                            <a href="{{ '/g/' . $guild->slug . '/member/leave' }}">
+                                <button type="button" class="btn btn-danger">Cancel request</button>
+                            </a>
                         </div>
                     </div>
                 </div>

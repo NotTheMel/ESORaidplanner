@@ -48,6 +48,15 @@ class DiscordController extends Controller
             ->where('discord_id', '=', $request->input('discord_user_id'))
             ->first();
 
+        $exists = Guild::query()
+            ->where('discord_id', '=', $request->input('discord_server_id'))
+            ->where('discord_channel_id', '=', $request->input('discord_channel_id'))
+            ->count();
+
+        if (0 !== $exists) {
+            return response($user->getDiscordMention().', This channel is already binded to another guild. Please unbind this guild first on the website via the guild settings page.', Response::HTTP_BAD_REQUEST);
+        }
+
         if (empty($request->input('guild_id'))) {
             if (0 === count($user->guildsWhereIsAdmin())) {
                 return \response($user->getDiscordMention().', You are currently not an admin in any guild.', Response::HTTP_OK);

@@ -38,6 +38,11 @@ class UserController extends Controller
         return view('user.ical');
     }
 
+    public function guildsView()
+    {
+        return view('user.guilds');
+    }
+
     public function updateAccountSettings(Request $request)
     {
         $request->validate([

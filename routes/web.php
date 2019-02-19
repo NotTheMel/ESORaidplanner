@@ -35,6 +35,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/user/characters/update/{character_id}', 'CharacterController@updateView')->name('characterUpdateView');
     Route::get('/user/characters/delete/{character_id}', 'CharacterController@delete')->name('characterDelete');
     Route::get('/user/ical', 'UserController@icalView')->name('userIcalView');
+    Route::get('/user/guilds', 'UserController@guildsView')->name('userGuildsView');
 
     Route::get('/guilds', 'GuildController@listView');
     Route::get('/guild/create', 'GuildController@createView')->name('guildCreateView');
@@ -71,6 +72,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::get('/g/{slug}/settings', 'GuildController@settingsView')->name('guildSettingsView');
             Route::get('/g/{slug}/members', 'GuildController@membersView')->name('guildMembersView');
             Route::post('/g/{slug}/settings', 'GuildController@saveSettings')->name('guildSaveSettings');
+            Route::get('/g/{slug}/settings/removebot', 'GuildController@disconnectDiscordBot')->name('guildDisconnectDiscordBot');
             Route::get('/g/{slug}/member/approve/{user_id}', 'GuildController@approveMember')->name('guildApproveMember');
             Route::get('/g/{slug}/member/remove/{user_id}', 'GuildController@removeMember')->name('guildRemoveMember');
 
