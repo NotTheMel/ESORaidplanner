@@ -62,18 +62,6 @@ Route::group(['middleware' => ['api.user.auth']], function () {
     Route::post('/u/self/signups', 'Api\UserBased\UserController@getSignups');
 
     Route::group(['middleware' => ['api.user.guild.member']], function () {
-        Route::post('/u/guild/{guild_id}', 'Api\UserBased\GuildController@get');
-        Route::post('/u/guild/{guild_id}/members', 'Api\UserBased\GuildController@getMembers');
-        Route::post('/u/guild/{guild_id}/members/pending', 'Api\UserBased\GuildController@getPendingMembers');
-        Route::post('/u/guild/{guild_id}/events', 'Api\UserBased\GuildController@getEvents');
-        Route::post('/u/guild/{guild_id}/leave', 'Api\UserBased\GuildController@leave');
-        Route::post('/u/event/{event_id}', 'Api\UserBased\EventController@get');
-        Route::post('/u/event/{event_id}/signups', 'Api\UserBased\EventController@getSignups');
-
-        Route::post('/u/signup/create/{event_id}', 'Api\UserBased\EventController@signup');
-        Route::post('/u/signup/update/{event_id}', 'Api\UserBased\EventController@signup');
-        Route::post('/u/signup/delete/{event_id}', 'Api\UserBased\EventController@signoff');
-
         Route::group(['middleware' => ['api.user.guild.admin']], function () {
             Route::post('/u/guild/{guild_id}/approve/{user_id}', 'Api\UserBased\GuildController@approveMembership');
             Route::post('/u/guild/{guild_id}/remove/{user_id}', 'Api\UserBased\GuildController@removeMembership');
@@ -87,5 +75,17 @@ Route::group(['middleware' => ['api.user.auth']], function () {
                 Route::post('/u/guild/{guild_id}/demote/{user_id}', 'Api\UserBased\GuildController@demoteMember');
             });
         });
+        
+        Route::post('/u/guild/{guild_id}', 'Api\UserBased\GuildController@get');
+        Route::post('/u/guild/{guild_id}/members', 'Api\UserBased\GuildController@getMembers');
+        Route::post('/u/guild/{guild_id}/members/pending', 'Api\UserBased\GuildController@getPendingMembers');
+        Route::post('/u/guild/{guild_id}/events', 'Api\UserBased\GuildController@getEvents');
+        Route::post('/u/guild/{guild_id}/leave', 'Api\UserBased\GuildController@leave');
+        Route::post('/u/event/{event_id}', 'Api\UserBased\EventController@get');
+        Route::post('/u/event/{event_id}/signups', 'Api\UserBased\EventController@getSignups');
+
+        Route::post('/u/signup/create/{event_id}', 'Api\UserBased\EventController@signup');
+        Route::post('/u/signup/update/{event_id}', 'Api\UserBased\EventController@signup');
+        Route::post('/u/signup/delete/{event_id}', 'Api\UserBased\EventController@signoff');
     });
 });
